@@ -1,0 +1,11 @@
+**/.git
+**/node_modules
+**/*.log
+**/*.tmp
+# кеш IDE
+.idea
+.vscode
+# тестовые файлы
+**/*_test.go
+# лишний hello-client
+hello-client

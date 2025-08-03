@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	pb "github.com/ZnayMed/znaymed-backend/pb"
@@ -12,7 +13,8 @@ import (
 )
 
 func main() {
-
+	addrAuth := os.Getenv("AUTH_SERVICE_ADDR")     // "auth-service:50054"
+	addrCourse := os.Getenv("COURSE_SERVICE_ADDR") // "course-service:50053"
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		var req struct {
 			Username string `json:"username"`
@@ -23,7 +25,7 @@ func main() {
 			return
 		}
 
-		conn, err := grpc.Dial("localhost:50053", grpc.WithInsecure())
+		conn, err := grpc.Dial(addrAuth, grpc.WithInsecure())
 		if err != nil {
 			http.Error(w, "gRPC connect failed", http.StatusInternalServerError)
 			return
@@ -56,7 +58,7 @@ func main() {
 			return
 		}
 
-		conn, err := grpc.Dial("localhost:50053", grpc.WithInsecure())
+		conn, err := grpc.Dial(addrAuth, grpc.WithInsecure())
 		if err != nil {
 			http.Error(w, "gRPC connect failed", http.StatusInternalServerError)
 			return
@@ -88,7 +90,7 @@ func main() {
 			return
 		}
 
-		conn, err := grpc.Dial("localhost:50054", grpc.WithInsecure()) // порт auth-сервиса
+		conn, err := grpc.Dial(addrAuth, grpc.WithInsecure())
 		if err != nil {
 			http.Error(w, "gRPC connect failed", http.StatusInternalServerError)
 			return
@@ -122,7 +124,7 @@ func main() {
 			return
 		}
 
-		conn, err := grpc.Dial("localhost:50053", grpc.WithInsecure())
+		conn, err := grpc.Dial(addrCourse, grpc.WithInsecure())
 		if err != nil {
 			http.Error(w, "gRPC connect failed", http.StatusInternalServerError)
 			return

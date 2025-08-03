@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"os"
+	"time"
 )
 
 type Database struct {
@@ -14,9 +15,8 @@ type Database struct {
 }
 
 func NewDatabase() (*Database, error) {
-	err := godotenv.Load() // загрузка .env
-	if err != nil {
-		log.Fatalf("Ошибка загрузки .env файла: %v", err)
+	if err := godotenv.Load(); err != nil {
+		log.Printf("no .env file, continue with docker vars: %v", err)
 	}
 
 	dsn := fmt.Sprintf(
@@ -28,13 +28,25 @@ func NewDatabase() (*Database, error) {
 		os.Getenv("DB_NAME"),
 	)
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	var db *gorm.DB
+	var err error
+
+	// Пытаемся подключиться до 30 секунд, каждые 3 сек.
+	for i := 0; i < 10; i++ {
+		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+		if err == nil {
+			break
+		}
+		log.Printf("DB not ready (%v); retry in 3s...", err)
+		time.Sleep(3 * time.Second)
+	}
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ошибка подключения к БД: %w", err)
 	}
 
-	err = db.AutoMigrate(&User{})
-	if err != nil {
+	if err := db.AutoMigrate(
+		&User{},
+	); err != nil {
 		return nil, err
 	}
 
