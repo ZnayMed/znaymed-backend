@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "./;pb";
+
+
+
+
+
+
+service AuthService{
+  rpc Login (LoginRequest) returns (LoginResponse);
+  rpc VerifyToken (VerifyRequest) returns (VerifyResponse);
+  rpc Register (SaveUserRequest) returns (SaveUserResponse);
+}
+service CourseService{
+  rpc GetUserSections (UserRequest) returns (UserSectionsResponse);
+}
+
+message UserRequest{
+  string tgid = 1;
+}
+
+message UserSectionsResponse{
+  repeated string topic_titles = 1;
+}
+
+message LoginRequest{
+  string username = 1;
+  string password = 2;
+}
+
+message LoginResponse{
+  string token = 1;
+}
+
+
+message VerifyRequest{
+  string token = 1;
+}
+
+message VerifyResponse{
+  bool valid = 1;
+}
+
+
+message SaveUserRequest {
+  string name = 1;
+  string tgid = 2;
+  string birthdate = 3;
+}
+message SaveUserResponse {
+  bool success = 1;
+}
+
