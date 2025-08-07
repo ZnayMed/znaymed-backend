@@ -31,7 +31,6 @@ func NewDatabase() (*Database, error) {
 	var db *gorm.DB
 	var err error
 
-	// Пытаемся подключиться до 30 секунд, каждые 3 сек.
 	for i := 0; i < 10; i++ {
 		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		if err == nil {
@@ -48,6 +47,15 @@ func NewDatabase() (*Database, error) {
 		&User{}, &Subject{}, &Section{}, &Topic{}, &UserSection{},
 	); err != nil {
 		return nil, err
+	}
+
+	var cnt int64
+	db.Model(&Subject{}).Count(&cnt)
+	if cnt == 0 {
+		if err := seedInitialData(db); err != nil {
+			return nil, err
+		}
+		log.Println("📥 База заполнена начальными предметами/темами")
 	}
 
 	return &Database{DB: db}, nil

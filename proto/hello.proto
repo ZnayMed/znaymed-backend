@@ -16,6 +16,32 @@ service AuthService{
 }
 service CourseService{
   rpc GetUserSections (UserRequest) returns (UserSectionsResponse);
+  rpc AddSection (SaveSectionRequest) returns (SaveSectionResponse);
+}
+
+service PaymentService {
+  rpc CreatePayment (CreatePaymentRequest) returns (CreatePaymentResponse);
+}
+
+message CreatePaymentRequest {
+  string tgid = 1;
+  string course_id = 2;
+}
+
+message CreatePaymentResponse {
+  string payment_id = 1;
+  string payment_url = 2;
+  string status = 3;
+}
+
+
+message SaveSectionRequest{
+  string tgid = 1;
+  string title = 2;
+}
+
+message SaveSectionResponse{
+  bool success = 1;
 }
 
 message UserRequest{
@@ -52,5 +78,6 @@ message SaveUserRequest {
 }
 message SaveUserResponse {
   bool success = 1;
+  string message = 2;
 }
 

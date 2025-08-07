@@ -44,7 +44,7 @@ func NewDatabase() (*Database, error) {
 	}
 
 	if err := db.AutoMigrate(
-		&User{},
+		&Payment{}, &Outbox{},
 	); err != nil {
 		return nil, err
 	}

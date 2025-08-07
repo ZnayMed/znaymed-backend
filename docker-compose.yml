@@ -6,7 +6,6 @@ services:
   ################################################################################
   db:
     image: postgres:16-alpine
-    container_name: znaymed-db
     restart: always
     environment:
       POSTGRES_USER:     ${DB_USER}
@@ -14,10 +13,8 @@ services:
       POSTGRES_DB:       ${DB_NAME}
     volumes:
       - db_data:/var/lib/postgresql/data
-    networks:
-      - znaymed-net
-    ports:
-      - "5432:5432"
+    networks: [znaymed-net]
+    ports: ["5432:5432"]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
       interval: 5s
@@ -32,18 +29,43 @@ services:
     container_name: znaymed-pgadmin
     restart: unless-stopped
     depends_on:
-      db:
-        condition: service_healthy
+      db: {condition: service_healthy}
     environment:
       PGADMIN_DEFAULT_EMAIL:    ${PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
       PGADMIN_LISTEN_PORT:      5050
     volumes:
       - pgadmin_storage:/var/lib/pgadmin
-    ports:
-      - "5050:5050"
-    networks:
-      - znaymed-net
+    ports: ["5050:5050"]
+    networks: [znaymed-net]
+
+  ################################################################################
+  # ZooKeeper (обязательно для Kafka)
+  ################################################################################
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    restart: unless-stopped
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks: [znaymed-net]
+
+  ################################################################################
+  # Kafka (один брокер)
+  ################################################################################
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    restart: unless-stopped
+    depends_on:
+      zookeeper: {condition: service_started}
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks: [znaymed-net]
+    ports: ["9092:9092"]
 
   ################################################################################
   # Auth micro-service (gRPC :50054)
@@ -52,22 +74,18 @@ services:
     build:
       context: .
       dockerfile: build/go.Dockerfile
-      args:
-        SERVICE_PATH: services/auth-service
+      args: { SERVICE_PATH: services/auth-service }
     depends_on:
-      db:
-        condition: service_healthy
+      db: {condition: service_healthy}
     restart: on-failure
     environment:
-      DB_HOST:     db
-      DB_PORT:     "5432"
-      DB_USER:     ${DB_USER}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME:     ${DB_NAME}
-    ports:
-      - "50054:50054"
-    networks:
-      - znaymed-net
+      DB_NAME: ${DB_NAME}
+    ports: ["50054:50054"]
+    networks: [znaymed-net]
 
   ################################################################################
   # Course micro-service (gRPC :50053)
@@ -76,22 +94,44 @@ services:
     build:
       context: .
       dockerfile: build/go.Dockerfile
-      args:
-        SERVICE_PATH: services/course-service
+      args: { SERVICE_PATH: services/course-service }
     depends_on:
-      db:
-        condition: service_healthy
+      db: {condition: service_healthy}
+      kafka: {condition: service_started}
     restart: on-failure
     environment:
-      DB_HOST:     db
-      DB_PORT:     "5432"
-      DB_USER:     ${DB_USER}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME:     ${DB_NAME}
+      DB_NAME: ${DB_NAME}
+      KAFKA_BROKERS: kafka:9092
+    ports: ["50053:50053"]
+    networks: [znaymed-net]
+
+  ################################################################################
+  # Payment micro-service (gRPC :50055)  ← НОВЫЙ
+  ################################################################################
+  payment-service:
+    build:
+      context: .
+      dockerfile: build/go.Dockerfile
+      args: { SERVICE_PATH: services/payment-service }
+    depends_on:
+      db:     {condition: service_healthy}
+      kafka:  {condition: service_started}
+    restart: on-failure
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      KAFKA_BROKERS: kafka:9092
     ports:
-      - "50053:50053"
-    networks:
-      - znaymed-net
+      - "50055:50055"  
+      - "8081:8081"
+    networks: [znaymed-net]
 
   ################################################################################
   # API-gateway (HTTP :8080)
@@ -100,25 +140,22 @@ services:
     build:
       context: .
       dockerfile: build/go.Dockerfile
-      args:
-        SERVICE_PATH: api_gateway
+      args: { SERVICE_PATH: api_gateway }
     depends_on:
-      auth-service:
-        condition: service_started   # дожидаемся запуска gRPC-сервисов
-      course-service:
-        condition: service_started
+      auth-service:   {condition: service_started}
+      course-service: {condition: service_started}
+      payment-service: {condition: service_started}
     restart: on-failure
     environment:
       AUTH_SERVICE_ADDR:   auth-service:50054
       COURSE_SERVICE_ADDR: course-service:50053
-    ports:
-      - "8080:8080"
-    networks:
-      - znaymed-net
+      PAYMENT_SERVICE_ADDR: payment-service:50055
+    ports: ["8080:8080"]
+    networks: [znaymed-net]
 
-################################################################################
+###############################################################################
 # shared volumes / network
-################################################################################
+###############################################################################
 volumes:
   db_data:
   pgadmin_storage:

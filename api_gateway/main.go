@@ -13,8 +13,9 @@ import (
 )
 
 func main() {
-	addrAuth := os.Getenv("AUTH_SERVICE_ADDR")     // "auth-service:50054"
-	addrCourse := os.Getenv("COURSE_SERVICE_ADDR") // "course-service:50053"
+	addrAuth := os.Getenv("AUTH_SERVICE_ADDR")
+	addrCourse := os.Getenv("COURSE_SERVICE_ADDR")
+	addrPayment := os.Getenv("PAYMENT_SERVICE_ADDR")
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		var req struct {
 			Username string `json:"username"`
@@ -85,6 +86,7 @@ func main() {
 			TgID      string `json:"tgid"`
 			Birthdate string `json:"birthdate"`
 		}
+
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, "invalid JSON", http.StatusBadRequest)
 			return
@@ -109,12 +111,64 @@ func main() {
 		})
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success": false,
+				"message": "internal error: " + err.Error(),
+			})
+			return
+		}
+
+		// Проверка успешности бизнес-логики
+		if !resp.Success {
+			w.WriteHeader(http.StatusBadRequest) // или 409 Conflict
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success": false,
+				"message": resp.Message,
+			})
+			return
+		}
+
+		// Всё успешно
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": true,
+			"message": resp.Message,
+		})
+	})
+
+	http.HandleFunc("/addsection", func(w http.ResponseWriter, r *http.Request) {
+		var req struct {
+			TgID  string `json:"tgid"`
+			Title string `json:"title"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "invalid JSON", http.StatusBadRequest)
+			return
+		}
+		conn, err := grpc.Dial(addrCourse, grpc.WithInsecure())
+		if err != nil {
+			http.Error(w, "gRPC connect failed", http.StatusInternalServerError)
+			return
+		}
+		defer conn.Close()
+
+		client := pb.NewCourseServiceClient(conn)
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+
+		resp, err := client.AddSection(ctx, &pb.SaveSectionRequest{
+			Tgid:  req.TgID,
+			Title: req.Title,
+		})
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]bool{"success": false})
 			return
 		}
 
 		json.NewEncoder(w).Encode(map[string]bool{"success": resp.Success})
 	})
+
 	http.HandleFunc("/sections", func(w http.ResponseWriter, r *http.Request) {
 		var req struct {
 			TgID string `json:"tgid"`
@@ -152,7 +206,39 @@ func main() {
 			"sections": resp.TopicTitles,
 		})
 	})
-
+	http.HandleFunc("/createpayment", func(w http.ResponseWriter, r *http.Request) {
+		var req struct {
+			TgID    string `json:"tgid"`
+			Section string `json:"section"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "invalid JSON", http.StatusBadRequest)
+			return
+		}
+		conn, err := grpc.Dial(addrPayment, grpc.WithInsecure())
+		if err != nil {
+			http.Error(w, "gRPC connect failed", http.StatusInternalServerError)
+			return
+		}
+		defer conn.Close()
+		client := pb.NewPaymentServiceClient(conn)
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+		resp, err := client.CreatePayment(ctx, &pb.CreatePaymentRequest{
+			Tgid:     req.TgID,
+			CourseId: req.Section,
+		})
+		if err != nil {
+			log.Println("Ошибка в RPC CreatePayment:", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(w).Encode(map[string]string{
+			"Payment_id":  resp.PaymentId,
+			"Payment_url": resp.PaymentUrl,
+			"Status":      resp.Status,
+		})
+	})
 	log.Println("API Gateway listening on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 

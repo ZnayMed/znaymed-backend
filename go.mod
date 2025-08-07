@@ -4,7 +4,9 @@ go 1.23.4
 
 require (
 	github.com/golang-jwt/jwt/v5 v5.3.0
+	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
+	github.com/segmentio/kafka-go v0.4.48
 	google.golang.org/grpc v1.74.2
 	google.golang.org/protobuf v1.36.6
 	gorm.io/driver/postgres v1.6.0
@@ -18,6 +20,8 @@ require (
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/klauspost/compress v1.15.9 // indirect
+	github.com/pierrec/lz4/v4 v4.1.15 // indirect
 	golang.org/x/crypto v0.38.0 // indirect
 	golang.org/x/net v0.40.0 // indirect
 	golang.org/x/sync v0.14.0 // indirect

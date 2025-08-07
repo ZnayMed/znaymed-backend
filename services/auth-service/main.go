@@ -56,9 +56,9 @@ func (s *authServer) Register(ctx context.Context, req *pb.SaveUserRequest) (*pb
 	err := s.db.SaveUser(req.Name, hashName, req.Birthdate)
 	if err != nil {
 		log.Println("Ошибка при сохранении:", err)
-		return &pb.SaveUserResponse{Success: false}, err
+		return &pb.SaveUserResponse{Success: false, Message: err.Error()}, err
 	}
-	return &pb.SaveUserResponse{Success: true}, nil
+	return &pb.SaveUserResponse{Success: true, Message: "Пользователь успешно добавлен"}, nil
 }
 
 func hashTGID(tgid string) string {

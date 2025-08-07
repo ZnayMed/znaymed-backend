@@ -1,6 +1,8 @@
 package db
 
-import "errors"
+import (
+	"errors"
+)
 
 type TopicInfo struct {
 	TgID        string
@@ -34,6 +36,7 @@ func (d *Database) GetTopicInfoForUser(topicTitle string, userTgID string) (*Top
 		MindmapURL:  topic.MindmapURL,
 	}, nil
 }
+
 func (d *Database) GetAccessibleSectionTitlesByTgID(tgid string) ([]string, error) {
 	var user User
 
@@ -54,4 +57,34 @@ func (d *Database) GetAccessibleSectionTitlesByTgID(tgid string) ([]string, erro
 	}
 
 	return titles, nil
+}
+
+func (d *Database) GiveSectionToUser(tgid string, sectionTitle string) (bool, error) {
+	var user User
+	if err := d.DB.Where("tgid = ?", tgid).First(&user).Error; err != nil {
+		return false, errors.New("пользователь не найден")
+	}
+
+	var section Section
+	if err := d.DB.Where("title = ?", sectionTitle).First(&section).Error; err != nil {
+		return false, errors.New("раздел не найден")
+	}
+
+	var count int64
+	err := d.DB.Table("user_sections").
+		Where("user_id = ? AND section_id = ?", user.ID, section.ID).
+		Count(&count).Error
+	if err != nil {
+		return false, err
+	}
+	if count > 0 {
+		return false, errors.New("раздел уже добавлен пользователю")
+	}
+
+	err = d.DB.Exec("INSERT INTO user_sections (user_id, section_id) VALUES (?, ?)", user.ID, section.ID).Error
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }

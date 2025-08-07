@@ -198,6 +198,7 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 
 const (
 	CourseService_GetUserSections_FullMethodName = "/pb.CourseService/GetUserSections"
+	CourseService_AddSection_FullMethodName      = "/pb.CourseService/AddSection"
 )
 
 // CourseServiceClient is the client API for CourseService service.
@@ -205,6 +206,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CourseServiceClient interface {
 	GetUserSections(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserSectionsResponse, error)
+	AddSection(ctx context.Context, in *SaveSectionRequest, opts ...grpc.CallOption) (*SaveSectionResponse, error)
 }
 
 type courseServiceClient struct {
@@ -225,11 +227,22 @@ func (c *courseServiceClient) GetUserSections(ctx context.Context, in *UserReque
 	return out, nil
 }
 
+func (c *courseServiceClient) AddSection(ctx context.Context, in *SaveSectionRequest, opts ...grpc.CallOption) (*SaveSectionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SaveSectionResponse)
+	err := c.cc.Invoke(ctx, CourseService_AddSection_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CourseServiceServer is the server API for CourseService service.
 // All implementations must embed UnimplementedCourseServiceServer
 // for forward compatibility.
 type CourseServiceServer interface {
 	GetUserSections(context.Context, *UserRequest) (*UserSectionsResponse, error)
+	AddSection(context.Context, *SaveSectionRequest) (*SaveSectionResponse, error)
 	mustEmbedUnimplementedCourseServiceServer()
 }
 
@@ -242,6 +255,9 @@ type UnimplementedCourseServiceServer struct{}
 
 func (UnimplementedCourseServiceServer) GetUserSections(context.Context, *UserRequest) (*UserSectionsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserSections not implemented")
+}
+func (UnimplementedCourseServiceServer) AddSection(context.Context, *SaveSectionRequest) (*SaveSectionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddSection not implemented")
 }
 func (UnimplementedCourseServiceServer) mustEmbedUnimplementedCourseServiceServer() {}
 func (UnimplementedCourseServiceServer) testEmbeddedByValue()                       {}
@@ -282,6 +298,24 @@ func _CourseService_GetUserSections_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CourseService_AddSection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SaveSectionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CourseServiceServer).AddSection(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CourseService_AddSection_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CourseServiceServer).AddSection(ctx, req.(*SaveSectionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CourseService_ServiceDesc is the grpc.ServiceDesc for CourseService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -292,6 +326,112 @@ var CourseService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserSections",
 			Handler:    _CourseService_GetUserSections_Handler,
+		},
+		{
+			MethodName: "AddSection",
+			Handler:    _CourseService_AddSection_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "hello.proto",
+}
+
+const (
+	PaymentService_CreatePayment_FullMethodName = "/pb.PaymentService/CreatePayment"
+)
+
+// PaymentServiceClient is the client API for PaymentService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type PaymentServiceClient interface {
+	CreatePayment(ctx context.Context, in *CreatePaymentRequest, opts ...grpc.CallOption) (*CreatePaymentResponse, error)
+}
+
+type paymentServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewPaymentServiceClient(cc grpc.ClientConnInterface) PaymentServiceClient {
+	return &paymentServiceClient{cc}
+}
+
+func (c *paymentServiceClient) CreatePayment(ctx context.Context, in *CreatePaymentRequest, opts ...grpc.CallOption) (*CreatePaymentResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreatePaymentResponse)
+	err := c.cc.Invoke(ctx, PaymentService_CreatePayment_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// PaymentServiceServer is the server API for PaymentService service.
+// All implementations must embed UnimplementedPaymentServiceServer
+// for forward compatibility.
+type PaymentServiceServer interface {
+	CreatePayment(context.Context, *CreatePaymentRequest) (*CreatePaymentResponse, error)
+	mustEmbedUnimplementedPaymentServiceServer()
+}
+
+// UnimplementedPaymentServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedPaymentServiceServer struct{}
+
+func (UnimplementedPaymentServiceServer) CreatePayment(context.Context, *CreatePaymentRequest) (*CreatePaymentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePayment not implemented")
+}
+func (UnimplementedPaymentServiceServer) mustEmbedUnimplementedPaymentServiceServer() {}
+func (UnimplementedPaymentServiceServer) testEmbeddedByValue()                        {}
+
+// UnsafePaymentServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to PaymentServiceServer will
+// result in compilation errors.
+type UnsafePaymentServiceServer interface {
+	mustEmbedUnimplementedPaymentServiceServer()
+}
+
+func RegisterPaymentServiceServer(s grpc.ServiceRegistrar, srv PaymentServiceServer) {
+	// If the following call pancis, it indicates UnimplementedPaymentServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&PaymentService_ServiceDesc, srv)
+}
+
+func _PaymentService_CreatePayment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePaymentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PaymentServiceServer).CreatePayment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PaymentService_CreatePayment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PaymentServiceServer).CreatePayment(ctx, req.(*CreatePaymentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// PaymentService_ServiceDesc is the grpc.ServiceDesc for PaymentService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var PaymentService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "pb.PaymentService",
+	HandlerType: (*PaymentServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreatePayment",
+			Handler:    _PaymentService_CreatePayment_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
