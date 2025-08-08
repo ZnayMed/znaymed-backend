@@ -9,11 +9,13 @@ option go_package = "./;pb";
 
 
 
-service AuthService{
-  rpc Login (LoginRequest) returns (LoginResponse);
-  rpc VerifyToken (VerifyRequest) returns (VerifyResponse);
-  rpc Register (SaveUserRequest) returns (SaveUserResponse);
+service AuthService {
+  rpc Login      (LoginRequest)      returns (LoginResponse);
+  rpc VerifyToken(VerifyRequest)     returns (VerifyResponse);
+  rpc Register   (SaveUserRequest)   returns (SaveUserResponse);
+  rpc CheckUser  (UserRequest)       returns (CheckUserResponse);
 }
+
 service CourseService{
   rpc GetUserSections (UserRequest) returns (UserSectionsResponse);
   rpc AddSection (SaveSectionRequest) returns (SaveSectionResponse);
@@ -61,7 +63,6 @@ message LoginResponse{
   string token = 1;
 }
 
-
 message VerifyRequest{
   string token = 1;
 }
@@ -70,12 +71,16 @@ message VerifyResponse{
   bool valid = 1;
 }
 
-
 message SaveUserRequest {
   string name = 1;
   string tgid = 2;
   string birthdate = 3;
 }
+
+message CheckUserResponse {
+  bool exists = 1;
+}
+
 message SaveUserResponse {
   bool success = 1;
   string message = 2;

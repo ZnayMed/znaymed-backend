@@ -136,6 +136,35 @@ func main() {
 		})
 	})
 
+	http.HandleFunc("/check_user", func(w http.ResponseWriter, r *http.Request) {
+		tgid := r.URL.Query().Get("tgid")
+		if tgid == "" {
+			http.Error(w, "missing tgid", http.StatusBadRequest)
+			return
+		}
+
+		conn, err := grpc.Dial(addrAuth, grpc.WithInsecure())
+		if err != nil {
+			http.Error(w, "gRPC connect failed", http.StatusInternalServerError)
+			return
+		}
+		defer conn.Close()
+
+		client := pb.NewAuthServiceClient(conn)
+
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+
+		resp, err := client.CheckUser(ctx, &pb.UserRequest{Tgid: tgid})
+		if err != nil {
+			http.Error(w, "CheckUser failed", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(map[string]bool{"exists": resp.Exists})
+	})
+
 	http.HandleFunc("/addsection", func(w http.ResponseWriter, r *http.Request) {
 		var req struct {
 			TgID  string `json:"tgid"`

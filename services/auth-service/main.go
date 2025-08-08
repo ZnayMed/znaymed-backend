@@ -5,6 +5,8 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"github.com/ZnayMed/znaymed-backend/services/auth-service/db"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"log"
 	"net"
 	"time"
@@ -59,6 +61,17 @@ func (s *authServer) Register(ctx context.Context, req *pb.SaveUserRequest) (*pb
 		return &pb.SaveUserResponse{Success: false, Message: err.Error()}, err
 	}
 	return &pb.SaveUserResponse{Success: true, Message: "Пользователь успешно добавлен"}, nil
+}
+
+func (s *authServer) CheckUser(ctx context.Context, req *pb.UserRequest) (*pb.CheckUserResponse, error) {
+	hashTgid := hashTGID(req.Tgid)
+
+	exists, err := s.db.UserExists(hashTgid)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "db error: %v", err)
+	}
+
+	return &pb.CheckUserResponse{Exists: exists}, nil
 }
 
 func hashTGID(tgid string) string {
