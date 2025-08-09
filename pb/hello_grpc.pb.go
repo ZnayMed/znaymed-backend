@@ -199,6 +199,7 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 const (
 	CourseService_GetUserSections_FullMethodName = "/pb.CourseService/GetUserSections"
 	CourseService_AddSection_FullMethodName      = "/pb.CourseService/AddSection"
+	CourseService_GetListSubjects_FullMethodName = "/pb.CourseService/GetListSubjects"
 )
 
 // CourseServiceClient is the client API for CourseService service.
@@ -207,6 +208,7 @@ const (
 type CourseServiceClient interface {
 	GetUserSections(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserSectionsResponse, error)
 	AddSection(ctx context.Context, in *SaveSectionRequest, opts ...grpc.CallOption) (*SaveSectionResponse, error)
+	GetListSubjects(ctx context.Context, in *ListSubjectsRequest, opts ...grpc.CallOption) (*ListSubjectsResponse, error)
 }
 
 type courseServiceClient struct {
@@ -237,12 +239,23 @@ func (c *courseServiceClient) AddSection(ctx context.Context, in *SaveSectionReq
 	return out, nil
 }
 
+func (c *courseServiceClient) GetListSubjects(ctx context.Context, in *ListSubjectsRequest, opts ...grpc.CallOption) (*ListSubjectsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListSubjectsResponse)
+	err := c.cc.Invoke(ctx, CourseService_GetListSubjects_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CourseServiceServer is the server API for CourseService service.
 // All implementations must embed UnimplementedCourseServiceServer
 // for forward compatibility.
 type CourseServiceServer interface {
 	GetUserSections(context.Context, *UserRequest) (*UserSectionsResponse, error)
 	AddSection(context.Context, *SaveSectionRequest) (*SaveSectionResponse, error)
+	GetListSubjects(context.Context, *ListSubjectsRequest) (*ListSubjectsResponse, error)
 	mustEmbedUnimplementedCourseServiceServer()
 }
 
@@ -258,6 +271,9 @@ func (UnimplementedCourseServiceServer) GetUserSections(context.Context, *UserRe
 }
 func (UnimplementedCourseServiceServer) AddSection(context.Context, *SaveSectionRequest) (*SaveSectionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddSection not implemented")
+}
+func (UnimplementedCourseServiceServer) GetListSubjects(context.Context, *ListSubjectsRequest) (*ListSubjectsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetListSubjects not implemented")
 }
 func (UnimplementedCourseServiceServer) mustEmbedUnimplementedCourseServiceServer() {}
 func (UnimplementedCourseServiceServer) testEmbeddedByValue()                       {}
@@ -316,6 +332,24 @@ func _CourseService_AddSection_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CourseService_GetListSubjects_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListSubjectsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CourseServiceServer).GetListSubjects(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CourseService_GetListSubjects_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CourseServiceServer).GetListSubjects(ctx, req.(*ListSubjectsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CourseService_ServiceDesc is the grpc.ServiceDesc for CourseService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -330,6 +364,10 @@ var CourseService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddSection",
 			Handler:    _CourseService_AddSection_Handler,
+		},
+		{
+			MethodName: "GetListSubjects",
+			Handler:    _CourseService_GetListSubjects_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

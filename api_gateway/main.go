@@ -118,9 +118,8 @@ func main() {
 			return
 		}
 
-		// Проверка успешности бизнес-логики
 		if !resp.Success {
-			w.WriteHeader(http.StatusBadRequest) // или 409 Conflict
+			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"success": false,
 				"message": resp.Message,
@@ -128,11 +127,38 @@ func main() {
 			return
 		}
 
-		// Всё успешно
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"success": true,
 			"message": resp.Message,
+		})
+	})
+
+	http.HandleFunc("/listsubjects", func(w http.ResponseWriter, r *http.Request) {
+		// Нет JSON в запросе, просто дергаем gRPC
+		conn, err := grpc.Dial(addrCourse, grpc.WithInsecure())
+		if err != nil {
+			http.Error(w, "gRPC connect failed", http.StatusInternalServerError)
+			log.Println("Ошибка подключения к gRPC:", err)
+			return
+		}
+		defer conn.Close()
+
+		client := pb.NewCourseServiceClient(conn)
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+
+		resp, err := client.GetListSubjects(ctx, &pb.ListSubjectsRequest{})
+		if err != nil {
+			http.Error(w, "gRPC call failed", http.StatusInternalServerError)
+			log.Println("Ошибка вызова ListSubjects:", err)
+			return
+		}
+
+		// Возвращаем JSON-массив
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"subjects": resp.Titles,
 		})
 	})
 

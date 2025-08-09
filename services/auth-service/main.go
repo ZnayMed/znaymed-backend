@@ -4,14 +4,11 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	pb "github.com/ZnayMed/znaymed-backend/pb"
 	"github.com/ZnayMed/znaymed-backend/services/auth-service/db"
+	"google.golang.org/grpc"
 	"log"
 	"net"
-	"time"
-
-	pb "github.com/ZnayMed/znaymed-backend/pb"
-	"github.com/golang-jwt/jwt/v5"
-	"google.golang.org/grpc"
 )
 
 var secret = []byte("пока_ничего")
@@ -21,32 +18,31 @@ type authServer struct {
 	db *db.Database
 }
 
-func (s *authServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
-	if req.Username != "admin" || req.Password != "password" {
-		return nil, grpc.Errorf(401, "invalid credentials")
-	}
-
-	// Генерация токена
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"username": req.Username,
-		"exp":      time.Now().Add(time.Hour * 24).Unix(),
-	})
-
-	tokenString, err := token.SignedString(secret)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pb.LoginResponse{Token: tokenString}, nil
-}
-
-func (s *authServer) VerifyToken(ctx context.Context, req *pb.VerifyRequest) (*pb.VerifyResponse, error) {
-	_, err := jwt.Parse(req.Token, func(token *jwt.Token) (interface{}, error) {
-		return secret, nil
-	})
-
-	return &pb.VerifyResponse{Valid: err == nil}, nil
-}
+//func (s *authServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
+//	if req.Username != "admin" || req.Password != "password" {
+//		return nil, grpc.Errorf(401, "invalid credentials")
+//	}
+//
+//	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+//		"username": req.Username,
+//		"exp":      time.Now().Add(time.Hour * 24).Unix(),
+//	})
+//
+//	tokenString, err := token.SignedString(secret)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return &pb.LoginResponse{Token: tokenString}, nil
+//}
+//
+//func (s *authServer) VerifyToken(ctx context.Context, req *pb.VerifyRequest) (*pb.VerifyResponse, error) {
+//	_, err := jwt.Parse(req.Token, func(token *jwt.Token) (interface{}, error) {
+//		return secret, nil
+//	})
+//
+//	return &pb.VerifyResponse{Valid: err == nil}, nil
+//}
 
 func (s *authServer) Register(ctx context.Context, req *pb.SaveUserRequest) (*pb.SaveUserResponse, error) {
 	hashName := hashTGID(req.Tgid)

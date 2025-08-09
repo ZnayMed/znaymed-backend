@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"errors"
 )
 
@@ -87,4 +88,17 @@ func (d *Database) GiveSectionToUser(tgid string, sectionTitle string) (bool, er
 	}
 
 	return true, nil
+}
+
+func (d *Database) ListSubjects(ctx context.Context) ([]Subject, error) {
+	var subjects []Subject
+	err := d.DB.WithContext(ctx).
+		Model(&Subject{}).
+		Select("id", "title").
+		Order("id").
+		Find(&subjects).Error
+	if err != nil {
+		return nil, err
+	}
+	return subjects, nil
 }

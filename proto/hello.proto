@@ -17,10 +17,18 @@ service AuthService{
 service CourseService{
   rpc GetUserSections (UserRequest) returns (UserSectionsResponse);
   rpc AddSection (SaveSectionRequest) returns (SaveSectionResponse);
+  rpc GetListSubjects(ListSubjectsRequest) returns (ListSubjectsResponse);
 }
 
 service PaymentService {
   rpc CreatePayment (CreatePaymentRequest) returns (CreatePaymentResponse);
+}
+
+message ListSubjectsRequest{
+
+}
+message ListSubjectsResponse {
+  repeated string titles = 1;
 }
 
 message CreatePaymentRequest {
