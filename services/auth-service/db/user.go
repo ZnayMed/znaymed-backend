@@ -13,6 +13,14 @@ type User struct {
 	Birthdate string
 }
 
+func (d *Database) UserExists(tgid string) (bool, error) {
+	var cnt int64
+	if err := d.DB.Model(&User{}).Where("tgid = ?", tgid).Count(&cnt).Error; err != nil {
+		return false, err
+	}
+	return cnt > 0, nil
+}
+
 func (d *Database) SaveUser(name, tgid, birthdate string) error {
 	var existing User
 	if err := d.DB.Where("tgid = ?", tgid).First(&existing).Error; err == nil {
