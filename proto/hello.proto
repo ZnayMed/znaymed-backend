@@ -20,6 +20,21 @@ service CourseService{
   rpc GetUserSections (UserRequest) returns (UserSectionsResponse);
   rpc AddSection (SaveSectionRequest) returns (SaveSectionResponse);
   rpc GetListSubjects(ListSubjectsRequest) returns (ListSubjectsResponse);
+  rpc GetSubjectSections(SubjectSectionsRequest) returns (SubjectSectionsResponse);
+}
+
+
+message SubjectSectionsRequest {
+  string tgid = 1;
+  string subject = 2;
+}
+
+message SectionItem {
+  string title = 1;
+  bool accessible = 2;
+}
+message SubjectSectionsResponse {
+  repeated SectionItem sections = 1;
 }
 
 service PaymentService {

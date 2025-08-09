@@ -21,6 +21,154 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type SubjectSectionsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Tgid          string                 `protobuf:"bytes,1,opt,name=tgid,proto3" json:"tgid,omitempty"`
+	Subject       string                 `protobuf:"bytes,2,opt,name=subject,proto3" json:"subject,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SubjectSectionsRequest) Reset() {
+	*x = SubjectSectionsRequest{}
+	mi := &file_hello_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SubjectSectionsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SubjectSectionsRequest) ProtoMessage() {}
+
+func (x *SubjectSectionsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_hello_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SubjectSectionsRequest.ProtoReflect.Descriptor instead.
+func (*SubjectSectionsRequest) Descriptor() ([]byte, []int) {
+	return file_hello_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *SubjectSectionsRequest) GetTgid() string {
+	if x != nil {
+		return x.Tgid
+	}
+	return ""
+}
+
+func (x *SubjectSectionsRequest) GetSubject() string {
+	if x != nil {
+		return x.Subject
+	}
+	return ""
+}
+
+type SectionItem struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Title         string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	Accessible    bool                   `protobuf:"varint,2,opt,name=accessible,proto3" json:"accessible,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SectionItem) Reset() {
+	*x = SectionItem{}
+	mi := &file_hello_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SectionItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SectionItem) ProtoMessage() {}
+
+func (x *SectionItem) ProtoReflect() protoreflect.Message {
+	mi := &file_hello_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SectionItem.ProtoReflect.Descriptor instead.
+func (*SectionItem) Descriptor() ([]byte, []int) {
+	return file_hello_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *SectionItem) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *SectionItem) GetAccessible() bool {
+	if x != nil {
+		return x.Accessible
+	}
+	return false
+}
+
+type SubjectSectionsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Sections      []*SectionItem         `protobuf:"bytes,1,rep,name=sections,proto3" json:"sections,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SubjectSectionsResponse) Reset() {
+	*x = SubjectSectionsResponse{}
+	mi := &file_hello_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SubjectSectionsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SubjectSectionsResponse) ProtoMessage() {}
+
+func (x *SubjectSectionsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_hello_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SubjectSectionsResponse.ProtoReflect.Descriptor instead.
+func (*SubjectSectionsResponse) Descriptor() ([]byte, []int) {
+	return file_hello_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *SubjectSectionsResponse) GetSections() []*SectionItem {
+	if x != nil {
+		return x.Sections
+	}
+	return nil
+}
+
 type ListSubjectsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -29,7 +177,7 @@ type ListSubjectsRequest struct {
 
 func (x *ListSubjectsRequest) Reset() {
 	*x = ListSubjectsRequest{}
-	mi := &file_hello_proto_msgTypes[0]
+	mi := &file_hello_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -41,7 +189,7 @@ func (x *ListSubjectsRequest) String() string {
 func (*ListSubjectsRequest) ProtoMessage() {}
 
 func (x *ListSubjectsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_hello_proto_msgTypes[0]
+	mi := &file_hello_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -54,7 +202,7 @@ func (x *ListSubjectsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSubjectsRequest.ProtoReflect.Descriptor instead.
 func (*ListSubjectsRequest) Descriptor() ([]byte, []int) {
-	return file_hello_proto_rawDescGZIP(), []int{0}
+	return file_hello_proto_rawDescGZIP(), []int{3}
 }
 
 type ListSubjectsResponse struct {
@@ -66,7 +214,7 @@ type ListSubjectsResponse struct {
 
 func (x *ListSubjectsResponse) Reset() {
 	*x = ListSubjectsResponse{}
-	mi := &file_hello_proto_msgTypes[1]
+	mi := &file_hello_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -78,7 +226,7 @@ func (x *ListSubjectsResponse) String() string {
 func (*ListSubjectsResponse) ProtoMessage() {}
 
 func (x *ListSubjectsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_hello_proto_msgTypes[1]
+	mi := &file_hello_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -91,7 +239,7 @@ func (x *ListSubjectsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSubjectsResponse.ProtoReflect.Descriptor instead.
 func (*ListSubjectsResponse) Descriptor() ([]byte, []int) {
-	return file_hello_proto_rawDescGZIP(), []int{1}
+	return file_hello_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ListSubjectsResponse) GetTitles() []string {
@@ -111,7 +259,7 @@ type CreatePaymentRequest struct {
 
 func (x *CreatePaymentRequest) Reset() {
 	*x = CreatePaymentRequest{}
-	mi := &file_hello_proto_msgTypes[2]
+	mi := &file_hello_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -123,7 +271,7 @@ func (x *CreatePaymentRequest) String() string {
 func (*CreatePaymentRequest) ProtoMessage() {}
 
 func (x *CreatePaymentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_hello_proto_msgTypes[2]
+	mi := &file_hello_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -136,7 +284,7 @@ func (x *CreatePaymentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreatePaymentRequest.ProtoReflect.Descriptor instead.
 func (*CreatePaymentRequest) Descriptor() ([]byte, []int) {
-	return file_hello_proto_rawDescGZIP(), []int{2}
+	return file_hello_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *CreatePaymentRequest) GetTgid() string {
@@ -164,7 +312,7 @@ type CreatePaymentResponse struct {
 
 func (x *CreatePaymentResponse) Reset() {
 	*x = CreatePaymentResponse{}
-	mi := &file_hello_proto_msgTypes[3]
+	mi := &file_hello_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -176,7 +324,7 @@ func (x *CreatePaymentResponse) String() string {
 func (*CreatePaymentResponse) ProtoMessage() {}
 
 func (x *CreatePaymentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_hello_proto_msgTypes[3]
+	mi := &file_hello_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -189,7 +337,7 @@ func (x *CreatePaymentResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreatePaymentResponse.ProtoReflect.Descriptor instead.
 func (*CreatePaymentResponse) Descriptor() ([]byte, []int) {
-	return file_hello_proto_rawDescGZIP(), []int{3}
+	return file_hello_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *CreatePaymentResponse) GetPaymentId() string {
@@ -223,7 +371,7 @@ type SaveSectionRequest struct {
 
 func (x *SaveSectionRequest) Reset() {
 	*x = SaveSectionRequest{}
-	mi := &file_hello_proto_msgTypes[4]
+	mi := &file_hello_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -235,7 +383,7 @@ func (x *SaveSectionRequest) String() string {
 func (*SaveSectionRequest) ProtoMessage() {}
 
 func (x *SaveSectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_hello_proto_msgTypes[4]
+	mi := &file_hello_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -248,7 +396,7 @@ func (x *SaveSectionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SaveSectionRequest.ProtoReflect.Descriptor instead.
 func (*SaveSectionRequest) Descriptor() ([]byte, []int) {
-	return file_hello_proto_rawDescGZIP(), []int{4}
+	return file_hello_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *SaveSectionRequest) GetTgid() string {
@@ -274,7 +422,7 @@ type SaveSectionResponse struct {
 
 func (x *SaveSectionResponse) Reset() {
 	*x = SaveSectionResponse{}
-	mi := &file_hello_proto_msgTypes[5]
+	mi := &file_hello_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -286,7 +434,7 @@ func (x *SaveSectionResponse) String() string {
 func (*SaveSectionResponse) ProtoMessage() {}
 
 func (x *SaveSectionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_hello_proto_msgTypes[5]
+	mi := &file_hello_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -299,7 +447,7 @@ func (x *SaveSectionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SaveSectionResponse.ProtoReflect.Descriptor instead.
 func (*SaveSectionResponse) Descriptor() ([]byte, []int) {
-	return file_hello_proto_rawDescGZIP(), []int{5}
+	return file_hello_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *SaveSectionResponse) GetSuccess() bool {
@@ -318,7 +466,7 @@ type UserRequest struct {
 
 func (x *UserRequest) Reset() {
 	*x = UserRequest{}
-	mi := &file_hello_proto_msgTypes[6]
+	mi := &file_hello_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -330,7 +478,7 @@ func (x *UserRequest) String() string {
 func (*UserRequest) ProtoMessage() {}
 
 func (x *UserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_hello_proto_msgTypes[6]
+	mi := &file_hello_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -343,7 +491,7 @@ func (x *UserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserRequest.ProtoReflect.Descriptor instead.
 func (*UserRequest) Descriptor() ([]byte, []int) {
-	return file_hello_proto_rawDescGZIP(), []int{6}
+	return file_hello_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *UserRequest) GetTgid() string {
@@ -362,7 +510,7 @@ type UserSectionsResponse struct {
 
 func (x *UserSectionsResponse) Reset() {
 	*x = UserSectionsResponse{}
-	mi := &file_hello_proto_msgTypes[7]
+	mi := &file_hello_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -374,7 +522,7 @@ func (x *UserSectionsResponse) String() string {
 func (*UserSectionsResponse) ProtoMessage() {}
 
 func (x *UserSectionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_hello_proto_msgTypes[7]
+	mi := &file_hello_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -387,7 +535,7 @@ func (x *UserSectionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserSectionsResponse.ProtoReflect.Descriptor instead.
 func (*UserSectionsResponse) Descriptor() ([]byte, []int) {
-	return file_hello_proto_rawDescGZIP(), []int{7}
+	return file_hello_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *UserSectionsResponse) GetTopicTitles() []string {
@@ -407,7 +555,7 @@ type LoginRequest struct {
 
 func (x *LoginRequest) Reset() {
 	*x = LoginRequest{}
-	mi := &file_hello_proto_msgTypes[8]
+	mi := &file_hello_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -419,7 +567,7 @@ func (x *LoginRequest) String() string {
 func (*LoginRequest) ProtoMessage() {}
 
 func (x *LoginRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_hello_proto_msgTypes[8]
+	mi := &file_hello_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -432,7 +580,7 @@ func (x *LoginRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginRequest.ProtoReflect.Descriptor instead.
 func (*LoginRequest) Descriptor() ([]byte, []int) {
-	return file_hello_proto_rawDescGZIP(), []int{8}
+	return file_hello_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *LoginRequest) GetUsername() string {
@@ -458,7 +606,7 @@ type LoginResponse struct {
 
 func (x *LoginResponse) Reset() {
 	*x = LoginResponse{}
-	mi := &file_hello_proto_msgTypes[9]
+	mi := &file_hello_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -470,7 +618,7 @@ func (x *LoginResponse) String() string {
 func (*LoginResponse) ProtoMessage() {}
 
 func (x *LoginResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_hello_proto_msgTypes[9]
+	mi := &file_hello_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -483,7 +631,7 @@ func (x *LoginResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginResponse.ProtoReflect.Descriptor instead.
 func (*LoginResponse) Descriptor() ([]byte, []int) {
-	return file_hello_proto_rawDescGZIP(), []int{9}
+	return file_hello_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *LoginResponse) GetToken() string {
@@ -502,7 +650,7 @@ type VerifyRequest struct {
 
 func (x *VerifyRequest) Reset() {
 	*x = VerifyRequest{}
-	mi := &file_hello_proto_msgTypes[10]
+	mi := &file_hello_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -514,7 +662,7 @@ func (x *VerifyRequest) String() string {
 func (*VerifyRequest) ProtoMessage() {}
 
 func (x *VerifyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_hello_proto_msgTypes[10]
+	mi := &file_hello_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -527,7 +675,7 @@ func (x *VerifyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerifyRequest.ProtoReflect.Descriptor instead.
 func (*VerifyRequest) Descriptor() ([]byte, []int) {
-	return file_hello_proto_rawDescGZIP(), []int{10}
+	return file_hello_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *VerifyRequest) GetToken() string {
@@ -546,7 +694,7 @@ type VerifyResponse struct {
 
 func (x *VerifyResponse) Reset() {
 	*x = VerifyResponse{}
-	mi := &file_hello_proto_msgTypes[11]
+	mi := &file_hello_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -558,7 +706,7 @@ func (x *VerifyResponse) String() string {
 func (*VerifyResponse) ProtoMessage() {}
 
 func (x *VerifyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_hello_proto_msgTypes[11]
+	mi := &file_hello_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -571,7 +719,7 @@ func (x *VerifyResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerifyResponse.ProtoReflect.Descriptor instead.
 func (*VerifyResponse) Descriptor() ([]byte, []int) {
-	return file_hello_proto_rawDescGZIP(), []int{11}
+	return file_hello_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *VerifyResponse) GetValid() bool {
@@ -592,7 +740,7 @@ type SaveUserRequest struct {
 
 func (x *SaveUserRequest) Reset() {
 	*x = SaveUserRequest{}
-	mi := &file_hello_proto_msgTypes[12]
+	mi := &file_hello_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -604,7 +752,7 @@ func (x *SaveUserRequest) String() string {
 func (*SaveUserRequest) ProtoMessage() {}
 
 func (x *SaveUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_hello_proto_msgTypes[12]
+	mi := &file_hello_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -617,7 +765,7 @@ func (x *SaveUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SaveUserRequest.ProtoReflect.Descriptor instead.
 func (*SaveUserRequest) Descriptor() ([]byte, []int) {
-	return file_hello_proto_rawDescGZIP(), []int{12}
+	return file_hello_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *SaveUserRequest) GetName() string {
@@ -641,6 +789,50 @@ func (x *SaveUserRequest) GetBirthdate() string {
 	return ""
 }
 
+type CheckUserResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Exists        bool                   `protobuf:"varint,1,opt,name=exists,proto3" json:"exists,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckUserResponse) Reset() {
+	*x = CheckUserResponse{}
+	mi := &file_hello_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckUserResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckUserResponse) ProtoMessage() {}
+
+func (x *CheckUserResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_hello_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckUserResponse.ProtoReflect.Descriptor instead.
+func (*CheckUserResponse) Descriptor() ([]byte, []int) {
+	return file_hello_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *CheckUserResponse) GetExists() bool {
+	if x != nil {
+		return x.Exists
+	}
+	return false
+}
+
 type SaveUserResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
@@ -651,7 +843,7 @@ type SaveUserResponse struct {
 
 func (x *SaveUserResponse) Reset() {
 	*x = SaveUserResponse{}
-	mi := &file_hello_proto_msgTypes[13]
+	mi := &file_hello_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -663,7 +855,7 @@ func (x *SaveUserResponse) String() string {
 func (*SaveUserResponse) ProtoMessage() {}
 
 func (x *SaveUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_hello_proto_msgTypes[13]
+	mi := &file_hello_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -676,7 +868,7 @@ func (x *SaveUserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SaveUserResponse.ProtoReflect.Descriptor instead.
 func (*SaveUserResponse) Descriptor() ([]byte, []int) {
-	return file_hello_proto_rawDescGZIP(), []int{13}
+	return file_hello_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *SaveUserResponse) GetSuccess() bool {
@@ -697,7 +889,17 @@ var File_hello_proto protoreflect.FileDescriptor
 
 const file_hello_proto_rawDesc = "" +
 	"\n" +
-	"\vhello.proto\x12\x02pb\"\x15\n" +
+	"\vhello.proto\x12\x02pb\"F\n" +
+	"\x16SubjectSectionsRequest\x12\x12\n" +
+	"\x04tgid\x18\x01 \x01(\tR\x04tgid\x12\x18\n" +
+	"\asubject\x18\x02 \x01(\tR\asubject\"C\n" +
+	"\vSectionItem\x12\x14\n" +
+	"\x05title\x18\x01 \x01(\tR\x05title\x12\x1e\n" +
+	"\n" +
+	"accessible\x18\x02 \x01(\bR\n" +
+	"accessible\"F\n" +
+	"\x17SubjectSectionsResponse\x12+\n" +
+	"\bsections\x18\x01 \x03(\v2\x0f.pb.SectionItemR\bsections\"\x15\n" +
 	"\x13ListSubjectsRequest\".\n" +
 	"\x14ListSubjectsResponse\x12\x16\n" +
 	"\x06titles\x18\x01 \x03(\tR\x06titles\"G\n" +
@@ -731,19 +933,23 @@ const file_hello_proto_rawDesc = "" +
 	"\x0fSaveUserRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x12\n" +
 	"\x04tgid\x18\x02 \x01(\tR\x04tgid\x12\x1c\n" +
-	"\tbirthdate\x18\x03 \x01(\tR\tbirthdate\"F\n" +
+	"\tbirthdate\x18\x03 \x01(\tR\tbirthdate\"+\n" +
+	"\x11CheckUserResponse\x12\x16\n" +
+	"\x06exists\x18\x01 \x01(\bR\x06exists\"F\n" +
 	"\x10SaveUserResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage2\xa8\x01\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage2\xdd\x01\n" +
 	"\vAuthService\x12,\n" +
 	"\x05Login\x12\x10.pb.LoginRequest\x1a\x11.pb.LoginResponse\x124\n" +
 	"\vVerifyToken\x12\x11.pb.VerifyRequest\x1a\x12.pb.VerifyResponse\x125\n" +
-	"\bRegister\x12\x13.pb.SaveUserRequest\x1a\x14.pb.SaveUserResponse2\xd2\x01\n" +
+	"\bRegister\x12\x13.pb.SaveUserRequest\x1a\x14.pb.SaveUserResponse\x123\n" +
+	"\tCheckUser\x12\x0f.pb.UserRequest\x1a\x15.pb.CheckUserResponse2\xa1\x02\n" +
 	"\rCourseService\x12<\n" +
 	"\x0fGetUserSections\x12\x0f.pb.UserRequest\x1a\x18.pb.UserSectionsResponse\x12=\n" +
 	"\n" +
 	"AddSection\x12\x16.pb.SaveSectionRequest\x1a\x17.pb.SaveSectionResponse\x12D\n" +
-	"\x0fGetListSubjects\x12\x17.pb.ListSubjectsRequest\x1a\x18.pb.ListSubjectsResponse2V\n" +
+	"\x0fGetListSubjects\x12\x17.pb.ListSubjectsRequest\x1a\x18.pb.ListSubjectsResponse\x12M\n" +
+	"\x12GetSubjectSections\x12\x1a.pb.SubjectSectionsRequest\x1a\x1b.pb.SubjectSectionsResponse2V\n" +
 	"\x0ePaymentService\x12D\n" +
 	"\rCreatePayment\x12\x18.pb.CreatePaymentRequest\x1a\x19.pb.CreatePaymentResponseB\aZ\x05./;pbb\x06proto3"
 
@@ -759,43 +965,52 @@ func file_hello_proto_rawDescGZIP() []byte {
 	return file_hello_proto_rawDescData
 }
 
-var file_hello_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_hello_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_hello_proto_goTypes = []any{
-	(*ListSubjectsRequest)(nil),   // 0: pb.ListSubjectsRequest
-	(*ListSubjectsResponse)(nil),  // 1: pb.ListSubjectsResponse
-	(*CreatePaymentRequest)(nil),  // 2: pb.CreatePaymentRequest
-	(*CreatePaymentResponse)(nil), // 3: pb.CreatePaymentResponse
-	(*SaveSectionRequest)(nil),    // 4: pb.SaveSectionRequest
-	(*SaveSectionResponse)(nil),   // 5: pb.SaveSectionResponse
-	(*UserRequest)(nil),           // 6: pb.UserRequest
-	(*UserSectionsResponse)(nil),  // 7: pb.UserSectionsResponse
-	(*LoginRequest)(nil),          // 8: pb.LoginRequest
-	(*LoginResponse)(nil),         // 9: pb.LoginResponse
-	(*VerifyRequest)(nil),         // 10: pb.VerifyRequest
-	(*VerifyResponse)(nil),        // 11: pb.VerifyResponse
-	(*SaveUserRequest)(nil),       // 12: pb.SaveUserRequest
-	(*SaveUserResponse)(nil),      // 13: pb.SaveUserResponse
+	(*SubjectSectionsRequest)(nil),  // 0: pb.SubjectSectionsRequest
+	(*SectionItem)(nil),             // 1: pb.SectionItem
+	(*SubjectSectionsResponse)(nil), // 2: pb.SubjectSectionsResponse
+	(*ListSubjectsRequest)(nil),     // 3: pb.ListSubjectsRequest
+	(*ListSubjectsResponse)(nil),    // 4: pb.ListSubjectsResponse
+	(*CreatePaymentRequest)(nil),    // 5: pb.CreatePaymentRequest
+	(*CreatePaymentResponse)(nil),   // 6: pb.CreatePaymentResponse
+	(*SaveSectionRequest)(nil),      // 7: pb.SaveSectionRequest
+	(*SaveSectionResponse)(nil),     // 8: pb.SaveSectionResponse
+	(*UserRequest)(nil),             // 9: pb.UserRequest
+	(*UserSectionsResponse)(nil),    // 10: pb.UserSectionsResponse
+	(*LoginRequest)(nil),            // 11: pb.LoginRequest
+	(*LoginResponse)(nil),           // 12: pb.LoginResponse
+	(*VerifyRequest)(nil),           // 13: pb.VerifyRequest
+	(*VerifyResponse)(nil),          // 14: pb.VerifyResponse
+	(*SaveUserRequest)(nil),         // 15: pb.SaveUserRequest
+	(*CheckUserResponse)(nil),       // 16: pb.CheckUserResponse
+	(*SaveUserResponse)(nil),        // 17: pb.SaveUserResponse
 }
 var file_hello_proto_depIdxs = []int32{
-	8,  // 0: pb.AuthService.Login:input_type -> pb.LoginRequest
-	10, // 1: pb.AuthService.VerifyToken:input_type -> pb.VerifyRequest
-	12, // 2: pb.AuthService.Register:input_type -> pb.SaveUserRequest
-	6,  // 3: pb.CourseService.GetUserSections:input_type -> pb.UserRequest
-	4,  // 4: pb.CourseService.AddSection:input_type -> pb.SaveSectionRequest
-	0,  // 5: pb.CourseService.GetListSubjects:input_type -> pb.ListSubjectsRequest
-	2,  // 6: pb.PaymentService.CreatePayment:input_type -> pb.CreatePaymentRequest
-	9,  // 7: pb.AuthService.Login:output_type -> pb.LoginResponse
-	11, // 8: pb.AuthService.VerifyToken:output_type -> pb.VerifyResponse
-	13, // 9: pb.AuthService.Register:output_type -> pb.SaveUserResponse
-	7,  // 10: pb.CourseService.GetUserSections:output_type -> pb.UserSectionsResponse
-	5,  // 11: pb.CourseService.AddSection:output_type -> pb.SaveSectionResponse
-	1,  // 12: pb.CourseService.GetListSubjects:output_type -> pb.ListSubjectsResponse
-	3,  // 13: pb.PaymentService.CreatePayment:output_type -> pb.CreatePaymentResponse
-	7,  // [7:14] is the sub-list for method output_type
-	0,  // [0:7] is the sub-list for method input_type
-	0,  // [0:0] is the sub-list for extension type_name
-	0,  // [0:0] is the sub-list for extension extendee
-	0,  // [0:0] is the sub-list for field type_name
+	1,  // 0: pb.SubjectSectionsResponse.sections:type_name -> pb.SectionItem
+	11, // 1: pb.AuthService.Login:input_type -> pb.LoginRequest
+	13, // 2: pb.AuthService.VerifyToken:input_type -> pb.VerifyRequest
+	15, // 3: pb.AuthService.Register:input_type -> pb.SaveUserRequest
+	9,  // 4: pb.AuthService.CheckUser:input_type -> pb.UserRequest
+	9,  // 5: pb.CourseService.GetUserSections:input_type -> pb.UserRequest
+	7,  // 6: pb.CourseService.AddSection:input_type -> pb.SaveSectionRequest
+	3,  // 7: pb.CourseService.GetListSubjects:input_type -> pb.ListSubjectsRequest
+	0,  // 8: pb.CourseService.GetSubjectSections:input_type -> pb.SubjectSectionsRequest
+	5,  // 9: pb.PaymentService.CreatePayment:input_type -> pb.CreatePaymentRequest
+	12, // 10: pb.AuthService.Login:output_type -> pb.LoginResponse
+	14, // 11: pb.AuthService.VerifyToken:output_type -> pb.VerifyResponse
+	17, // 12: pb.AuthService.Register:output_type -> pb.SaveUserResponse
+	16, // 13: pb.AuthService.CheckUser:output_type -> pb.CheckUserResponse
+	10, // 14: pb.CourseService.GetUserSections:output_type -> pb.UserSectionsResponse
+	8,  // 15: pb.CourseService.AddSection:output_type -> pb.SaveSectionResponse
+	4,  // 16: pb.CourseService.GetListSubjects:output_type -> pb.ListSubjectsResponse
+	2,  // 17: pb.CourseService.GetSubjectSections:output_type -> pb.SubjectSectionsResponse
+	6,  // 18: pb.PaymentService.CreatePayment:output_type -> pb.CreatePaymentResponse
+	10, // [10:19] is the sub-list for method output_type
+	1,  // [1:10] is the sub-list for method input_type
+	1,  // [1:1] is the sub-list for extension type_name
+	1,  // [1:1] is the sub-list for extension extendee
+	0,  // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_hello_proto_init() }
@@ -809,7 +1024,7 @@ func file_hello_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_hello_proto_rawDesc), len(file_hello_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   3,
 		},

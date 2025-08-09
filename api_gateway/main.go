@@ -135,7 +135,6 @@ func main() {
 	})
 
 	http.HandleFunc("/listsubjects", func(w http.ResponseWriter, r *http.Request) {
-		// Нет JSON в запросе, просто дергаем gRPC
 		conn, err := grpc.Dial(addrCourse, grpc.WithInsecure())
 		if err != nil {
 			http.Error(w, "gRPC connect failed", http.StatusInternalServerError)
@@ -195,43 +194,43 @@ func main() {
 		json.NewEncoder(w).Encode(map[string]bool{"success": resp.Success})
 	})
 
-	http.HandleFunc("/sections", func(w http.ResponseWriter, r *http.Request) {
-		var req struct {
-			TgID string `json:"tgid"`
-		}
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "invalid JSON", http.StatusBadRequest)
-			return
-		}
-
-		conn, err := grpc.Dial(addrCourse, grpc.WithInsecure())
-		if err != nil {
-			http.Error(w, "gRPC connect failed", http.StatusInternalServerError)
-			return
-		}
-		defer conn.Close()
-
-		client := pb.NewCourseServiceClient(conn)
-
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
-		defer cancel()
-
-		resp, err := client.GetUserSections(ctx, &pb.UserRequest{
-			Tgid: req.TgID,
-		})
-		if err != nil {
-			log.Println("Ошибка в gRPC GetUserSections:", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]string{
-				"error": "Failed to get sections",
-			})
-			return
-		}
-
-		json.NewEncoder(w).Encode(map[string][]string{
-			"sections": resp.TopicTitles,
-		})
-	})
+	//http.HandleFunc("/sections", func(w http.ResponseWriter, r *http.Request) {
+	//	var req struct {
+	//		TgID string `json:"tgid"`
+	//	}
+	//	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	//		http.Error(w, "invalid JSON", http.StatusBadRequest)
+	//		return
+	//	}
+	//
+	//	conn, err := grpc.Dial(addrCourse, grpc.WithInsecure())
+	//	if err != nil {
+	//		http.Error(w, "gRPC connect failed", http.StatusInternalServerError)
+	//		return
+	//	}
+	//	defer conn.Close()
+	//
+	//	client := pb.NewCourseServiceClient(conn)
+	//
+	//	ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
+	//	defer cancel()
+	//
+	//	resp, err := client.GetUserSections(ctx, &pb.UserRequest{
+	//		Tgid: req.TgID,
+	//	})
+	//	if err != nil {
+	//		log.Println("Ошибка в gRPC GetUserSections:", err)
+	//		w.WriteHeader(http.StatusInternalServerError)
+	//		json.NewEncoder(w).Encode(map[string]string{
+	//			"error": "Failed to get sections",
+	//		})
+	//		return
+	//	}
+	//
+	//	json.NewEncoder(w).Encode(map[string][]string{
+	//		"sections": resp.TopicTitles,
+	//	})
+	//})
 	http.HandleFunc("/createpayment", func(w http.ResponseWriter, r *http.Request) {
 		var req struct {
 			TgID    string `json:"tgid"`
@@ -265,7 +264,56 @@ func main() {
 			"Status":      resp.Status,
 		})
 	})
+
+	http.HandleFunc("/subjectsections", func(w http.ResponseWriter, r *http.Request) {
+		// ожидаем JSON вида: {"tgid":"1001","subject":"Математика"}
+		var reqBody struct {
+			TgID    string `json:"tgid"`
+			Subject string `json:"subject"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+			http.Error(w, "invalid JSON", http.StatusBadRequest)
+			return
+		}
+
+		conn, err := grpc.Dial(addrCourse, grpc.WithInsecure())
+		if err != nil {
+			http.Error(w, "gRPC connect failed", http.StatusInternalServerError)
+			return
+		}
+		defer conn.Close()
+
+		client := pb.NewCourseServiceClient(conn)
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+
+		resp, err := client.GetSubjectSections(ctx, &pb.SubjectSectionsRequest{
+			Tgid:    reqBody.TgID,
+			Subject: reqBody.Subject,
+		})
+		if err != nil {
+			http.Error(w, "gRPC call failed", http.StatusInternalServerError)
+			return
+		}
+
+		type sectionJSON struct {
+			Title      string `json:"title"`
+			Accessible bool   `json:"accessible"`
+		}
+		out := struct {
+			Sections []sectionJSON `json:"sections"`
+		}{Sections: make([]sectionJSON, 0, len(resp.Sections))}
+
+		for _, s := range resp.Sections {
+			out.Sections = append(out.Sections, sectionJSON{
+				Title:      s.Title,
+				Accessible: s.Accessible,
+			})
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(out)
+	})
 	log.Println("API Gateway listening on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
-
 }

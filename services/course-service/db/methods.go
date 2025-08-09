@@ -102,3 +102,48 @@ func (d *Database) ListSubjects(ctx context.Context) ([]Subject, error) {
 	}
 	return subjects, nil
 }
+
+func (d *Database) GetSectionTitlesBySubjectTitle(subject string) ([]string, error) {
+	var titles []string
+	err := d.DB.
+		Table("sections AS s").
+		Select("s.title").
+		Joins("JOIN subjects subj ON subj.id = s.subject_id").
+		Where("subj.title = ?", subject).
+		Order("s.id").
+		Scan(&titles).Error
+	return titles, err
+}
+
+func (d *Database) GetAccessibleSectionTitlesByTGIDAndSubject(tgid, subject string) ([]string, error) {
+	var user User
+	if err := d.DB.Where("tgid = ?", tgid).First(&user).Error; err != nil {
+		return nil, err
+	}
+	var titles []string
+	err := d.DB.
+		Table("user_sections AS us").
+		Select("s.title").
+		Joins("JOIN sections s ON s.id = us.section_id").
+		Joins("JOIN subjects subj ON subj.id = s.subject_id").
+		Where("us.user_id = ? AND subj.title = ?", user.ID, subject).
+		Order("s.id").
+		Scan(&titles).Error
+	return titles, err
+}
+
+func (d *Database) GetAccessibleSectionTitlesByTGIDHash(tgidHash string) ([]string, error) {
+	var user User
+	if err := d.DB.Where("tgid = ?", tgidHash).First(&user).Error; err != nil {
+		return nil, err
+	}
+	var titles []string
+	err := d.DB.
+		Table("user_sections AS us").
+		Select("s.title").
+		Joins("JOIN sections s ON s.id = us.section_id").
+		Where("us.user_id = ?", user.ID).
+		Order("s.id").
+		Scan(&titles).Error
+	return titles, err
+}

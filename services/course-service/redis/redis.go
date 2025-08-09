@@ -31,6 +31,10 @@ func FillData(ctx context.Context, rdb *redis.Client) {
 	rdb.SAdd(ctx, "subject:2:sections", 21, 22)
 	rdb.SAdd(ctx, "subject:3:sections", 31, 32)
 
+	rdb.Set(ctx, "subject:title:Математика", 1, 0)
+	rdb.Set(ctx, "subject:title:Физика", 2, 0)
+	rdb.Set(ctx, "subject:title:Химия", 3, 0)
+
 	// ===== Разделы =====
 	// Математика
 	rdb.HSet(ctx, "section:11", "id", 11, "subject_id", 1, "title", "Алгебра",
@@ -98,48 +102,89 @@ func FillData(ctx context.Context, rdb *redis.Client) {
 	rdb.SAdd(ctx, "user:1003:sections", 31, 32)
 }
 
-func GetUserSectionTitles(ctx context.Context, rdb *redis.Client, tgid string) ([]string, error) {
-	key := "user:" + tgid + ":sections"
-
+func GetSubjectSectionIDs(ctx context.Context, rdb *redis.Client, subjectID string) ([]string, error) {
+	if subjectID == "" {
+		return nil, nil
+	}
+	key := "subject:" + subjectID + ":sections"
 	ids, err := rdb.SMembers(ctx, key).Result()
 	if err != nil {
-		return nil, fmt.Errorf("redis SMEMBERS %s: %w", key, err)
+		return nil, fmt.Errorf("SMEMBERS %s: %w", key, err)
 	}
+	ttl, err := rdb.TTL(ctx, key).Result()
+	if err == nil && ttl > 0 {
+		_ = rdb.Persist(ctx, key).Err()
+	}
+	return ids, nil
+}
+
+// Возвращает карту id->title; miss — сколько id без title (нет ключа/поля)
+func GetSectionTitlesByIDs(ctx context.Context, rdb *redis.Client, ids []string) (map[string]string, int, error) {
+	m := make(map[string]string, len(ids))
 	if len(ids) == 0 {
-		return nil, nil
+		return m, 0, nil
+	}
+	pipe := rdb.Pipeline()
+	cmds := make([]*redis.StringCmd, len(ids))
+	for i, id := range ids {
+		cmds[i] = pipe.HGet(ctx, "section:"+id, "title")
+	}
+	_, err := pipe.Exec(ctx)
+	if err != nil && err != redis.Nil {
+		return nil, 0, fmt.Errorf("pipeline HGET title: %w", err)
 	}
 
-	titles := make([]string, 0, len(ids))
-	for _, id := range ids {
-		secKey := "section:" + id
-		t, err := rdb.HGet(ctx, secKey, "title").Result()
-		if err == redis.Nil {
+	miss := 0
+	for i, id := range ids {
+		val, e := cmds[i].Result()
+		if e == redis.Nil || val == "" {
+			miss++
 			continue
 		}
-		if err != nil {
-			return nil, fmt.Errorf("redis HGET %s title: %w", secKey, err)
+		if e != nil {
+			miss++
+			continue
 		}
-		if t != "" {
-			titles = append(titles, t)
+		// Гарантируем персистентность ключа секции (без TTL)
+		if ttl, e2 := rdb.TTL(ctx, "section:"+id).Result(); e2 == nil && ttl > 0 {
+			_ = rdb.Persist(ctx, "section:"+id).Err()
 		}
+		m[id] = val
 	}
+	return m, miss, nil
+}
 
-	if len(titles) == 0 {
+func GetSubjectIDByTitle(ctx context.Context, rdb *redis.Client, title string) (string, error) {
+	if title == "" {
+		return "", nil
+	}
+	key := "subject:title:" + title
+	id, err := rdb.Get(ctx, key).Result()
+	if err == redis.Nil {
+		return "", nil
+	}
+	if err != nil {
+		return "", fmt.Errorf("GET %s: %w", key, err)
+	}
+	// Индекс — персистентный
+	if ttl, e := rdb.TTL(ctx, key).Result(); e == nil && ttl > 0 {
+		_ = rdb.Persist(ctx, key).Err()
+	}
+	return id, nil
+}
+
+func GetUserSectionIDs(ctx context.Context, rdb *redis.Client, tgid string) ([]string, error) {
+	key := "user:" + tgid + ":sections"
+	ids, err := rdb.SMembers(ctx, key).Result()
+	if err == redis.Nil {
 		return nil, nil
 	}
-
-	ttl, err := rdb.TTL(ctx, key).Result()
 	if err != nil {
-		return nil, fmt.Errorf("redis TTL %s: %w", key, err)
+		return nil, fmt.Errorf("SMEMBERS %s: %w", key, err)
 	}
-
-	if ttl > 0 {
-		if err := rdb.Expire(ctx, key, 3*time.Hour).Err(); err != nil {
-			return nil, fmt.Errorf("redis EXPIRE %s: %w", key, err)
-		}
-	}
-
-	return titles, nil
+	// Пользовательский ключ — кеш с TTL
+	_ = rdb.Expire(ctx, key, 3*time.Hour).Err()
+	return ids, nil
 }
 
 func SaveUserSectionsByTitles(ctx context.Context, rdb *redis.Client, tgid string, titles []string, ttl time.Duration) error {
@@ -148,28 +193,56 @@ func SaveUserSectionsByTitles(ctx context.Context, rdb *redis.Client, tgid strin
 	}
 	key := "user:" + tgid + ":sections"
 
+	pipe := rdb.Pipeline()
 	for _, title := range titles {
 		idxKey := "section:title:" + title
 		id, err := rdb.Get(ctx, idxKey).Result()
-		if err == redis.Nil {
+		if err == redis.Nil || id == "" {
 			continue
 		}
 		if err != nil {
-			return fmt.Errorf("redis GET %s: %w", idxKey, err)
+			return fmt.Errorf("GET %s: %w", idxKey, err)
 		}
-		if id == "" {
-			continue
-		}
-		if err := rdb.SAdd(ctx, key, id).Err(); err != nil {
-			return fmt.Errorf("redis SADD %s %s: %w", key, id, err)
-		}
+		pipe.SAdd(ctx, key, id)
 	}
-
-	if err := rdb.Expire(ctx, key, ttl).Err(); err != nil {
-		return fmt.Errorf("redis EXPIRE %s: %w", key, err)
+	pipe.Expire(ctx, key, ttl)
+	if _, err := pipe.Exec(ctx); err != nil {
+		return fmt.Errorf("pipeline SADD/EXPIRE %s: %w", key, err)
 	}
 	return nil
 }
+
+func GetUserSectionTitles(ctx context.Context, rdb *redis.Client, tgid string) ([]string, error) {
+	key := "user:" + tgid + ":sections"
+
+	ids, err := rdb.SMembers(ctx, key).Result()
+	if err == redis.Nil || len(ids) == 0 {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("SMEMBERS %s: %w", key, err)
+	}
+
+	pipe := rdb.Pipeline()
+	cmds := make([]*redis.StringCmd, len(ids))
+	for i, id := range ids {
+		cmds[i] = pipe.HGet(ctx, "section:"+id, "title")
+	}
+	if _, err := pipe.Exec(ctx); err != nil && err != redis.Nil {
+		return nil, fmt.Errorf("pipeline HGET title: %w", err)
+	}
+
+	titles := make([]string, 0, len(ids))
+	for i := range ids {
+		val, e := cmds[i].Result()
+		if e == nil && val != "" {
+			titles = append(titles, val)
+		}
+	}
+	_ = rdb.Expire(ctx, key, 3*time.Hour).Err()
+	return titles, nil
+}
+
 func GetSubjectTitles(ctx context.Context, rdb *redis.Client) ([]string, error) {
 	ids, err := rdb.SMembers(ctx, "subjects:set").Result()
 	if err != nil {
@@ -190,4 +263,32 @@ func GetSubjectTitles(ctx context.Context, rdb *redis.Client) ([]string, error) 
 		}
 	}
 	return out, nil
+}
+
+func UserSectionsExists(ctx context.Context, rdb *redis.Client, tgid string) (bool, error) {
+	key := "user:" + tgid + ":sections"
+	n, err := rdb.Exists(ctx, key).Result()
+	if err != nil {
+		return false, err
+	}
+	return n == 1, nil
+}
+
+func AddUserSectionByTitle(ctx context.Context, rdb *redis.Client, tgid, title string, ttl time.Duration) error {
+	if title == "" || tgid == "" {
+		return fmt.Errorf("empty tgid or title")
+	}
+	id, err := rdb.Get(ctx, "section:title:"+title).Result()
+	if err == redis.Nil || id == "" {
+		return fmt.Errorf("section id not found for title %q", title)
+	}
+	if err != nil {
+		return fmt.Errorf("GET section:title:%s: %w", title, err)
+	}
+	key := "user:" + tgid + ":sections"
+	pipe := rdb.Pipeline()
+	pipe.SAdd(ctx, key, id)
+	pipe.Expire(ctx, key, ttl)
+	_, execErr := pipe.Exec(ctx)
+	return execErr
 }
