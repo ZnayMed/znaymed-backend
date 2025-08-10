@@ -7,6 +7,8 @@ import (
 	pb "github.com/ZnayMed/znaymed-backend/pb"
 	"github.com/ZnayMed/znaymed-backend/services/auth-service/db"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"log"
 	"net"
 )
@@ -16,6 +18,15 @@ var secret = []byte("пока_ничего")
 type authServer struct {
 	pb.UnimplementedAuthServiceServer
 	db *db.Database
+}
+
+func (s *authServer) CheckUser(ctx context.Context, req *pb.UserRequest) (*pb.CheckUserResponse, error) {
+	hashTgid := hashTGID(req.Tgid)
+	exists, err := s.db.UserExists(hashTgid)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "db error: %v", err)
+	}
+	return &pb.CheckUserResponse{Exists: exists}, nil
 }
 
 //func (s *authServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
