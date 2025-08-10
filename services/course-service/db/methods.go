@@ -38,26 +38,20 @@ func (d *Database) GetTopicInfoForUser(topicTitle string, userTgID string) (*Top
 	}, nil
 }
 
-func (d *Database) GetAccessibleSectionTitlesByTgID(tgid string) ([]string, error) {
+func (d *Database) GetAccessibleSectionTitlesByTGIDHash(tgidHash string) ([]string, error) {
 	var user User
-
-	if err := d.DB.Where("tgid = ?", tgid).First(&user).Error; err != nil {
-		return nil, errors.New("пользователь не найден")
-	}
-
-	var titles []string
-	err := d.DB.
-		Table("sections").
-		Select("sections.title").
-		Joins("JOIN user_sections ON user_sections.section_id = sections.id").
-		Where("user_sections.user_id = ?", user.ID).
-		Scan(&titles).Error
-
-	if err != nil {
+	if err := d.DB.Where("tgid = ?", tgidHash).First(&user).Error; err != nil {
 		return nil, err
 	}
-
-	return titles, nil
+	var titles []string
+	err := d.DB.
+		Table("user_sections AS us").
+		Select("s.title").
+		Joins("JOIN sections s ON s.id = us.section_id").
+		Where("us.user_id = ?", user.ID).
+		Order("s.id").
+		Scan(&titles).Error
+	return titles, err
 }
 
 func (d *Database) GiveSectionToUser(tgid string, sectionTitle string) (bool, error) {
@@ -127,22 +121,6 @@ func (d *Database) GetAccessibleSectionTitlesByTGIDAndSubject(tgid, subject stri
 		Joins("JOIN sections s ON s.id = us.section_id").
 		Joins("JOIN subjects subj ON subj.id = s.subject_id").
 		Where("us.user_id = ? AND subj.title = ?", user.ID, subject).
-		Order("s.id").
-		Scan(&titles).Error
-	return titles, err
-}
-
-func (d *Database) GetAccessibleSectionTitlesByTGIDHash(tgidHash string) ([]string, error) {
-	var user User
-	if err := d.DB.Where("tgid = ?", tgidHash).First(&user).Error; err != nil {
-		return nil, err
-	}
-	var titles []string
-	err := d.DB.
-		Table("user_sections AS us").
-		Select("s.title").
-		Joins("JOIN sections s ON s.id = us.section_id").
-		Where("us.user_id = ?", user.ID).
 		Order("s.id").
 		Scan(&titles).Error
 	return titles, err

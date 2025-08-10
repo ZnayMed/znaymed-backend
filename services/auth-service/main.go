@@ -6,27 +6,54 @@ import (
 	"encoding/hex"
 	pb "github.com/ZnayMed/znaymed-backend/pb"
 	"github.com/ZnayMed/znaymed-backend/services/auth-service/db"
+	redisauth "github.com/ZnayMed/znaymed-backend/services/auth-service/redis"
+	goredis "github.com/redis/go-redis/v9"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"
 	"net"
+	"time"
 )
 
-var secret = []byte("пока_ничего")
+const userTTL = 3 * time.Hour
 
 type authServer struct {
 	pb.UnimplementedAuthServiceServer
-	db *db.Database
+	db  *db.Database
+	rdb *goredis.Client
 }
 
 func (s *authServer) CheckUser(ctx context.Context, req *pb.UserRequest) (*pb.CheckUserResponse, error) {
-	hashTgid := hashTGID(req.Tgid)
+	tgid := req.Tgid
+	hashTgid := hashTGID(tgid)
+
+	if s.rdb != nil {
+		existsKey := "user:" + tgid + ":exists"
+		sectionsKey := "user:" + tgid + ":sections"
+
+		if n, err := s.rdb.Exists(ctx, existsKey, sectionsKey).Result(); err == nil && n > 0 {
+			return &pb.CheckUserResponse{Exists: true}, nil
+		}
+	}
+
 	exists, err := s.db.UserExists(hashTgid)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "db error: %v", err)
 	}
-	return &pb.CheckUserResponse{Exists: exists}, nil
+	if !exists {
+		return &pb.CheckUserResponse{Exists: false}, nil
+	}
+
+	if s.rdb != nil {
+		_ = redisauth.SetUserExistMarker(ctx, s.rdb, tgid, userTTL)
+
+		if titles, err := s.db.GetAccessibleSectionTitlesByTGIDHash(hashTgid); err == nil {
+			_ = redisauth.SaveUserSectionsByTitles(ctx, s.rdb, tgid, titles, userTTL)
+		}
+	}
+
+	return &pb.CheckUserResponse{Exists: true}, nil
 }
 
 //func (s *authServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
@@ -57,14 +84,23 @@ func (s *authServer) CheckUser(ctx context.Context, req *pb.UserRequest) (*pb.Ch
 
 func (s *authServer) Register(ctx context.Context, req *pb.SaveUserRequest) (*pb.SaveUserResponse, error) {
 	hashName := hashTGID(req.Tgid)
-
 	log.Printf("Пытаемся сохранить: name=%s, hashTgid=%s, birthdate=%s", req.Name, hashName, req.Birthdate)
 
-	err := s.db.SaveUser(req.Name, hashName, req.Birthdate)
-	if err != nil {
+	// 1) Сохраняем в БД
+	if err := s.db.SaveUser(req.Name, hashName, req.Birthdate); err != nil {
 		log.Println("Ошибка при сохранении:", err)
 		return &pb.SaveUserResponse{Success: false, Message: err.Error()}, err
 	}
+
+	if s.rdb != nil {
+		key := "user:" + req.Tgid + ":exists"
+		if err := s.rdb.SetEx(ctx, key, "1", userTTL).Err(); err != nil {
+			log.Printf("⚠️  Redis: не удалось установить маркер %s: %v", key, err)
+		} else {
+			log.Printf("✅ Redis: установлен маркер %s на %v", key, userTTL)
+		}
+	}
+
 	return &pb.SaveUserResponse{Success: true, Message: "Пользователь успешно добавлен"}, nil
 }
 
@@ -78,12 +114,18 @@ func main() {
 	if err != nil {
 		log.Fatalf("Ошибка подключения к базе данных: %v", err)
 	}
+
+	rdb := redisauth.New()
+
 	lis, err := net.Listen("tcp", ":50054")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	grpcServer := grpc.NewServer()
-	pb.RegisterAuthServiceServer(grpcServer, &authServer{db: database})
+	pb.RegisterAuthServiceServer(grpcServer, &authServer{
+		db:  database,
+		rdb: rdb,
+	})
 
 	log.Println("AuthService listening on :50054")
 	if err := grpcServer.Serve(lis); err != nil {
