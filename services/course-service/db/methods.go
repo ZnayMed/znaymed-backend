@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"errors"
+	"gorm.io/gorm"
 )
 
 type TopicInfo struct {
@@ -124,4 +125,26 @@ func (d *Database) GetAccessibleSectionTitlesByTGIDAndSubject(tgid, subject stri
 		Order("s.id").
 		Scan(&titles).Error
 	return titles, err
+}
+
+func GetSectionIDByTitle(ctx context.Context, gdb *gorm.DB, title string) (uint, error) {
+	var sec Section
+	if err := gdb.WithContext(ctx).
+		Select("id").
+		Where("title = ?", title).
+		First(&sec).Error; err != nil {
+		return 0, err
+	}
+	return sec.ID, nil
+}
+
+func GetTopicsBySectionID(ctx context.Context, gdb *gorm.DB, sectionID uint) ([]Topic, error) {
+	var topics []Topic
+	if err := gdb.WithContext(ctx).
+		Where("section_id = ?", sectionID).
+		Order("id").
+		Find(&topics).Error; err != nil {
+		return nil, err
+	}
+	return topics, nil
 }

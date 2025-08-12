@@ -21,11 +21,28 @@ service CourseService{
   rpc AddSection (SaveSectionRequest) returns (SaveSectionResponse);
   rpc GetListSubjects(ListSubjectsRequest) returns (ListSubjectsResponse);
   rpc GetSubjectSections(SubjectSectionsRequest) returns (SubjectSectionsResponse);
+  rpc GetTopicsBySectionTitle (SectionTitleRequest) returns (SectionTopicsResponse);
 }
 service PaymentService {
   rpc CreatePayment (CreatePaymentRequest) returns (CreatePaymentResponse);
 }
 
+message SectionTitleRequest {
+  string section_title = 1;
+}
+
+message TopicItem {
+  int64  id          = 1;
+  int64  section_id  = 2;
+  string title       = 3;
+  string description = 4;
+  string tg_id       = 5;
+  string mindmap_url = 6;
+}
+
+message SectionTopicsResponse {
+  repeated TopicItem topics = 1;
+}
 
 message SubjectSectionsRequest {
   string tgid = 1;

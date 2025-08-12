@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/redis/go-redis/v9"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -118,7 +119,12 @@ func GetSubjectSectionIDs(ctx context.Context, rdb *redis.Client, subjectID stri
 	return ids, nil
 }
 
-// Возвращает карту id->title; miss — сколько id без title (нет ключа/поля)
+func GetSectionIDByTitle(ctx context.Context, rdb *redis.Client, title string) (string, error) {
+	// KEY: section:title:<title>  -> <section_id>
+	key := "section:title:" + title
+	return rdb.Get(ctx, key).Result()
+}
+
 func GetSectionTitlesByIDs(ctx context.Context, rdb *redis.Client, ids []string) (map[string]string, int, error) {
 	m := make(map[string]string, len(ids))
 	if len(ids) == 0 {
@@ -212,37 +218,6 @@ func SaveUserSectionsByTitles(ctx context.Context, rdb *redis.Client, tgid strin
 	return nil
 }
 
-func GetUserSectionTitles(ctx context.Context, rdb *redis.Client, tgid string) ([]string, error) {
-	key := "user:" + tgid + ":sections"
-
-	ids, err := rdb.SMembers(ctx, key).Result()
-	if err == redis.Nil || len(ids) == 0 {
-		return nil, nil
-	}
-	if err != nil {
-		return nil, fmt.Errorf("SMEMBERS %s: %w", key, err)
-	}
-
-	pipe := rdb.Pipeline()
-	cmds := make([]*redis.StringCmd, len(ids))
-	for i, id := range ids {
-		cmds[i] = pipe.HGet(ctx, "section:"+id, "title")
-	}
-	if _, err := pipe.Exec(ctx); err != nil && err != redis.Nil {
-		return nil, fmt.Errorf("pipeline HGET title: %w", err)
-	}
-
-	titles := make([]string, 0, len(ids))
-	for i := range ids {
-		val, e := cmds[i].Result()
-		if e == nil && val != "" {
-			titles = append(titles, val)
-		}
-	}
-	_ = rdb.Expire(ctx, key, 3*time.Hour).Err()
-	return titles, nil
-}
-
 func GetSubjectTitles(ctx context.Context, rdb *redis.Client) ([]string, error) {
 	ids, err := rdb.SMembers(ctx, "subjects:set").Result()
 	if err != nil {
@@ -291,4 +266,84 @@ func AddUserSectionByTitle(ctx context.Context, rdb *redis.Client, tgid, title s
 	pipe.Expire(ctx, key, ttl)
 	_, execErr := pipe.Exec(ctx)
 	return execErr
+}
+
+func GetSectionTopicIDs(ctx context.Context, rdb *redis.Client, sectionID string) ([]string, error) {
+	// KEY: section:<id>:topics  -> Set(topic_ids)
+	key := "section:" + sectionID + ":topics"
+	return rdb.SMembers(ctx, key).Result()
+}
+
+type Topic struct {
+	ID          int64
+	SectionID   int64
+	Title       string
+	Description string
+	TgID        string
+	MindmapURL  string
+}
+
+func GetTopicByID(ctx context.Context, rdb *redis.Client, topicID string) (*Topic, error) {
+	// HASH: topic:<id>  -> { id, section_id, title, description, tg_id, mindmap_url }
+	key := "topic:" + topicID
+
+	// Можно HGetAll, он компактнее для полного объекта
+	m, err := rdb.HGetAll(ctx, key).Result()
+	if err != nil {
+		return nil, fmt.Errorf("HGetAll %s: %w", key, err)
+	}
+	if len(m) == 0 {
+		return nil, redis.Nil
+	}
+
+	id, _ := strconv.ParseInt(m["id"], 10, 64)
+	secID, _ := strconv.ParseInt(m["section_id"], 10, 64)
+
+	return &Topic{
+		ID:          id,
+		SectionID:   secID,
+		Title:       m["title"],
+		Description: m["description"],
+		TgID:        m["tg_id"],
+		MindmapURL:  m["mindmap_url"],
+	}, nil
+}
+
+func GetTopicsByIDsPipeline(ctx context.Context, rdb *redis.Client, topicIDs []string) ([]*Topic, error) {
+	if len(topicIDs) == 0 {
+		return nil, nil
+	}
+
+	pipe := rdb.Pipeline()
+	cmds := make([]*redis.MapStringStringCmd, 0, len(topicIDs))
+	for _, id := range topicIDs {
+		cmds = append(cmds, pipe.HGetAll(ctx, "topic:"+id))
+	}
+	if _, err := pipe.Exec(ctx); err != nil {
+		return nil, fmt.Errorf("pipeline HGetAll topics: %w", err)
+	}
+
+	out := make([]*Topic, 0, len(topicIDs))
+	for i, cmd := range cmds {
+		m, err := cmd.Result()
+		if err != nil {
+			// пропустим отсутствующий топик
+			continue
+		}
+		if len(m) == 0 {
+			continue
+		}
+		id, _ := strconv.ParseInt(m["id"], 10, 64)
+		secID, _ := strconv.ParseInt(m["section_id"], 10, 64)
+		out = append(out, &Topic{
+			ID:          id,
+			SectionID:   secID,
+			Title:       m["title"],
+			Description: m["description"],
+			TgID:        m["tg_id"],
+			MindmapURL:  m["mindmap_url"],
+		})
+		_ = i // на случай, если понадобятся логи с индексом
+	}
+	return out, nil
 }

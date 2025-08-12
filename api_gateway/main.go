@@ -17,6 +17,69 @@ func main() {
 	addrCourse := os.Getenv("COURSE_SERVICE_ADDR")
 	addrPayment := os.Getenv("PAYMENT_SERVICE_ADDR")
 
+	http.HandleFunc("/sectiontopics", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		var reqBody struct {
+			SectionTitle string `json:"section_title"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+			http.Error(w, "bad json", http.StatusBadRequest)
+			log.Println("Ошибка декодирования JSON:", err)
+			return
+		}
+		if reqBody.SectionTitle == "" {
+			http.Error(w, "section_title is required", http.StatusBadRequest)
+			return
+		}
+
+		conn, err := grpc.Dial(addrCourse, grpc.WithInsecure())
+		if err != nil {
+			http.Error(w, "gRPC connect failed", http.StatusInternalServerError)
+			log.Println("Ошибка подключения к gRPC:", err)
+			return
+		}
+		defer conn.Close()
+
+		client := pb.NewCourseServiceClient(conn)
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+
+		resp, err := client.GetTopicsBySectionTitle(ctx, &pb.SectionTitleRequest{
+			SectionTitle: reqBody.SectionTitle,
+		})
+		if err != nil {
+			http.Error(w, "gRPC call failed", http.StatusInternalServerError)
+			log.Println("Ошибка вызова GetTopicsBySectionTitle:", err)
+			return
+		}
+
+		type topicJSON struct {
+			Title       string `json:"title"`
+			Description string `json:"description"`
+			TgId        string `json:"tg_id"`
+			MindmapUrl  string `json:"mindmap_url"`
+		}
+		out := make([]topicJSON, 0, len(resp.Topics))
+		for _, t := range resp.Topics {
+			out = append(out, topicJSON{
+				Title:       t.Title,
+				Description: t.Description,
+				TgId:        t.TgId,
+				MindmapUrl:  t.MindmapUrl,
+			})
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"section_title": reqBody.SectionTitle,
+			"topics":        out,
+		})
+	})
+
 	http.HandleFunc("/check_user", func(w http.ResponseWriter, r *http.Request) {
 		tgid := r.URL.Query().Get("tgid")
 		if tgid == "" {
@@ -184,7 +247,6 @@ func main() {
 			return
 		}
 
-		// Возвращаем JSON-массив
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"subjects": resp.Titles,
@@ -224,43 +286,6 @@ func main() {
 		json.NewEncoder(w).Encode(map[string]bool{"success": resp.Success})
 	})
 
-	//http.HandleFunc("/sections", func(w http.ResponseWriter, r *http.Request) {
-	//	var req struct {
-	//		TgID string `json:"tgid"`
-	//	}
-	//	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-	//		http.Error(w, "invalid JSON", http.StatusBadRequest)
-	//		return
-	//	}
-	//
-	//	conn, err := grpc.Dial(addrCourse, grpc.WithInsecure())
-	//	if err != nil {
-	//		http.Error(w, "gRPC connect failed", http.StatusInternalServerError)
-	//		return
-	//	}
-	//	defer conn.Close()
-	//
-	//	client := pb.NewCourseServiceClient(conn)
-	//
-	//	ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
-	//	defer cancel()
-	//
-	//	resp, err := client.GetUserSections(ctx, &pb.UserRequest{
-	//		Tgid: req.TgID,
-	//	})
-	//	if err != nil {
-	//		log.Println("Ошибка в gRPC GetUserSections:", err)
-	//		w.WriteHeader(http.StatusInternalServerError)
-	//		json.NewEncoder(w).Encode(map[string]string{
-	//			"error": "Failed to get sections",
-	//		})
-	//		return
-	//	}
-	//
-	//	json.NewEncoder(w).Encode(map[string][]string{
-	//		"sections": resp.TopicTitles,
-	//	})
-	//})
 	http.HandleFunc("/createpayment", func(w http.ResponseWriter, r *http.Request) {
 		var req struct {
 			TgID    string `json:"tgid"`
@@ -296,7 +321,7 @@ func main() {
 	})
 
 	http.HandleFunc("/subjectsections", func(w http.ResponseWriter, r *http.Request) {
-		// ожидаем JSON вида: {"tgid":"1001","subject":"Математика"}
+
 		var reqBody struct {
 			TgID    string `json:"tgid"`
 			Subject string `json:"subject"`

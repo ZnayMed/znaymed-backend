@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"github.com/ZnayMed/znaymed-backend/pb"
 	"github.com/ZnayMed/znaymed-backend/services/course-service/db"
 	rediscourse "github.com/ZnayMed/znaymed-backend/services/course-service/redis"
@@ -13,6 +14,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"gorm.io/gorm"
 	"log"
 	"net"
 	"time"
@@ -24,11 +26,102 @@ type courseServer struct {
 	rdb *goredis.Client
 }
 
-// добавлено
-func AddSection(ctx context.Context, database *db.Database, rdb *goredis.Client, hashName string, title string) error {
-	const userTTL = 3 * time.Hour
+func (s *courseServer) GetTopicsBySectionTitle(ctx context.Context, req *pb.SectionTitleRequest) (*pb.SectionTopicsResponse, error) {
+	title := req.SectionTitle
+	if title == "" {
+		log.Printf("❌ GetTopicsBySectionTitle: empty section_title")
+		return nil, status.Error(codes.InvalidArgument, "section_title is required")
+	}
 
-	log.Printf("📥 AddSectionFromKafka: hash=%s title=%s", hashName, title)
+	log.Printf("📥 GetTopicsBySectionTitle: section_title=%q", title)
+
+	if s.rdb != nil {
+		log.Printf("🔍 Trying Redis path for section_title=%q", title)
+
+		sectionID, rerr := rediscourse.GetSectionIDByTitle(ctx, s.rdb, title)
+		if rerr != nil {
+			if rerr == goredis.Nil {
+				log.Printf("ℹ️ Redis miss: section:title:%s not found", title)
+			} else {
+				log.Printf("⚠️ Redis error in GetSectionIDByTitle: %v (will fallback to DB)", rerr)
+			}
+		} else {
+			log.Printf("✅ Redis sectionID=%s for title=%q", sectionID, title)
+
+			topicIDs, rerr := rediscourse.GetSectionTopicIDs(ctx, s.rdb, sectionID)
+			if rerr != nil {
+				log.Printf("⚠️ Redis error in GetSectionTopicIDs(%s): %v (will fallback to DB)", sectionID, rerr)
+			} else {
+				log.Printf("ℹ️ Redis topicIDs: %v", topicIDs)
+
+				if len(topicIDs) == 0 {
+					log.Printf("ℹ️ Redis: no topics for sectionID=%s (title=%q). Returning empty list (no DB fallback).", sectionID, title)
+					return &pb.SectionTopicsResponse{Topics: nil}, nil
+				}
+
+				topics, rerr := rediscourse.GetTopicsByIDsPipeline(ctx, s.rdb, topicIDs)
+				if rerr != nil {
+					log.Printf("⚠️ Redis error in GetTopicsByIDsPipeline: %v (will fallback to DB)", rerr)
+				} else {
+					log.Printf("✅ Redis topics loaded: %d", len(topics))
+
+					resp := &pb.SectionTopicsResponse{Topics: make([]*pb.TopicItem, 0, len(topics))}
+					for _, t := range topics {
+						resp.Topics = append(resp.Topics, &pb.TopicItem{
+							Id:          t.ID,
+							SectionId:   t.SectionID,
+							Title:       t.Title,
+							Description: t.Description,
+							TgId:        t.TgID,
+							MindmapUrl:  t.MindmapURL,
+						})
+					}
+					return resp, nil
+				}
+			}
+		}
+	} else {
+		log.Printf("ℹ️ Redis client is nil — using DB path")
+	}
+
+	log.Printf("↪️ Fallback to DB for section_title=%q", title)
+
+	secID, err := db.GetSectionIDByTitle(ctx, s.db.DB, title)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Printf("ℹ️ DB: section not found: %q", title)
+			return &pb.SectionTopicsResponse{Topics: nil}, nil
+		}
+		log.Printf("❌ DB error in dbGetSectionIDByTitle: %v", err)
+		return nil, status.Errorf(codes.Internal, "db: section by title: %v", err)
+	}
+
+	topics, err := db.GetTopicsBySectionID(ctx, s.db.DB, secID)
+	if err != nil {
+		log.Printf("❌ DB error in dbGetTopicsBySectionID: %v", err)
+		return nil, status.Errorf(codes.Internal, "db: topics by section: %v", err)
+	}
+
+	log.Printf("✅ DB topics loaded: %d (no Redis writes as requested)", len(topics))
+
+	resp := &pb.SectionTopicsResponse{Topics: make([]*pb.TopicItem, 0, len(topics))}
+	for _, t := range topics {
+		resp.Topics = append(resp.Topics, &pb.TopicItem{
+			Id:          int64(t.ID),
+			SectionId:   int64(t.SectionID),
+			Title:       t.Title,
+			Description: t.Description,
+			TgId:        t.TgID,
+			MindmapUrl:  t.MindmapURL,
+		})
+	}
+	return resp, nil
+}
+
+func AddSection(ctx context.Context, database *db.Database, rdb *goredis.Client, tgid string, title string) error {
+	const userTTL = 3 * time.Hour
+	hashName := hashTGID(tgid)
+	log.Printf("📥 AddSectionFromKafka: hash=%s title=%s", tgid, title)
 
 	// 1) Пишем в БД
 	success, err := database.GiveSectionToUser(hashName, title)
@@ -41,28 +134,25 @@ func AddSection(ctx context.Context, database *db.Database, rdb *goredis.Client,
 		return nil
 	}
 
-	// 2) Обновляем Redis
-	exists, err := rediscourse.UserSectionsExists(ctx, rdb, hashName)
+	exists, err := rediscourse.UserSectionsExists(ctx, rdb, tgid)
 	if err != nil {
-		log.Printf("⚠️ Redis EXISTS user:%s:sections error: %v (skip warmup)", hashName, err)
+		log.Printf("⚠️ Redis EXISTS user:%s:sections error: %v (skip warmup)", tgid, err)
 		return nil
 	}
 
 	if exists {
-		// Ключ есть — добавляем только новый раздел
-		if err := rediscourse.AddUserSectionByTitle(ctx, rdb, hashName, title, userTTL); err != nil {
-			log.Printf("⚠️ Redis SADD user:%s:sections by title=%q failed: %v", hashName, title, err)
+		if err := rediscourse.AddUserSectionByTitle(ctx, rdb, tgid, title, userTTL); err != nil {
+			log.Printf("⚠️ Redis SADD user:%s:sections by title=%q failed: %v", tgid, title, err)
 		} else {
-			log.Printf("💾 Redis updated: user:%s:sections += %q", hashName, title)
+			log.Printf("💾 Redis updated: user:%s:sections += %q", tgid, title)
 		}
 	} else {
-		// Ключа нет — гидратируем ПОЛНЫЙ набор доступных разделов из БД (включая только что добавленный)
 		titles, derr := database.GetAccessibleSectionTitlesByTGIDHash(hashName)
 		if derr != nil {
 			log.Printf("⚠️ DB GetAccessibleSectionTitlesByTGIDHash error: %v (skip warmup)", derr)
 			return nil
 		}
-		if err := rediscourse.SaveUserSectionsByTitles(ctx, rdb, hashName, titles, userTTL); err != nil {
+		if err := rediscourse.SaveUserSectionsByTitles(ctx, rdb, tgid, titles, userTTL); err != nil {
 			log.Printf("⚠️ Redis warmup user:%s:sections failed: %v", hashName, err)
 		} else {
 			log.Printf("💾 Redis warmed user:%s:sections with %d titles (TTL=%s)", hashName, len(titles), userTTL)
@@ -71,8 +161,6 @@ func AddSection(ctx context.Context, database *db.Database, rdb *goredis.Client,
 
 	return nil
 }
-
-//добавлено
 
 func (s *courseServer) GetListSubjects(ctx context.Context, req *pb.ListSubjectsRequest) (*pb.ListSubjectsResponse, error) {
 	if s.rdb != nil {
@@ -93,8 +181,6 @@ func (s *courseServer) GetListSubjects(ctx context.Context, req *pb.ListSubjects
 	}
 	return &pb.ListSubjectsResponse{Titles: titles}, nil
 }
-
-//добавлено
 
 func (s *courseServer) GetSubjectSections(ctx context.Context, req *pb.SubjectSectionsRequest) (*pb.SubjectSectionsResponse, error) {
 	const userTTL = 3 * time.Hour
@@ -225,40 +311,6 @@ func (s *courseServer) GetSubjectSections(ctx context.Context, req *pb.SubjectSe
 	return resp, nil
 }
 
-//func (s *courseServer) GetUserSections(ctx context.Context, req *pb.UserRequest) (*pb.UserSectionsResponse, error) {
-//	log.Printf("📥 Запрос разделов для пользователя TGID=%s", req.Tgid)
-//
-//	titles, rerr := rediscourse.GetUserSectionTitles(ctx, s.rdb, req.Tgid)
-//	if rerr != nil {
-//		log.Printf("⚠️ Redis ошибка: %v (упадём в БД)", rerr)
-//	}
-//	if len(titles) > 0 {
-//		log.Printf("✅ Найдено в Redis: %v", titles)
-//		return &pb.UserSectionsResponse{TopicTitles: titles}, nil
-//	}
-//	log.Println("⚠️ В Redis нет данных, обращаемся к БД")
-//
-//	hashName := hashTGID(req.Tgid)
-//	titles, err := s.db.GetAccessibleSectionTitlesByTgID(hashName)
-//	if err != nil {
-//		log.Printf("❌ Ошибка при получении из БД: %v", err)
-//		return &pb.UserSectionsResponse{TopicTitles: nil}, err
-//	}
-//	log.Printf("✅ Найдено в БД: %v", titles)
-//
-//	if len(titles) > 0 {
-//		if err := rediscourse.SaveUserSectionsByTitles(ctx, s.rdb, req.Tgid, titles, 3*time.Hour); err != nil {
-//			log.Printf("⚠️ Не удалось сохранить в Redis: %v", err)
-//		} else {
-//			log.Printf("💾 Сохранено в Redis (TTL 3h): %v", titles)
-//		}
-//	} else {
-//		log.Println("⚠️ В БД нет доступных разделов")
-//	}
-//
-//	return &pb.UserSectionsResponse{TopicTitles: titles}, nil
-//}
-
 func hashTGID(tgid string) string {
 	hash := sha256.Sum256([]byte(tgid))
 	return hex.EncodeToString(hash[:])
@@ -294,7 +346,7 @@ func StartKafkaConsumer(database *db.Database, ctx context.Context, rdb *goredis
 				continue
 			}
 
-			err = AddSection(ctx, database, rdb, hashTGID(event.Tgid), event.CourseID)
+			err = AddSection(ctx, database, rdb, event.Tgid, event.CourseID)
 			if err != nil {
 				log.Printf("❌ Ошибка при добавлении курса пользователю: %v", err)
 			} else {

@@ -235,10 +235,11 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	CourseService_GetUserSections_FullMethodName    = "/pb.CourseService/GetUserSections"
-	CourseService_AddSection_FullMethodName         = "/pb.CourseService/AddSection"
-	CourseService_GetListSubjects_FullMethodName    = "/pb.CourseService/GetListSubjects"
-	CourseService_GetSubjectSections_FullMethodName = "/pb.CourseService/GetSubjectSections"
+	CourseService_GetUserSections_FullMethodName         = "/pb.CourseService/GetUserSections"
+	CourseService_AddSection_FullMethodName              = "/pb.CourseService/AddSection"
+	CourseService_GetListSubjects_FullMethodName         = "/pb.CourseService/GetListSubjects"
+	CourseService_GetSubjectSections_FullMethodName      = "/pb.CourseService/GetSubjectSections"
+	CourseService_GetTopicsBySectionTitle_FullMethodName = "/pb.CourseService/GetTopicsBySectionTitle"
 )
 
 // CourseServiceClient is the client API for CourseService service.
@@ -249,6 +250,7 @@ type CourseServiceClient interface {
 	AddSection(ctx context.Context, in *SaveSectionRequest, opts ...grpc.CallOption) (*SaveSectionResponse, error)
 	GetListSubjects(ctx context.Context, in *ListSubjectsRequest, opts ...grpc.CallOption) (*ListSubjectsResponse, error)
 	GetSubjectSections(ctx context.Context, in *SubjectSectionsRequest, opts ...grpc.CallOption) (*SubjectSectionsResponse, error)
+	GetTopicsBySectionTitle(ctx context.Context, in *SectionTitleRequest, opts ...grpc.CallOption) (*SectionTopicsResponse, error)
 }
 
 type courseServiceClient struct {
@@ -299,6 +301,16 @@ func (c *courseServiceClient) GetSubjectSections(ctx context.Context, in *Subjec
 	return out, nil
 }
 
+func (c *courseServiceClient) GetTopicsBySectionTitle(ctx context.Context, in *SectionTitleRequest, opts ...grpc.CallOption) (*SectionTopicsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SectionTopicsResponse)
+	err := c.cc.Invoke(ctx, CourseService_GetTopicsBySectionTitle_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CourseServiceServer is the server API for CourseService service.
 // All implementations must embed UnimplementedCourseServiceServer
 // for forward compatibility.
@@ -307,6 +319,7 @@ type CourseServiceServer interface {
 	AddSection(context.Context, *SaveSectionRequest) (*SaveSectionResponse, error)
 	GetListSubjects(context.Context, *ListSubjectsRequest) (*ListSubjectsResponse, error)
 	GetSubjectSections(context.Context, *SubjectSectionsRequest) (*SubjectSectionsResponse, error)
+	GetTopicsBySectionTitle(context.Context, *SectionTitleRequest) (*SectionTopicsResponse, error)
 	mustEmbedUnimplementedCourseServiceServer()
 }
 
@@ -328,6 +341,9 @@ func (UnimplementedCourseServiceServer) GetListSubjects(context.Context, *ListSu
 }
 func (UnimplementedCourseServiceServer) GetSubjectSections(context.Context, *SubjectSectionsRequest) (*SubjectSectionsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSubjectSections not implemented")
+}
+func (UnimplementedCourseServiceServer) GetTopicsBySectionTitle(context.Context, *SectionTitleRequest) (*SectionTopicsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTopicsBySectionTitle not implemented")
 }
 func (UnimplementedCourseServiceServer) mustEmbedUnimplementedCourseServiceServer() {}
 func (UnimplementedCourseServiceServer) testEmbeddedByValue()                       {}
@@ -422,6 +438,24 @@ func _CourseService_GetSubjectSections_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CourseService_GetTopicsBySectionTitle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SectionTitleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CourseServiceServer).GetTopicsBySectionTitle(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CourseService_GetTopicsBySectionTitle_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CourseServiceServer).GetTopicsBySectionTitle(ctx, req.(*SectionTitleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CourseService_ServiceDesc is the grpc.ServiceDesc for CourseService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -444,6 +478,10 @@ var CourseService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetSubjectSections",
 			Handler:    _CourseService_GetSubjectSections_Handler,
+		},
+		{
+			MethodName: "GetTopicsBySectionTitle",
+			Handler:    _CourseService_GetTopicsBySectionTitle_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
