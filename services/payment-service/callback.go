@@ -105,7 +105,7 @@ func (s *paymentServer) PSPCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("🔔 Webhook %s обработан для payment=%s (provider=%s)", hook.Event, payment.ID, hook.Object.ID)
+	log.Printf("Webhook %s обработан для payment=%s (provider=%s)", hook.Event, payment.ID, hook.Object.ID)
 	w.WriteHeader(http.StatusOK)
 }
 

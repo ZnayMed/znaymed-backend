@@ -34,7 +34,7 @@ func (s *paymentServer) startKafkaDispatcher(topic string) {
 
 			events, err := s.db.GetUnsentOutboxEvents()
 			if err != nil {
-				log.Println("❌ Ошибка при получении событий из outbox:", err)
+				log.Println("Ошибка при получении событий из outbox:", err)
 				continue
 			}
 
@@ -44,15 +44,15 @@ func (s *paymentServer) startKafkaDispatcher(topic string) {
 					Value: event.Payload,
 				})
 				if err != nil {
-					log.Println("❌ Ошибка отправки в Kafka:", err)
+					log.Println("Ошибка отправки в Kafka:", err)
 					continue
 				}
 
 				err = s.db.MarkOutboxEventAsSent(event.ID)
 				if err != nil {
-					log.Println("❌ Ошибка пометки события как отправленного:", err)
+					log.Println("Ошибка пометки события как отправленного:", err)
 				} else {
-					log.Println("📤 Отправлено в Kafka:", event.ID)
+					log.Println("Отправлено в Kafka:", event.ID)
 				}
 			}
 		}
@@ -65,7 +65,7 @@ func getCoursePriceRUB(ctx context.Context, courseID string) (amountInKopecks in
 
 func (s *paymentServer) CreatePayment(ctx context.Context, req *pb.CreatePaymentRequest) (*pb.CreatePaymentResponse, error) {
 	if p, err := s.db.FindActivePending(req.Tgid, req.CourseId); err == nil {
-		log.Println("💰 Уже есть активный платеж, возвращаю ConfirmationURL")
+		log.Println("Уже есть активный платеж, возвращаю ConfirmationURL")
 		return &pb.CreatePaymentResponse{
 			PaymentId:  p.ID,
 			PaymentUrl: p.ConfirmationURL,
@@ -94,7 +94,7 @@ func (s *paymentServer) CreatePayment(ctx context.Context, req *pb.CreatePayment
 		IdempotenceKey: idemKey,
 	}
 	if err := s.db.CreatePayment(p); err != nil {
-		log.Println("❌ Ошибка создания платежа:", err)
+		log.Println("Ошибка создания платежа:", err)
 		return nil, err
 	}
 
@@ -106,7 +106,7 @@ func (s *paymentServer) CreatePayment(ctx context.Context, req *pb.CreatePayment
 		"course_id":           p.CourseID,
 	})
 	if err != nil {
-		log.Println("❌ YooKassa CreatePayment:", err)
+		log.Println("YooKassa CreatePayment:", err)
 		return nil, err
 	}
 

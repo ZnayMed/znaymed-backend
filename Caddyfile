@@ -1,0 +1,22 @@
+{
+	email zaharov.danil2021@gmail.com
+}
+
+pay.znaymed.ru {
+
+	encode zstd gzip
+
+
+
+	@callback path /psp-callback
+	@notpost {
+		path /psp-callback
+		not method POST
+	}
+
+	reverse_proxy @callback payment-service:8081
+
+	respond @notpost 405
+
+	respond 404
+}

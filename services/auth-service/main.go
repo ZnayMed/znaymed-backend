@@ -28,50 +28,50 @@ func (s *authServer) CheckUser(ctx context.Context, req *pb.UserRequest) (*pb.Ch
 	tgid := req.Tgid
 	hashTgid := hashTGID(tgid)
 
-	log.Printf("📥 CheckUser: tgid=%s, hash=%s", tgid, hashTgid)
+	log.Printf("CheckUser: tgid=%s, hash=%s", tgid, hashTgid)
 
 	if s.rdb != nil {
 		existsKey := "user:" + tgid + ":exists"
 		sectionsKey := "user:" + tgid + ":sections"
 
-		log.Printf("🔍 Проверка Redis: ключи %q и %q", existsKey, sectionsKey)
+		log.Printf("Проверка Redis: ключи %q и %q", existsKey, sectionsKey)
 
 		if n, err := s.rdb.Exists(ctx, existsKey, sectionsKey).Result(); err == nil {
 			if n > 0 {
-				log.Printf("✅ Redis hit: найдено %d ключ(ей), возвращаем Exists=true", n)
+				log.Printf("Redis hit: найдено %d ключ(ей), возвращаем Exists=true", n)
 				return &pb.CheckUserResponse{Exists: true}, nil
 			}
-			log.Printf("ℹ️ Redis miss: ключи не найдены")
+			log.Printf("ℹRedis miss: ключи не найдены")
 		} else {
-			log.Printf("⚠️ Redis error: %v", err)
+			log.Printf("⚠Redis error: %v", err)
 		}
 	}
 
-	log.Printf("🔍 Проверка в БД...")
+	log.Printf("Проверка в БД...")
 	exists, err := s.db.UserExists(hashTgid)
 	if err != nil {
-		log.Printf("❌ DB error: %v", err)
+		log.Printf("DB error: %v", err)
 		return nil, status.Errorf(codes.Internal, "db error: %v", err)
 	}
 	if !exists {
-		log.Printf("❌ Пользователь не найден в БД")
+		log.Printf("Пользователь не найден в БД")
 		return &pb.CheckUserResponse{Exists: false}, nil
 	}
-	log.Printf("✅ DB hit: пользователь найден")
+	log.Printf("DB hit: пользователь найден")
 
 	if s.rdb != nil {
-		log.Printf("💾 Сохраняем маркер существования в Redis на TTL=%s", userTTL)
+		log.Printf("Сохраняем маркер существования в Redis на TTL=%s", userTTL)
 		_ = redisauth.SetUserExistMarker(ctx, s.rdb, tgid, userTTL)
 
 		if titles, err := s.db.GetAccessibleSectionTitlesByTGIDHash(hashTgid); err == nil {
-			log.Printf("💾 Сохраняем %d секций пользователя в Redis", len(titles))
+			log.Printf("Сохраняем %d секций пользователя в Redis", len(titles))
 			_ = redisauth.SaveUserSectionsByTitles(ctx, s.rdb, tgid, titles, userTTL)
 		} else {
-			log.Printf("⚠️ Ошибка получения секций из БД: %v", err)
+			log.Printf("⚠Ошибка получения секций из БД: %v", err)
 		}
 	}
 
-	log.Printf("✅ Возвращаем Exists=true")
+	log.Printf("Возвращаем Exists=true")
 	return &pb.CheckUserResponse{Exists: true}, nil
 }
 
@@ -114,9 +114,9 @@ func (s *authServer) Register(ctx context.Context, req *pb.SaveUserRequest) (*pb
 	if s.rdb != nil {
 		key := "user:" + req.Tgid + ":exists"
 		if err := s.rdb.SetEx(ctx, key, "1", userTTL).Err(); err != nil {
-			log.Printf("⚠️  Redis: не удалось установить маркер %s: %v", key, err)
+			log.Printf("Redis: не удалось установить маркер %s: %v", key, err)
 		} else {
-			log.Printf("✅ Redis: установлен маркер %s на %v", key, userTTL)
+			log.Printf("Redis: установлен маркер %s на %v", key, userTTL)
 		}
 	}
 

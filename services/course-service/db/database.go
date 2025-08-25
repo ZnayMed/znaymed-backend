@@ -55,7 +55,7 @@ func NewDatabase() (*Database, error) {
 		if err := seedInitialData(db); err != nil {
 			return nil, err
 		}
-		log.Println("📥 База заполнена начальными предметами/темами")
+		log.Println("База заполнена начальными предметами/темами")
 	}
 
 	return &Database{DB: db}, nil

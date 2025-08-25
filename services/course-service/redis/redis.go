@@ -150,7 +150,6 @@ func GetSectionTitlesByIDs(ctx context.Context, rdb *redis.Client, ids []string)
 			miss++
 			continue
 		}
-		// Гарантируем персистентность ключа секции (без TTL)
 		if ttl, e2 := rdb.TTL(ctx, "section:"+id).Result(); e2 == nil && ttl > 0 {
 			_ = rdb.Persist(ctx, "section:"+id).Err()
 		}
@@ -268,7 +267,6 @@ func AddUserSectionByTitle(ctx context.Context, rdb *redis.Client, tgid, title s
 }
 
 func GetSectionTopicIDs(ctx context.Context, rdb *redis.Client, sectionID string) ([]string, error) {
-	// KEY: section:<id>:topics  -> Set(topic_ids)
 	key := "section:" + sectionID + ":topics"
 	return rdb.SMembers(ctx, key).Result()
 }
@@ -283,10 +281,8 @@ type Topic struct {
 }
 
 func GetTopicByID(ctx context.Context, rdb *redis.Client, topicID string) (*Topic, error) {
-	// HASH: topic:<id>  -> { id, section_id, title, description, tg_id, mindmap_url }
 	key := "topic:" + topicID
 
-	// Можно HGetAll, он компактнее для полного объекта
 	m, err := rdb.HGetAll(ctx, key).Result()
 	if err != nil {
 		return nil, fmt.Errorf("HGetAll %s: %w", key, err)
@@ -342,7 +338,7 @@ func GetTopicsByIDsPipeline(ctx context.Context, rdb *redis.Client, topicIDs []s
 			TgID:        m["tg_id"],
 			MindmapURL:  m["mindmap_url"],
 		})
-		_ = i // на случай, если понадобятся логи с индексом
+		_ = i
 	}
 	return out, nil
 }

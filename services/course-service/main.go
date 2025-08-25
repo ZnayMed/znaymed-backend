@@ -29,41 +29,41 @@ type courseServer struct {
 func (s *courseServer) GetTopicsBySectionTitle(ctx context.Context, req *pb.SectionTitleRequest) (*pb.SectionTopicsResponse, error) {
 	title := req.SectionTitle
 	if title == "" {
-		log.Printf("❌ GetTopicsBySectionTitle: empty section_title")
+		log.Printf("GetTopicsBySectionTitle: empty section_title")
 		return nil, status.Error(codes.InvalidArgument, "section_title is required")
 	}
 
-	log.Printf("📥 GetTopicsBySectionTitle: section_title=%q", title)
+	log.Printf("GetTopicsBySectionTitle: section_title=%q", title)
 
 	if s.rdb != nil {
-		log.Printf("🔍 Trying Redis path for section_title=%q", title)
+		log.Printf("Trying Redis path for section_title=%q", title)
 
 		sectionID, rerr := rediscourse.GetSectionIDByTitle(ctx, s.rdb, title)
 		if rerr != nil {
 			if rerr == goredis.Nil {
-				log.Printf("ℹ️ Redis miss: section:title:%s not found", title)
+				log.Printf("Redis miss: section:title:%s not found", title)
 			} else {
-				log.Printf("⚠️ Redis error in GetSectionIDByTitle: %v (will fallback to DB)", rerr)
+				log.Printf("Redis error in GetSectionIDByTitle: %v (will fallback to DB)", rerr)
 			}
 		} else {
-			log.Printf("✅ Redis sectionID=%s for title=%q", sectionID, title)
+			log.Printf("Redis sectionID=%s for title=%q", sectionID, title)
 
 			topicIDs, rerr := rediscourse.GetSectionTopicIDs(ctx, s.rdb, sectionID)
 			if rerr != nil {
-				log.Printf("⚠️ Redis error in GetSectionTopicIDs(%s): %v (will fallback to DB)", sectionID, rerr)
+				log.Printf("Redis error in GetSectionTopicIDs(%s): %v (will fallback to DB)", sectionID, rerr)
 			} else {
-				log.Printf("ℹ️ Redis topicIDs: %v", topicIDs)
+				log.Printf("Redis topicIDs: %v", topicIDs)
 
 				if len(topicIDs) == 0 {
-					log.Printf("ℹ️ Redis: no topics for sectionID=%s (title=%q). Returning empty list (no DB fallback).", sectionID, title)
+					log.Printf("Redis: no topics for sectionID=%s (title=%q). Returning empty list (no DB fallback).", sectionID, title)
 					return &pb.SectionTopicsResponse{Topics: nil}, nil
 				}
 
 				topics, rerr := rediscourse.GetTopicsByIDsPipeline(ctx, s.rdb, topicIDs)
 				if rerr != nil {
-					log.Printf("⚠️ Redis error in GetTopicsByIDsPipeline: %v (will fallback to DB)", rerr)
+					log.Printf("Redis error in GetTopicsByIDsPipeline: %v (will fallback to DB)", rerr)
 				} else {
-					log.Printf("✅ Redis topics loaded: %d", len(topics))
+					log.Printf("Redis topics loaded: %d", len(topics))
 
 					resp := &pb.SectionTopicsResponse{Topics: make([]*pb.TopicItem, 0, len(topics))}
 					for _, t := range topics {
@@ -81,28 +81,28 @@ func (s *courseServer) GetTopicsBySectionTitle(ctx context.Context, req *pb.Sect
 			}
 		}
 	} else {
-		log.Printf("ℹ️ Redis client is nil — using DB path")
+		log.Printf("Redis client is nil — using DB path")
 	}
 
-	log.Printf("↪️ Fallback to DB for section_title=%q", title)
+	log.Printf("Fallback to DB for section_title=%q", title)
 
 	secID, err := db.GetSectionIDByTitle(ctx, s.db.DB, title)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			log.Printf("ℹ️ DB: section not found: %q", title)
+			log.Printf("DB: section not found: %q", title)
 			return &pb.SectionTopicsResponse{Topics: nil}, nil
 		}
-		log.Printf("❌ DB error in dbGetSectionIDByTitle: %v", err)
+		log.Printf("DB error in dbGetSectionIDByTitle: %v", err)
 		return nil, status.Errorf(codes.Internal, "db: section by title: %v", err)
 	}
 
 	topics, err := db.GetTopicsBySectionID(ctx, s.db.DB, secID)
 	if err != nil {
-		log.Printf("❌ DB error in dbGetTopicsBySectionID: %v", err)
+		log.Printf("DB error in dbGetTopicsBySectionID: %v", err)
 		return nil, status.Errorf(codes.Internal, "db: topics by section: %v", err)
 	}
 
-	log.Printf("✅ DB topics loaded: %d (no Redis writes as requested)", len(topics))
+	log.Printf("DB topics loaded: %d (no Redis writes as requested)", len(topics))
 
 	resp := &pb.SectionTopicsResponse{Topics: make([]*pb.TopicItem, 0, len(topics))}
 	for _, t := range topics {
@@ -125,36 +125,36 @@ func AddSection(ctx context.Context, database *db.Database, rdb *goredis.Client,
 
 	success, err := database.GiveSectionToUser(hashName, title)
 	if err != nil {
-		log.Printf("❌ DB GiveSectionToUser error: %v", err)
+		log.Printf("DB GiveSectionToUser error: %v", err)
 		return err
 	}
 	if !success {
-		log.Printf("ℹ️ DB: nothing changed for hash=%s title=%s", hashName, title)
+		log.Printf("DB: nothing changed for hash=%s title=%s", hashName, title)
 		return nil
 	}
 
 	exists, err := rediscourse.UserSectionsExists(ctx, rdb, tgid)
 	if err != nil {
-		log.Printf("⚠️ Redis EXISTS user:%s:sections error: %v (skip warmup)", tgid, err)
+		log.Printf("Redis EXISTS user:%s:sections error: %v (skip warmup)", tgid, err)
 		return nil
 	}
 
 	if exists {
 		if err := rediscourse.AddUserSectionByTitle(ctx, rdb, tgid, title, userTTL); err != nil {
-			log.Printf("⚠️ Redis SADD user:%s:sections by title=%q failed: %v", tgid, title, err)
+			log.Printf("Redis SADD user:%s:sections by title=%q failed: %v", tgid, title, err)
 		} else {
-			log.Printf("💾 Redis updated: user:%s:sections += %q", tgid, title)
+			log.Printf("Redis updated: user:%s:sections += %q", tgid, title)
 		}
 	} else {
 		titles, derr := database.GetAccessibleSectionTitlesByTGIDHash(hashName)
 		if derr != nil {
-			log.Printf("⚠️ DB GetAccessibleSectionTitlesByTGIDHash error: %v (skip warmup)", derr)
+			log.Printf("DB GetAccessibleSectionTitlesByTGIDHash error: %v (skip warmup)", derr)
 			return nil
 		}
 		if err := rediscourse.SaveUserSectionsByTitles(ctx, rdb, tgid, titles, userTTL); err != nil {
-			log.Printf("⚠️ Redis warmup user:%s:sections failed: %v", hashName, err)
+			log.Printf("Redis warmup user:%s:sections failed: %v", hashName, err)
 		} else {
-			log.Printf("💾 Redis warmed user:%s:sections with %d titles (TTL=%s)", hashName, len(titles), userTTL)
+			log.Printf("Redis warmed user:%s:sections with %d titles (TTL=%s)", hashName, len(titles), userTTL)
 		}
 	}
 
@@ -185,56 +185,56 @@ func (s *courseServer) GetSubjectSections(ctx context.Context, req *pb.SubjectSe
 	const userTTL = 3 * time.Hour
 	start := time.Now()
 
-	log.Printf("📥 GetSubjectSections: subject='%s', tgid=%s", req.Subject, req.Tgid)
+	log.Printf("GetSubjectSections: subject='%s', tgid=%s", req.Subject, req.Tgid)
 
 	subjectID, err := rediscourse.GetSubjectIDByTitle(ctx, s.rdb, req.Subject)
 	if err != nil {
-		log.Printf("⚠️ Redis GetSubjectIDByTitle('%s') error: %v", req.Subject, err)
+		log.Printf("Redis GetSubjectIDByTitle('%s') error: %v", req.Subject, err)
 	}
 	if subjectID == "" {
-		log.Printf("ℹ️ Redis: subject id for '%s' not found", req.Subject)
+		log.Printf("Redis: subject id for '%s' not found", req.Subject)
 	}
 
 	subIDs, err := rediscourse.GetSubjectSectionIDs(ctx, s.rdb, subjectID)
 	if err != nil {
-		log.Printf("⚠️ Redis GetSubjectSectionIDs(subjectID=%s) error: %v", subjectID, err)
+		log.Printf("Redis GetSubjectSectionIDs(subjectID=%s) error: %v", subjectID, err)
 	}
 	if len(subIDs) == 0 {
-		log.Printf("ℹ️ Redis: no section IDs for subjectID=%s", subjectID)
+		log.Printf("Redis: no section IDs for subjectID=%s", subjectID)
 	}
 
 	id2title, miss, err := rediscourse.GetSectionTitlesByIDs(ctx, s.rdb, subIDs)
 	if err != nil {
-		log.Printf("⚠️ Redis GetSectionTitlesByIDs error: %v", err)
+		log.Printf("Redis GetSectionTitlesByIDs error: %v", err)
 	}
 	if miss > 0 {
-		log.Printf("ℹ️ Redis: missing %d section titles (subjectID=%s)", miss, subjectID)
+		log.Printf("Redis: missing %d section titles (subjectID=%s)", miss, subjectID)
 	}
 
 	hasFullSubjectInRedis := subjectID != "" && len(subIDs) > 0 && miss == 0
 	if hasFullSubjectInRedis {
 		userIDs, err := rediscourse.GetUserSectionIDs(ctx, s.rdb, req.Tgid)
 		if err != nil {
-			log.Printf("⚠️ Redis GetUserSectionIDs(tgid=%s) error: %v", req.Tgid, err)
+			log.Printf(" Redis GetUserSectionIDs(tgid=%s) error: %v", req.Tgid, err)
 		}
 
 		if len(userIDs) == 0 {
-			log.Printf("ℹ️ Redis: no user sections for tgid=%s — fallback DB", req.Tgid)
+			log.Printf("Redis: no user sections for tgid=%s — fallback DB", req.Tgid)
 
 			accTitles, dberr := s.db.GetAccessibleSectionTitlesByTGIDAndSubject(hashTGID(req.Tgid), req.Subject)
 			if dberr != nil {
-				log.Printf("⚠️ DB GetAccessibleSectionTitlesByTGIDAndSubject error: %v", dberr)
+				log.Printf("DB GetAccessibleSectionTitlesByTGIDAndSubject error: %v", dberr)
 				accTitles = nil
 			}
 
 			if len(accTitles) > 0 {
 				if err := rediscourse.SaveUserSectionsByTitles(ctx, s.rdb, req.Tgid, accTitles, userTTL); err != nil {
-					log.Printf("⚠️ Redis SaveUserSectionsByTitles error: %v", err)
+					log.Printf("Redis SaveUserSectionsByTitles error: %v", err)
 				} else {
-					log.Printf("💾 Redis warmed user:%s:sections with %d titles (TTL=%s)", req.Tgid, len(accTitles), userTTL)
+					log.Printf("Redis warmed user:%s:sections with %d titles (TTL=%s)", req.Tgid, len(accTitles), userTTL)
 				}
 			} else {
-				log.Printf("ℹ️ DB: no accessible titles for tgid=%s, subject='%s'", req.Tgid, req.Subject)
+				log.Printf("DB: no accessible titles for tgid=%s, subject='%s'", req.Tgid, req.Subject)
 			}
 
 			accTitleSet := make(map[string]struct{}, len(accTitles))
@@ -251,7 +251,7 @@ func (s *courseServer) GetSubjectSections(ctx context.Context, req *pb.SubjectSe
 					Accessible: ok,
 				})
 			}
-			log.Printf("✅ GetSubjectSections OK (redis subject + db user) in %s", time.Since(start))
+			log.Printf("GetSubjectSections OK (redis subject + db user) in %s", time.Since(start))
 			return resp, nil
 		}
 
@@ -268,28 +268,28 @@ func (s *courseServer) GetSubjectSections(ctx context.Context, req *pb.SubjectSe
 				Accessible: ok,
 			})
 		}
-		log.Printf("✅ GetSubjectSections OK (redis only) in %s", time.Since(start))
+		log.Printf("GetSubjectSections OK (redis only) in %s", time.Since(start))
 		return resp, nil
 	}
 
-	log.Printf("↪️ Fallback to DB for subject='%s'", req.Subject)
+	log.Printf("Fallback to DB for subject='%s'", req.Subject)
 
 	allTitles, err := s.db.GetSectionTitlesBySubjectTitle(req.Subject)
 	if err != nil {
-		log.Printf("❌ DB GetSectionTitlesBySubjectTitle error: %v", err)
+		log.Printf(" DB GetSectionTitlesBySubjectTitle error: %v", err)
 		return nil, status.Errorf(codes.Internal, "db: sections by subject: %v", err)
 	}
 	accTitles, err := s.db.GetAccessibleSectionTitlesByTGIDAndSubject(hashTGID(req.Tgid), req.Subject)
 	if err != nil {
-		log.Printf("⚠️ DB GetAccessibleSectionTitlesByTGIDAndSubject error: %v", err)
+		log.Printf("DB GetAccessibleSectionTitlesByTGIDAndSubject error: %v", err)
 		accTitles = nil
 	}
 
 	if len(accTitles) > 0 {
 		if err := rediscourse.SaveUserSectionsByTitles(ctx, s.rdb, req.Tgid, accTitles, userTTL); err != nil {
-			log.Printf("⚠️ Redis SaveUserSectionsByTitles error: %v", err)
+			log.Printf("Redis SaveUserSectionsByTitles error: %v", err)
 		} else {
-			log.Printf("💾 Redis warmed user:%s:sections with %d titles (TTL=%s)", req.Tgid, len(accTitles), userTTL)
+			log.Printf("Redis warmed user:%s:sections with %d titles (TTL=%s)", req.Tgid, len(accTitles), userTTL)
 		}
 	}
 
@@ -306,7 +306,7 @@ func (s *courseServer) GetSubjectSections(ctx context.Context, req *pb.SubjectSe
 			Accessible: ok,
 		})
 	}
-	log.Printf("✅ GetSubjectSections OK (db fallback) in %s", time.Since(start))
+	log.Printf("GetSubjectSections OK (db fallback) in %s", time.Since(start))
 	return resp, nil
 }
 
@@ -325,15 +325,15 @@ func StartKafkaConsumer(database *db.Database, ctx context.Context, rdb *goredis
 	})
 
 	go func() {
-		log.Println("📥 Kafka Consumer started for topic: course-events")
+		log.Println("Kafka Consumer started for topic: course-events")
 		for {
 			m, err := reader.ReadMessage(context.Background())
 			if err != nil {
-				log.Printf("❌ Kafka read error: %v", err)
+				log.Printf("Kafka read error: %v", err)
 				continue
 			}
 
-			log.Printf("📨 Получено сообщение: %s", string(m.Value))
+			log.Printf("Получено сообщение: %s", string(m.Value))
 
 			var event struct {
 				PaymentID string `json:"payment_id"`
@@ -341,15 +341,15 @@ func StartKafkaConsumer(database *db.Database, ctx context.Context, rdb *goredis
 				CourseID  string `json:"course_id"`
 			}
 			if err := json.Unmarshal(m.Value, &event); err != nil {
-				log.Printf("❌ Ошибка при разборе события: %v", err)
+				log.Printf("Ошибка при разборе события: %v", err)
 				continue
 			}
 
 			err = AddSection(ctx, database, rdb, event.Tgid, event.CourseID)
 			if err != nil {
-				log.Printf("❌ Ошибка при добавлении курса пользователю: %v", err)
+				log.Printf("Ошибка при добавлении курса пользователю: %v", err)
 			} else {
-				log.Printf("✅ Курс %s добавлен пользователю %s", event.CourseID, event.Tgid)
+				log.Printf("Курс %s добавлен пользователю %s", event.CourseID, event.Tgid)
 			}
 		}
 	}()
