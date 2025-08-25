@@ -123,7 +123,6 @@ func AddSection(ctx context.Context, database *db.Database, rdb *goredis.Client,
 	hashName := hashTGID(tgid)
 	log.Printf("📥 AddSectionFromKafka: hash=%s title=%s", tgid, title)
 
-	// 1) Пишем в БД
 	success, err := database.GiveSectionToUser(hashName, title)
 	if err != nil {
 		log.Printf("❌ DB GiveSectionToUser error: %v", err)

@@ -9,11 +9,24 @@ func (d *Database) FindPayment(tgid, courseID string) (*Payment, error) {
 	var payment Payment
 	err := d.DB.
 		Where("tgid = ? AND course_id = ?", tgid, courseID).
+		Order("created_at DESC").
 		First(&payment).Error
 	if err != nil {
 		return nil, err
 	}
 	return &payment, nil
+}
+
+func (d *Database) FindActivePending(tgid, courseID string) (*Payment, error) {
+	var p Payment
+	err := d.DB.
+		Where("tgid = ? AND course_id = ? AND status = ?", tgid, courseID, "PENDING").
+		Order("created_at DESC").
+		First(&p).Error
+	if err != nil {
+		return nil, err
+	}
+	return &p, nil
 }
 
 func (d *Database) CreatePayment(p *Payment) error {
@@ -24,6 +37,21 @@ func (d *Database) MarkPaymentAsPaid(tx *gorm.DB, paymentID string) error {
 	return tx.Model(&Payment{}).
 		Where("id = ? AND status <> ?", paymentID, "PAID").
 		Update("status", "PAID").Error
+}
+
+func (d *Database) MarkPaymentAsCanceled(tx *gorm.DB, paymentID string) error {
+	return tx.Model(&Payment{}).
+		Where("id = ? AND status <> ?", paymentID, "CANCELED").
+		Update("status", "CANCELED").Error
+}
+
+func (d *Database) UpdateProviderFields(tx *gorm.DB, id string, providerID, confirmationURL string) error {
+	return tx.Model(&Payment{}).Where("id = ?", id).
+		Updates(map[string]interface{}{
+			"provider":         "yookassa",
+			"provider_id":      providerID,
+			"confirmation_url": confirmationURL,
+		}).Error
 }
 
 func (d *Database) AddOutboxEventTx(tx *gorm.DB, eventType string, payload interface{}) error {

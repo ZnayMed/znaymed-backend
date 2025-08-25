@@ -3,24 +3,51 @@ package main
 import (
 	"encoding/json"
 	"github.com/ZnayMed/znaymed-backend/services/payment-service/db"
+	"io"
 	"log"
 	"net/http"
+	"os"
+	"strings"
 )
 
-func (s *paymentServer) PSPCallback(w http.ResponseWriter, r *http.Request) {
-	var cb struct {
-		PaymentID string `json:"payment_id"`
-		Status    string `json:"status"`
-	}
+type yooWebhook struct {
+	Event  string        `json:"event"`
+	Object yooPaymentObj `json:"object"`
+}
 
-	if err := json.NewDecoder(r.Body).Decode(&cb); err != nil {
-		http.Error(w, "invalid JSON", http.StatusBadRequest)
+type yooPaymentObj struct {
+	ID       string            `json:"id"`
+	Status   string            `json:"status"`
+	Metadata map[string]string `json:"metadata"`
+	Amount   struct {
+		Value    string `json:"value"`
+		Currency string `json:"currency"`
+	} `json:"amount"`
+}
+
+func (s *paymentServer) PSPCallback(w http.ResponseWriter, r *http.Request) {
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "read body failed", http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	if !strings.Contains(string(body), "payment.") {
+		w.WriteHeader(http.StatusOK)
 		return
 	}
 
-	if cb.Status != "success" {
-		log.Printf("⚠️ Платёж %s не успешен, игнорируем", cb.PaymentID)
-		w.WriteHeader(http.StatusOK)
+	var hook yooWebhook
+	if err := json.Unmarshal(body, &hook); err != nil {
+		http.Error(w, "invalid json", http.StatusBadRequest)
+		return
+	}
+
+	internalID := hook.Object.Metadata["internal_payment_id"]
+	if internalID == "" {
+		http.Error(w, "no internal payment id", http.StatusBadRequest)
 		return
 	}
 
@@ -37,33 +64,39 @@ func (s *paymentServer) PSPCallback(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	var payment db.Payment
-	if err := tx.First(&payment, "id = ?", cb.PaymentID).Error; err != nil {
+	if err := tx.First(&payment, "id = ?", internalID).Error; err != nil {
 		_ = tx.Rollback()
 		http.Error(w, "payment not found", http.StatusNotFound)
 		return
 	}
-	if payment.Status == "PAID" {
-		log.Println("✅ Повторный callback, платёж уже PAID")
-		_ = tx.Rollback()
-		w.WriteHeader(http.StatusOK)
-		return
-	}
 
-	if err := s.db.MarkPaymentAsPaid(tx, cb.PaymentID); err != nil {
-		_ = tx.Rollback()
-		http.Error(w, "status update failed", http.StatusInternalServerError)
-		return
-	}
-
-	err := s.db.AddOutboxEventTx(tx, "PaymentConfirmed", map[string]string{
-		"payment_id": payment.ID,
-		"tgid":       payment.TgID,
-		"course_id":  payment.CourseID,
-	})
-	if err != nil {
-		_ = tx.Rollback()
-		http.Error(w, "outbox insert failed", http.StatusInternalServerError)
-		return
+	switch hook.Event {
+	case "payment.succeeded":
+		if err := s.db.MarkPaymentAsPaid(tx, payment.ID); err != nil {
+			_ = tx.Rollback()
+			http.Error(w, "status update failed", http.StatusInternalServerError)
+			return
+		}
+		err := s.db.AddOutboxEventTx(tx, "PaymentConfirmed", map[string]interface{}{
+			"version":    1,
+			"payment_id": payment.ID,
+			"tgid":       payment.TgID,
+			"course_id":  payment.CourseID,
+			"amount":     payment.Amount,
+			"currency":   payment.Currency,
+		})
+		if err != nil {
+			_ = tx.Rollback()
+			http.Error(w, "outbox insert failed", http.StatusInternalServerError)
+			return
+		}
+	case "payment.canceled":
+		if err := s.db.MarkPaymentAsCanceled(tx, payment.ID); err != nil {
+			_ = tx.Rollback()
+			http.Error(w, "status update failed", http.StatusInternalServerError)
+			return
+		}
+	default:
 	}
 
 	if err := tx.Commit().Error; err != nil {
@@ -72,6 +105,14 @@ func (s *paymentServer) PSPCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("🎉 Платёж %s отмечен как PAID и отправлен в outbox", cb.PaymentID)
+	log.Printf("🔔 Webhook %s обработан для payment=%s (provider=%s)", hook.Event, payment.ID, hook.Object.ID)
 	w.WriteHeader(http.StatusOK)
+}
+
+func (s *paymentServer) PSPCallbackTest(w http.ResponseWriter, r *http.Request) {
+	if os.Getenv("ENV") == "prod" {
+		http.Error(w, "forbidden", http.StatusForbidden)
+		return
+	}
+	s.PSPCallback(w, r)
 }

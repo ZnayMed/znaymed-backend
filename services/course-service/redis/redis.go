@@ -120,7 +120,6 @@ func GetSubjectSectionIDs(ctx context.Context, rdb *redis.Client, subjectID stri
 }
 
 func GetSectionIDByTitle(ctx context.Context, rdb *redis.Client, title string) (string, error) {
-	// KEY: section:title:<title>  -> <section_id>
 	key := "section:title:" + title
 	return rdb.Get(ctx, key).Result()
 }
