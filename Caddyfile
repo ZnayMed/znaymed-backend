@@ -2,7 +2,7 @@
 	email zaharov.danil2021@gmail.com
 }
 
-pay.znaymed.ru {
+znaymed.ru {
 
 	encode zstd gzip
 
