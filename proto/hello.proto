@@ -17,6 +17,10 @@ service AuthService {
 }
 
 service CourseService{
+  rpc MissingSectionsBySubjects (MissingSectionsRequest) returns (MissingSectionsResponse);
+
+  rpc SubjectMissingTotal (SubjectMissingTotalRequest) returns (SubjectMissingTotalResponse);
+
   rpc GetUserSections (UserRequest) returns (UserSectionsResponse);
   rpc AddSection (SaveSectionRequest) returns (SaveSectionResponse);
   rpc GetListSubjects(ListSubjectsRequest) returns (ListSubjectsResponse);
@@ -25,6 +29,31 @@ service CourseService{
 }
 service PaymentService {
   rpc CreatePayment (CreatePaymentRequest) returns (CreatePaymentResponse);
+}
+
+
+message MissingSectionsRequest {
+  string tgid = 1;
+  repeated string subjects = 2;
+}
+
+message MissingSectionsResponse {
+  map<string, SubjectMissing> result = 1;
+}
+
+message SubjectMissing {
+  repeated string section_ids = 1;
+}
+
+message SubjectMissingTotalRequest {
+  string tgid = 1;
+  string subject = 2;
+}
+
+message SubjectMissingTotalResponse {
+  string subject = 1;
+  int64 total_kopeck = 2;
+  string currency = 3;
 }
 
 message SectionTitleRequest {

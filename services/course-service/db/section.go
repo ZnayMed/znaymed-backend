@@ -6,4 +6,5 @@ type Section struct {
 	Title       string `gorm:"not null"`
 	Description string
 	Topics      []Topic `gorm:"foreignKey:SectionID"`
+	PriceKopeck int64   `gorm:"not null;default:0"`
 }

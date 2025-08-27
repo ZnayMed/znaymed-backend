@@ -39,30 +39,48 @@ func FillData(ctx context.Context, rdb *redis.Client) {
 
 	// ===== Разделы =====
 	// Математика
-	rdb.HSet(ctx, "section:11", "id", 11, "subject_id", 1, "title", "Алгебра",
-		"description", "Основы алгебры: выражения, уравнения, функции")
+	rdb.HSet(ctx, "section:11",
+		"id", 11, "subject_id", 1, "title", "Алгебра",
+		"description", "Основы алгебры: выражения, уравнения, функции",
+		"price_kopeck", 19900,
+	)
 	rdb.Set(ctx, "section:title:Алгебра", 11, 0)
 
-	rdb.HSet(ctx, "section:12", "id", 12, "subject_id", 1, "title", "Геометрия",
-		"description", "Планиметрия и стереометрия")
+	rdb.HSet(ctx, "section:12",
+		"id", 12, "subject_id", 1, "title", "Геометрия",
+		"description", "Планиметрия и стереометрия",
+		"price_kopeck", 24900,
+	)
 	rdb.Set(ctx, "section:title:Геометрия", 12, 0)
 
 	// Физика
-	rdb.HSet(ctx, "section:21", "id", 21, "subject_id", 2, "title", "Механика",
-		"description", "Законы Ньютона, кинематика, динамика")
+	rdb.HSet(ctx, "section:21",
+		"id", 21, "subject_id", 2, "title", "Механика",
+		"description", "Законы Ньютона, кинематика, динамика",
+		"price_kopeck", 29900,
+	)
 	rdb.Set(ctx, "section:title:Механика", 21, 0)
 
-	rdb.HSet(ctx, "section:22", "id", 22, "subject_id", 2, "title", "Оптика",
-		"description", "Свет, линзы, зеркала")
+	rdb.HSet(ctx, "section:22",
+		"id", 22, "subject_id", 2, "title", "Оптика",
+		"description", "Свет, линзы, зеркала",
+		"price_kopeck", 15900,
+	)
 	rdb.Set(ctx, "section:title:Оптика", 22, 0)
 
 	// Химия
-	rdb.HSet(ctx, "section:31", "id", 31, "subject_id", 3, "title", "Органическая химия",
-		"description", "Углеводороды, функциональные группы")
+	rdb.HSet(ctx, "section:31",
+		"id", 31, "subject_id", 3, "title", "Органическая химия",
+		"description", "Углеводороды, функциональные группы",
+		"price_kopeck", 18900,
+	)
 	rdb.Set(ctx, "section:title:Органическая химия", 31, 0)
 
-	rdb.HSet(ctx, "section:32", "id", 32, "subject_id", 3, "title", "Неорганическая химия",
-		"description", "Соли, оксиды, кислоты")
+	rdb.HSet(ctx, "section:32",
+		"id", 32, "subject_id", 3, "title", "Неорганическая химия",
+		"description", "Соли, оксиды, кислоты",
+		"price_kopeck", 17900,
+	)
 	rdb.Set(ctx, "section:title:Неорганическая химия", 32, 0)
 
 	// ===== Темы (связи раздел → темы + данные тем) =====
@@ -342,4 +360,25 @@ func GetTopicsByIDsPipeline(ctx context.Context, rdb *redis.Client, topicIDs []s
 		_ = i
 	}
 	return out, nil
+}
+
+// ===== НОВОЕ: кэш цены раздела (по subject+sectionTitle)
+func keySectionPrice(subject, sectionTitle string) string {
+	return "section_price:" + subject + ":" + sectionTitle
+}
+
+func GetSectionPrice(ctx context.Context, rdb *redis.Client, subject, sectionTitle string) (int64, bool) {
+	s, err := rdb.Get(ctx, keySectionPrice(subject, sectionTitle)).Result()
+	if err != nil || s == "" {
+		return 0, false
+	}
+	v, convErr := strconv.ParseInt(s, 10, 64)
+	if convErr != nil {
+		return 0, false
+	}
+	return v, true
+}
+
+func SetSectionPrice(ctx context.Context, rdb *redis.Client, subject, sectionTitle string, priceK int64) {
+	_ = rdb.Set(ctx, keySectionPrice(subject, sectionTitle), strconv.FormatInt(priceK, 10), 10*time.Minute).Err()
 }

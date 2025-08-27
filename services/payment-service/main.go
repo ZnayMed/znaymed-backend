@@ -102,7 +102,6 @@ func normalizeCourses(in []string) []string {
 }
 
 func (s *paymentServer) CreatePayment(ctx context.Context, req *pb.CreatePaymentRequest) (*pb.CreatePaymentResponse, error) {
-	// 1) нормализуем список
 	courses := normalizeCourses(req.CourseIds)
 	if len(courses) == 0 {
 		return nil, fmt.Errorf("empty course_ids")

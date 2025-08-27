@@ -8,8 +8,8 @@ services:
     image: redis:7-alpine
     container_name: znaymed-redis
     restart: unless-stopped
-    command: [ "redis-server", "--appendonly", "no" ]   # для старта без персистентности
-    ports: [ "6379:6379" ]                               # опционально: доступ с хоста
+    command: [ "redis-server", "--appendonly", "no" ]
+    ports: [ "6379:6379" ]
     networks: [ znaymed-net ]
 
   ################################################################################
@@ -124,18 +124,18 @@ services:
   ################################################################################
   # Payment micro-service (gRPC :50055)  ← НОВЫЙ
   ################################################################################
-  caddy:
-    image: caddy:2
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./caddy_data:/data
-      - ./caddy_config:/config
-    networks:
-      - znaymed-net
+#  caddy:
+#    image: caddy:2
+#    restart: unless-stopped
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    volumes:
+#      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+#      - ./caddy_data:/data
+#      - ./caddy_config:/config
+#    networks:
+#      - znaymed-net
   payment-service:
     build:
       context: .
@@ -161,7 +161,7 @@ services:
       YOOKASSA_MOCK: ${YOOKASSA_MOCK}
     ports:
       - "50055:50055"  
-#      - "8081:8081"
+      - "8081:8081"
     networks: [znaymed-net]
 
   ################################################################################

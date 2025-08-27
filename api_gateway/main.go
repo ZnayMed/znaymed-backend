@@ -18,6 +18,136 @@ func main() {
 	addrCourse := os.Getenv("COURSE_SERVICE_ADDR")
 	addrPayment := os.Getenv("PAYMENT_SERVICE_ADDR")
 
+	http.HandleFunc("/createpayment_miss_sections", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		var req struct {
+			TgID     string   `json:"tgid"`
+			Subjects []string `json:"subjects"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.TgID == "" || len(req.Subjects) == 0 {
+			http.Error(w, "invalid json: need tgid and subjects", http.StatusBadRequest)
+			return
+		}
+
+		cConn, err := grpc.Dial(addrCourse, grpc.WithInsecure())
+		if err != nil {
+			http.Error(w, "gRPC connect to course failed", http.StatusInternalServerError)
+			return
+		}
+		defer cConn.Close()
+
+		cClient := pb.NewCourseServiceClient(cConn)
+		ctxCourse, cancelCourse := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancelCourse()
+
+		cResp, err := cClient.MissingSectionsBySubjects(ctxCourse, &pb.MissingSectionsRequest{
+			Tgid:     req.TgID,
+			Subjects: req.Subjects,
+		})
+		if err != nil {
+			http.Error(w, "MissingSectionsBySubjects failed", http.StatusInternalServerError)
+			return
+		}
+
+		bySubject := make(map[string][]string, len(cResp.Result))
+		var sections []string
+		for subj, pack := range cResp.Result {
+			if pack == nil || len(pack.SectionIds) == 0 {
+				continue
+			}
+			bySubject[subj] = append([]string(nil), pack.SectionIds...)
+			sections = append(sections, pack.SectionIds...)
+		}
+
+		if len(sections) == 0 {
+			w.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"message":    "nothing to buy: all sections already owned",
+				"sections":   []string{},
+				"by_subject": bySubject,
+			})
+			return
+		}
+
+		pConn, err := grpc.Dial(addrPayment, grpc.WithInsecure())
+		if err != nil {
+			http.Error(w, "gRPC connect to payment failed", http.StatusInternalServerError)
+			return
+		}
+		defer pConn.Close()
+
+		pClient := pb.NewPaymentServiceClient(pConn)
+		ctxPay, cancelPay := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancelPay()
+
+		pResp, err := pClient.CreatePayment(ctxPay, &pb.CreatePaymentRequest{
+			Tgid:      req.TgID,
+			CourseIds: sections,
+		})
+		if err != nil {
+			log.Println("CreatePayment RPC failed:", err)
+			http.Error(w, "payment create failed", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"payment_id":  pResp.PaymentId,
+			"payment_url": pResp.PaymentUrl,
+			"status":      pResp.Status,
+			"sections":    sections,
+			"by_subject":  bySubject,
+		})
+	})
+
+	http.HandleFunc("/subject_total", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		var req struct {
+			TgID    string `json:"tgid"`
+			Subject string `json:"subject"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.TgID == "" || req.Subject == "" {
+			http.Error(w, "invalid json: need tgid and subject", http.StatusBadRequest)
+			return
+		}
+
+		conn, err := grpc.Dial(addrCourse, grpc.WithInsecure())
+		if err != nil {
+			http.Error(w, "gRPC connect failed", http.StatusInternalServerError)
+			return
+		}
+		defer conn.Close()
+
+		client := pb.NewCourseServiceClient(conn)
+
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+
+		resp, err := client.SubjectMissingTotal(ctx, &pb.SubjectMissingTotalRequest{
+			Tgid:    req.TgID,
+			Subject: req.Subject,
+		})
+		if err != nil {
+			http.Error(w, "SubjectMissingTotal failed", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"subject":      resp.Subject,
+			"total_kopeck": resp.TotalKopeck,
+			"currency":     resp.Currency,
+		})
+	})
+
 	http.HandleFunc("/sectiontopics", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)

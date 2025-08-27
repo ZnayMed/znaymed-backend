@@ -1,3 +1,7 @@
 hello-client/
 .env
 .qodo
+docker-compose.yml
+Caddyfile
+caddy_config
+caddy_data

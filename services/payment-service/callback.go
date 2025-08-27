@@ -41,7 +41,6 @@ func extractCourseIDs(courseIDField string) []string {
 		}
 		return out
 	}
-	// одиночный
 	id := strings.TrimSpace(courseIDField)
 	if id == "" {
 		return nil

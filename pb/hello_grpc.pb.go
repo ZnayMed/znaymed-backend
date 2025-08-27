@@ -235,17 +235,21 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	CourseService_GetUserSections_FullMethodName         = "/pb.CourseService/GetUserSections"
-	CourseService_AddSection_FullMethodName              = "/pb.CourseService/AddSection"
-	CourseService_GetListSubjects_FullMethodName         = "/pb.CourseService/GetListSubjects"
-	CourseService_GetSubjectSections_FullMethodName      = "/pb.CourseService/GetSubjectSections"
-	CourseService_GetTopicsBySectionTitle_FullMethodName = "/pb.CourseService/GetTopicsBySectionTitle"
+	CourseService_MissingSectionsBySubjects_FullMethodName = "/pb.CourseService/MissingSectionsBySubjects"
+	CourseService_SubjectMissingTotal_FullMethodName       = "/pb.CourseService/SubjectMissingTotal"
+	CourseService_GetUserSections_FullMethodName           = "/pb.CourseService/GetUserSections"
+	CourseService_AddSection_FullMethodName                = "/pb.CourseService/AddSection"
+	CourseService_GetListSubjects_FullMethodName           = "/pb.CourseService/GetListSubjects"
+	CourseService_GetSubjectSections_FullMethodName        = "/pb.CourseService/GetSubjectSections"
+	CourseService_GetTopicsBySectionTitle_FullMethodName   = "/pb.CourseService/GetTopicsBySectionTitle"
 )
 
 // CourseServiceClient is the client API for CourseService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CourseServiceClient interface {
+	MissingSectionsBySubjects(ctx context.Context, in *MissingSectionsRequest, opts ...grpc.CallOption) (*MissingSectionsResponse, error)
+	SubjectMissingTotal(ctx context.Context, in *SubjectMissingTotalRequest, opts ...grpc.CallOption) (*SubjectMissingTotalResponse, error)
 	GetUserSections(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserSectionsResponse, error)
 	AddSection(ctx context.Context, in *SaveSectionRequest, opts ...grpc.CallOption) (*SaveSectionResponse, error)
 	GetListSubjects(ctx context.Context, in *ListSubjectsRequest, opts ...grpc.CallOption) (*ListSubjectsResponse, error)
@@ -259,6 +263,26 @@ type courseServiceClient struct {
 
 func NewCourseServiceClient(cc grpc.ClientConnInterface) CourseServiceClient {
 	return &courseServiceClient{cc}
+}
+
+func (c *courseServiceClient) MissingSectionsBySubjects(ctx context.Context, in *MissingSectionsRequest, opts ...grpc.CallOption) (*MissingSectionsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MissingSectionsResponse)
+	err := c.cc.Invoke(ctx, CourseService_MissingSectionsBySubjects_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *courseServiceClient) SubjectMissingTotal(ctx context.Context, in *SubjectMissingTotalRequest, opts ...grpc.CallOption) (*SubjectMissingTotalResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SubjectMissingTotalResponse)
+	err := c.cc.Invoke(ctx, CourseService_SubjectMissingTotal_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *courseServiceClient) GetUserSections(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserSectionsResponse, error) {
@@ -315,6 +339,8 @@ func (c *courseServiceClient) GetTopicsBySectionTitle(ctx context.Context, in *S
 // All implementations must embed UnimplementedCourseServiceServer
 // for forward compatibility.
 type CourseServiceServer interface {
+	MissingSectionsBySubjects(context.Context, *MissingSectionsRequest) (*MissingSectionsResponse, error)
+	SubjectMissingTotal(context.Context, *SubjectMissingTotalRequest) (*SubjectMissingTotalResponse, error)
 	GetUserSections(context.Context, *UserRequest) (*UserSectionsResponse, error)
 	AddSection(context.Context, *SaveSectionRequest) (*SaveSectionResponse, error)
 	GetListSubjects(context.Context, *ListSubjectsRequest) (*ListSubjectsResponse, error)
@@ -330,6 +356,12 @@ type CourseServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedCourseServiceServer struct{}
 
+func (UnimplementedCourseServiceServer) MissingSectionsBySubjects(context.Context, *MissingSectionsRequest) (*MissingSectionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MissingSectionsBySubjects not implemented")
+}
+func (UnimplementedCourseServiceServer) SubjectMissingTotal(context.Context, *SubjectMissingTotalRequest) (*SubjectMissingTotalResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SubjectMissingTotal not implemented")
+}
 func (UnimplementedCourseServiceServer) GetUserSections(context.Context, *UserRequest) (*UserSectionsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserSections not implemented")
 }
@@ -364,6 +396,42 @@ func RegisterCourseServiceServer(s grpc.ServiceRegistrar, srv CourseServiceServe
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&CourseService_ServiceDesc, srv)
+}
+
+func _CourseService_MissingSectionsBySubjects_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MissingSectionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CourseServiceServer).MissingSectionsBySubjects(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CourseService_MissingSectionsBySubjects_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CourseServiceServer).MissingSectionsBySubjects(ctx, req.(*MissingSectionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CourseService_SubjectMissingTotal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SubjectMissingTotalRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CourseServiceServer).SubjectMissingTotal(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CourseService_SubjectMissingTotal_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CourseServiceServer).SubjectMissingTotal(ctx, req.(*SubjectMissingTotalRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _CourseService_GetUserSections_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -463,6 +531,14 @@ var CourseService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "pb.CourseService",
 	HandlerType: (*CourseServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "MissingSectionsBySubjects",
+			Handler:    _CourseService_MissingSectionsBySubjects_Handler,
+		},
+		{
+			MethodName: "SubjectMissingTotal",
+			Handler:    _CourseService_SubjectMissingTotal_Handler,
+		},
 		{
 			MethodName: "GetUserSections",
 			Handler:    _CourseService_GetUserSections_Handler,

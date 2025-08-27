@@ -395,6 +395,115 @@ func StartKafkaConsumer(database *db.Database, ctx context.Context, rdb *goredis
 	}()
 }
 
+func setDiffStr(all, owned []string) []string {
+	if len(all) == 0 {
+		return nil
+	}
+	m := make(map[string]struct{}, len(owned))
+	for _, s := range owned {
+		m[s] = struct{}{}
+	}
+	out := make([]string, 0, len(all))
+	for _, s := range all {
+		if _, ok := m[s]; !ok {
+			out = append(out, s)
+		}
+	}
+	return out
+}
+
+func (s *courseServer) MissingSectionsBySubjects(ctx context.Context, in *pb.MissingSectionsRequest) (*pb.MissingSectionsResponse, error) {
+	if in == nil || in.Tgid == "" || len(in.Subjects) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "tgid and subjects are required")
+	}
+	out := &pb.MissingSectionsResponse{Result: make(map[string]*pb.SubjectMissing, len(in.Subjects))}
+
+	for _, subj := range in.Subjects {
+		var allTitles []string
+		subjectID, _ := rediscourse.GetSubjectIDByTitle(ctx, s.rdb, subj)
+		if subjectID != "" {
+			secIDs, _ := rediscourse.GetSubjectSectionIDs(ctx, s.rdb, subjectID)
+			if len(secIDs) > 0 {
+				if id2title, miss, err := rediscourse.GetSectionTitlesByIDs(ctx, s.rdb, secIDs); err == nil && miss == 0 {
+					allTitles = make([]string, 0, len(secIDs))
+					for _, id := range secIDs {
+						allTitles = append(allTitles, id2title[id])
+					}
+				}
+			}
+		}
+
+		if len(allTitles) == 0 {
+			titles, err := s.db.GetSectionTitlesBySubjectTitle(subj)
+			if err != nil {
+				return nil, status.Errorf(codes.Internal, "db sections by subject: %v", err)
+			}
+			allTitles = titles
+		}
+
+		ownedTitles, err := s.db.GetAccessibleSectionTitlesByTGIDAndSubject(hashTGID(in.Tgid), subj)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "db user owned by subject: %v", err)
+		}
+
+		missing := setDiffStr(allTitles, ownedTitles)
+		out.Result[subj] = &pb.SubjectMissing{SectionIds: missing}
+	}
+	return out, nil
+}
+
+func (s *courseServer) SubjectMissingTotal(ctx context.Context, in *pb.SubjectMissingTotalRequest) (*pb.SubjectMissingTotalResponse, error) {
+	if in == nil || in.Tgid == "" || in.Subject == "" {
+		return nil, status.Error(codes.InvalidArgument, "tgid and subject are required")
+	}
+
+	var allTitles []string
+	if subjectID, _ := rediscourse.GetSubjectIDByTitle(ctx, s.rdb, in.Subject); subjectID != "" {
+		if secIDs, _ := rediscourse.GetSubjectSectionIDs(ctx, s.rdb, subjectID); len(secIDs) > 0 {
+			if id2title, miss, err := rediscourse.GetSectionTitlesByIDs(ctx, s.rdb, secIDs); err == nil && miss == 0 {
+				allTitles = make([]string, 0, len(secIDs))
+				for _, id := range secIDs {
+					allTitles = append(allTitles, id2title[id])
+				}
+			}
+		}
+	}
+	if len(allTitles) == 0 {
+		titles, err := s.db.GetSectionTitlesBySubjectTitle(in.Subject)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "db sections by subject: %v", err)
+		}
+		allTitles = titles
+	}
+
+	ownedTitles, err := s.db.GetAccessibleSectionTitlesByTGIDAndSubject(hashTGID(in.Tgid), in.Subject)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "db user owned by subject: %v", err)
+	}
+
+	missing := setDiffStr(allTitles, ownedTitles)
+
+	var total int64
+	for _, title := range missing {
+		if v, ok := rediscourse.GetSectionPrice(ctx, s.rdb, in.Subject, title); ok {
+			total += v
+			continue
+		}
+		priceK, derr := s.db.GetSectionPriceKopeckByTitle(ctx, title)
+		if derr != nil {
+			return nil, status.Errorf(codes.Internal, "db price by title: %v", derr)
+		}
+		total += priceK
+		rediscourse.SetSectionPrice(ctx, s.rdb, in.Subject, title, priceK)
+	}
+
+	return &pb.SubjectMissingTotalResponse{
+		Subject:     in.Subject,
+		TotalKopeck: total,
+		Currency:    "RUB",
+	}, nil
+}
+
 func main() {
 	database, err := db.NewDatabase()
 	if err != nil {
