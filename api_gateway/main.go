@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	pb "github.com/ZnayMed/znaymed-backend/pb"
@@ -287,33 +288,50 @@ func main() {
 	})
 
 	http.HandleFunc("/createpayment", func(w http.ResponseWriter, r *http.Request) {
-		var req struct {
-			TgID    string `json:"tgid"`
-			Section string `json:"section"`
+		type createReq struct {
+			TgID     string   `json:"tgid"`
+			Sections []string `json:"sections"`
+			Section  string   `json:"section"`
 		}
+
+		var req createReq
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, "invalid JSON", http.StatusBadRequest)
 			return
 		}
+
+		courseIDs := req.Sections
+		if len(courseIDs) == 0 && strings.TrimSpace(req.Section) != "" {
+			courseIDs = []string{req.Section}
+		}
+		if req.TgID == "" || len(courseIDs) == 0 {
+			http.Error(w, "missing tgid or sections", http.StatusBadRequest)
+			return
+		}
+
 		conn, err := grpc.Dial(addrPayment, grpc.WithInsecure())
 		if err != nil {
 			http.Error(w, "gRPC connect failed", http.StatusInternalServerError)
 			return
 		}
 		defer conn.Close()
+
 		client := pb.NewPaymentServiceClient(conn)
-		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
+
 		resp, err := client.CreatePayment(ctx, &pb.CreatePaymentRequest{
-			Tgid:     req.TgID,
-			CourseId: req.Section,
+			Tgid:      req.TgID,
+			CourseIds: courseIDs,
 		})
 		if err != nil {
 			log.Println("Ошибка в RPC CreatePayment:", err)
-			w.WriteHeader(http.StatusInternalServerError)
+			http.Error(w, "payment create failed", http.StatusInternalServerError)
 			return
 		}
-		json.NewEncoder(w).Encode(map[string]string{
+
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(map[string]string{
 			"Payment_id":  resp.PaymentId,
 			"Payment_url": resp.PaymentUrl,
 			"Status":      resp.Status,

@@ -68,7 +68,7 @@ message ListSubjectsResponse {
 
 message CreatePaymentRequest {
   string tgid = 1;
-  string course_id = 2;
+  repeated string course_ids = 2;
 }
 
 message CreatePaymentResponse {

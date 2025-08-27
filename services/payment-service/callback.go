@@ -25,6 +25,30 @@ type yooPaymentObj struct {
 	} `json:"amount"`
 }
 
+func extractCourseIDs(courseIDField string) []string {
+	if strings.HasPrefix(courseIDField, "MULTI:") {
+		rest := strings.TrimPrefix(courseIDField, "MULTI:")
+		if rest == "" {
+			return nil
+		}
+		parts := strings.Split(rest, "|")
+		out := make([]string, 0, len(parts))
+		for _, p := range parts {
+			p = strings.TrimSpace(p)
+			if p != "" {
+				out = append(out, p)
+			}
+		}
+		return out
+	}
+	// одиночный
+	id := strings.TrimSpace(courseIDField)
+	if id == "" {
+		return nil
+	}
+	return []string{id}
+}
+
 func (s *paymentServer) PSPCallback(w http.ResponseWriter, r *http.Request) {
 
 	body, err := io.ReadAll(r.Body)
@@ -77,19 +101,25 @@ func (s *paymentServer) PSPCallback(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "status update failed", http.StatusInternalServerError)
 			return
 		}
+
+		courseIDs := extractCourseIDs(payment.CourseID)
+
 		err := s.db.AddOutboxEventTx(tx, "PaymentConfirmed", map[string]interface{}{
-			"version":    1,
-			"payment_id": payment.ID,
-			"tgid":       payment.TgID,
-			"course_id":  payment.CourseID,
-			"amount":     payment.Amount,
-			"currency":   payment.Currency,
+			"version":     1,
+			"payment_id":  payment.ID,
+			"tgid":        payment.TgID,
+			"course_id":   payment.CourseID,
+			"course_ids":  courseIDs,
+			"amount":      payment.Amount,
+			"currency":    payment.Currency,
+			"provider_id": hook.Object.ID,
 		})
 		if err != nil {
 			_ = tx.Rollback()
 			http.Error(w, "outbox insert failed", http.StatusInternalServerError)
 			return
 		}
+
 	case "payment.canceled":
 		if err := s.db.MarkPaymentAsCanceled(tx, payment.ID); err != nil {
 			_ = tx.Rollback()

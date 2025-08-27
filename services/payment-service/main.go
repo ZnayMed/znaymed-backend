@@ -12,7 +12,9 @@ import (
 	"log"
 	"net"
 	"os"
+	"sort"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -62,10 +64,53 @@ func (s *paymentServer) startKafkaDispatcher(topic string) {
 func getCoursePriceRUB(ctx context.Context, courseID string) (amountInKopecks int64, err error) {
 	return 19900, nil
 }
+func getTotalPriceRUB(ctx context.Context, courseIDs []string) (int64, error) {
+	var total int64
+	for _, id := range courseIDs {
+		amountK, err := getCoursePriceRUB(ctx, id)
+		if err != nil {
+			return 0, err
+		}
+		total += amountK
+	}
+	return total, nil
+}
+
+func basketKey(courseIDs []string) string {
+	if len(courseIDs) == 1 {
+		return courseIDs[0]
+	}
+	return "MULTI:" + strings.Join(courseIDs, "|")
+}
+
+func normalizeCourses(in []string) []string {
+	seen := make(map[string]struct{}, len(in))
+	out := make([]string, 0, len(in))
+	for _, v := range in {
+		id := strings.TrimSpace(v)
+		if id == "" {
+			continue
+		}
+		if _, ok := seen[id]; ok {
+			continue
+		}
+		seen[id] = struct{}{}
+		out = append(out, id)
+	}
+	sort.Strings(out)
+	return out
+}
 
 func (s *paymentServer) CreatePayment(ctx context.Context, req *pb.CreatePaymentRequest) (*pb.CreatePaymentResponse, error) {
-	if p, err := s.db.FindActivePending(req.Tgid, req.CourseId); err == nil {
-		log.Println("Уже есть активный платеж, возвращаю ConfirmationURL")
+	// 1) нормализуем список
+	courses := normalizeCourses(req.CourseIds)
+	if len(courses) == 0 {
+		return nil, fmt.Errorf("empty course_ids")
+	}
+	key := basketKey(courses)
+
+	if p, err := s.db.FindActivePending(req.Tgid, key); err == nil {
+		log.Println("💰 Уже есть активный платеж по корзине, возвращаю ConfirmationURL")
 		return &pb.CreatePaymentResponse{
 			PaymentId:  p.ID,
 			PaymentUrl: p.ConfirmationURL,
@@ -73,23 +118,24 @@ func (s *paymentServer) CreatePayment(ctx context.Context, req *pb.CreatePayment
 		}, nil
 	}
 
-	amountK, err := getCoursePriceRUB(ctx, req.CourseId)
+	totalK, err := getTotalPriceRUB(ctx, courses)
 	if err != nil {
 		return nil, err
 	}
-	amountRubStr := fmt.Sprintf("%.2f", float64(amountK)/100.0)
+	amountRubStr := fmt.Sprintf("%.2f", float64(totalK)/100.0)
 
 	paymentID := uuid.NewString()
 	idemKey := uuid.NewString()
 
+	desc := fmt.Sprintf("Оплата доступа к %d раздел(ам)", len(courses))
 	p := &db.Payment{
 		ID:             paymentID,
 		TgID:           req.Tgid,
-		CourseID:       req.CourseId,
+		CourseID:       key,
 		Status:         "PENDING",
-		Amount:         amountK,
+		Amount:         totalK,
 		Currency:       "RUB",
-		Description:    "Оплата доступа к курсу/разделу",
+		Description:    desc,
 		Provider:       "yookassa",
 		IdempotenceKey: idemKey,
 	}
@@ -100,11 +146,19 @@ func (s *paymentServer) CreatePayment(ctx context.Context, req *pb.CreatePayment
 
 	yoo := provider.NewYooKassa()
 	returnURL := os.Getenv("PUBLIC_RETURN_URL")
-	providerID, confirmationURL, status, expiresAt, err := yoo.CreatePayment(ctx, amountRubStr, p.Description, returnURL, idemKey, map[string]string{
-		"internal_payment_id": p.ID,
-		"tgid":                p.TgID,
-		"course_id":           p.CourseID,
-	})
+	providerID, confirmationURL, status, expiresAt, err := yoo.CreatePayment(
+		ctx,
+		amountRubStr,
+		desc,
+		returnURL,
+		idemKey,
+		map[string]string{
+			"internal_payment_id": p.ID,
+			"tgid":                p.TgID,
+			"basket_key":          key,
+			"courses":             strings.Join(courses, ","),
+		},
+	)
 	if err != nil {
 		log.Println("YooKassa CreatePayment:", err)
 		return nil, err

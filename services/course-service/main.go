@@ -17,6 +17,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"net"
+	"strings"
 	"time"
 )
 
@@ -24,6 +25,17 @@ type courseServer struct {
 	pb.UnimplementedCourseServiceServer
 	db  *db.Database
 	rdb *goredis.Client
+}
+type paymentConfirmedEvent struct {
+	Version    int      `json:"version"`
+	PaymentID  string   `json:"payment_id"`
+	Tgid       string   `json:"tgid"`
+	CourseID   string   `json:"course_id"`
+	CourseIDs  []string `json:"course_ids"`
+	Amount     int64    `json:"amount"`
+	Currency   string   `json:"currency"`
+	ProviderID string   `json:"provider_id"`
+	EventType  string   `json:"event_type"`
 }
 
 func (s *courseServer) GetTopicsBySectionTitle(ctx context.Context, req *pb.SectionTitleRequest) (*pb.SectionTopicsResponse, error) {
@@ -315,6 +327,30 @@ func hashTGID(tgid string) string {
 	return hex.EncodeToString(hash[:])
 }
 
+func extractCourseIDs(courseIDField string) []string {
+	if strings.HasPrefix(courseIDField, "MULTI:") {
+		rest := strings.TrimPrefix(courseIDField, "MULTI:")
+		if rest == "" {
+			return nil
+		}
+		parts := strings.Split(rest, "|")
+		out := make([]string, 0, len(parts))
+		for _, p := range parts {
+			p = strings.TrimSpace(p)
+			if p != "" {
+				out = append(out, p)
+			}
+		}
+		return out
+	}
+
+	id := strings.TrimSpace(courseIDField)
+	if id == "" {
+		return nil
+	}
+	return []string{id}
+}
+
 func StartKafkaConsumer(database *db.Database, ctx context.Context, rdb *goredis.Client) {
 	reader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:  []string{"kafka:9092"},
@@ -327,29 +363,33 @@ func StartKafkaConsumer(database *db.Database, ctx context.Context, rdb *goredis
 	go func() {
 		log.Println("Kafka Consumer started for topic: course-events")
 		for {
-			m, err := reader.ReadMessage(context.Background())
+			msg, err := reader.ReadMessage(context.Background())
 			if err != nil {
 				log.Printf("Kafka read error: %v", err)
 				continue
 			}
 
-			log.Printf("Получено сообщение: %s", string(m.Value))
-
-			var event struct {
-				PaymentID string `json:"payment_id"`
-				Tgid      string `json:"tgid"`
-				CourseID  string `json:"course_id"`
-			}
-			if err := json.Unmarshal(m.Value, &event); err != nil {
-				log.Printf("Ошибка при разборе события: %v", err)
+			var evt paymentConfirmedEvent
+			if err := json.Unmarshal(msg.Value, &evt); err != nil {
+				log.Printf("Ошибка при разборе события: %v; raw=%s", err, string(msg.Value))
 				continue
 			}
 
-			err = AddSection(ctx, database, rdb, event.Tgid, event.CourseID)
-			if err != nil {
-				log.Printf("Ошибка при добавлении курса пользователю: %v", err)
-			} else {
-				log.Printf("Курс %s добавлен пользователю %s", event.CourseID, event.Tgid)
+			ids := evt.CourseIDs
+			if len(ids) == 0 {
+				ids = extractCourseIDs(evt.CourseID)
+			}
+			if len(ids) == 0 {
+				log.Printf("Пустой список курсов в событии payment_id=%s", evt.PaymentID)
+				continue
+			}
+
+			for _, cid := range ids {
+				if err := AddSection(ctx, database, rdb, evt.Tgid, cid); err != nil {
+					log.Printf("Ошибка при добавлении курса '%s' пользователю '%s': %v", cid, evt.Tgid, err)
+					continue
+				}
+				log.Printf("Курс %s добавлен пользователю %s (payment=%s)", cid, evt.Tgid, evt.PaymentID)
 			}
 		}
 	}()
