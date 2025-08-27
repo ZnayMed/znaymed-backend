@@ -18,6 +18,7 @@ func New() *redis.Client {
 		Addr:        addr,
 		DialTimeout: 2 * time.Second,
 		ReadTimeout: 2 * time.Second,
+		DB:          0,
 	})
 }
 
