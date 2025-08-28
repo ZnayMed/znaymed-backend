@@ -236,6 +236,7 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 
 const (
 	CourseService_MissingSectionsBySubjects_FullMethodName = "/pb.CourseService/MissingSectionsBySubjects"
+	CourseService_PriceMissingFromList_FullMethodName      = "/pb.CourseService/PriceMissingFromList"
 	CourseService_SubjectMissingTotal_FullMethodName       = "/pb.CourseService/SubjectMissingTotal"
 	CourseService_GetUserSections_FullMethodName           = "/pb.CourseService/GetUserSections"
 	CourseService_AddSection_FullMethodName                = "/pb.CourseService/AddSection"
@@ -249,6 +250,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CourseServiceClient interface {
 	MissingSectionsBySubjects(ctx context.Context, in *MissingSectionsRequest, opts ...grpc.CallOption) (*MissingSectionsResponse, error)
+	PriceMissingFromList(ctx context.Context, in *PriceMissingRequest, opts ...grpc.CallOption) (*PriceMissingResponse, error)
 	SubjectMissingTotal(ctx context.Context, in *SubjectMissingTotalRequest, opts ...grpc.CallOption) (*SubjectMissingTotalResponse, error)
 	GetUserSections(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserSectionsResponse, error)
 	AddSection(ctx context.Context, in *SaveSectionRequest, opts ...grpc.CallOption) (*SaveSectionResponse, error)
@@ -269,6 +271,16 @@ func (c *courseServiceClient) MissingSectionsBySubjects(ctx context.Context, in 
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(MissingSectionsResponse)
 	err := c.cc.Invoke(ctx, CourseService_MissingSectionsBySubjects_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *courseServiceClient) PriceMissingFromList(ctx context.Context, in *PriceMissingRequest, opts ...grpc.CallOption) (*PriceMissingResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PriceMissingResponse)
+	err := c.cc.Invoke(ctx, CourseService_PriceMissingFromList_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -340,6 +352,7 @@ func (c *courseServiceClient) GetTopicsBySectionTitle(ctx context.Context, in *S
 // for forward compatibility.
 type CourseServiceServer interface {
 	MissingSectionsBySubjects(context.Context, *MissingSectionsRequest) (*MissingSectionsResponse, error)
+	PriceMissingFromList(context.Context, *PriceMissingRequest) (*PriceMissingResponse, error)
 	SubjectMissingTotal(context.Context, *SubjectMissingTotalRequest) (*SubjectMissingTotalResponse, error)
 	GetUserSections(context.Context, *UserRequest) (*UserSectionsResponse, error)
 	AddSection(context.Context, *SaveSectionRequest) (*SaveSectionResponse, error)
@@ -358,6 +371,9 @@ type UnimplementedCourseServiceServer struct{}
 
 func (UnimplementedCourseServiceServer) MissingSectionsBySubjects(context.Context, *MissingSectionsRequest) (*MissingSectionsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MissingSectionsBySubjects not implemented")
+}
+func (UnimplementedCourseServiceServer) PriceMissingFromList(context.Context, *PriceMissingRequest) (*PriceMissingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PriceMissingFromList not implemented")
 }
 func (UnimplementedCourseServiceServer) SubjectMissingTotal(context.Context, *SubjectMissingTotalRequest) (*SubjectMissingTotalResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SubjectMissingTotal not implemented")
@@ -412,6 +428,24 @@ func _CourseService_MissingSectionsBySubjects_Handler(srv interface{}, ctx conte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CourseServiceServer).MissingSectionsBySubjects(ctx, req.(*MissingSectionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CourseService_PriceMissingFromList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PriceMissingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CourseServiceServer).PriceMissingFromList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CourseService_PriceMissingFromList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CourseServiceServer).PriceMissingFromList(ctx, req.(*PriceMissingRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -534,6 +568,10 @@ var CourseService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "MissingSectionsBySubjects",
 			Handler:    _CourseService_MissingSectionsBySubjects_Handler,
+		},
+		{
+			MethodName: "PriceMissingFromList",
+			Handler:    _CourseService_PriceMissingFromList_Handler,
 		},
 		{
 			MethodName: "SubjectMissingTotal",

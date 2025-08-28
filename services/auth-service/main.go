@@ -105,7 +105,6 @@ func (s *authServer) Register(ctx context.Context, req *pb.SaveUserRequest) (*pb
 	hashName := hashTGID(req.Tgid)
 	log.Printf("Пытаемся сохранить: name=%s, hashTgid=%s, birthdate=%s", req.Name, hashName, req.Birthdate)
 
-	// 1) Сохраняем в БД
 	if err := s.db.SaveUser(req.Name, hashName, req.Birthdate); err != nil {
 		log.Println("Ошибка при сохранении:", err)
 		return &pb.SaveUserResponse{Success: false, Message: err.Error()}, err

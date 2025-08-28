@@ -61,21 +61,6 @@ func (s *paymentServer) startKafkaDispatcher(topic string) {
 	}()
 }
 
-func getCoursePriceRUB(ctx context.Context, courseID string) (amountInKopecks int64, err error) {
-	return 19900, nil
-}
-func getTotalPriceRUB(ctx context.Context, courseIDs []string) (int64, error) {
-	var total int64
-	for _, id := range courseIDs {
-		amountK, err := getCoursePriceRUB(ctx, id)
-		if err != nil {
-			return 0, err
-		}
-		total += amountK
-	}
-	return total, nil
-}
-
 func basketKey(courseIDs []string) string {
 	if len(courseIDs) == 1 {
 		return courseIDs[0]
@@ -106,6 +91,10 @@ func (s *paymentServer) CreatePayment(ctx context.Context, req *pb.CreatePayment
 	if len(courses) == 0 {
 		return nil, fmt.Errorf("empty course_ids")
 	}
+	if req.AmountKopeck <= 0 {
+		return nil, fmt.Errorf("amount_kopeck must be > 0")
+	}
+
 	key := basketKey(courses)
 
 	if p, err := s.db.FindActivePending(req.Tgid, key); err == nil {
@@ -117,10 +106,7 @@ func (s *paymentServer) CreatePayment(ctx context.Context, req *pb.CreatePayment
 		}, nil
 	}
 
-	totalK, err := getTotalPriceRUB(ctx, courses)
-	if err != nil {
-		return nil, err
-	}
+	totalK := req.AmountKopeck
 	amountRubStr := fmt.Sprintf("%.2f", float64(totalK)/100.0)
 
 	paymentID := uuid.NewString()

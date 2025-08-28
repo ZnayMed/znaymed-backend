@@ -17,6 +17,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"net"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -501,6 +502,68 @@ func (s *courseServer) SubjectMissingTotal(ctx context.Context, in *pb.SubjectMi
 		Subject:     in.Subject,
 		TotalKopeck: total,
 		Currency:    "RUB",
+	}, nil
+}
+
+func setOf(ss []string) map[string]struct{} {
+	m := make(map[string]struct{}, len(ss))
+	for _, s := range ss {
+		m[s] = struct{}{}
+	}
+	return m
+}
+
+func (s *courseServer) PriceMissingFromList(ctx context.Context, in *pb.PriceMissingRequest) (*pb.PriceMissingResponse, error) {
+	if in == nil || in.Tgid == "" || len(in.Sections) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "tgid and sections are required")
+	}
+
+	ownedTitles, err := s.db.GetAccessibleSectionTitlesByTGIDHash(hashTGID(in.Tgid))
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "db owned titles: %v", err)
+	}
+	owned := setOf(ownedTitles)
+
+	missing := make([]string, 0, len(in.Sections))
+	for _, title := range in.Sections {
+		if _, ok := owned[title]; !ok {
+			missing = append(missing, title)
+		}
+	}
+	if len(missing) == 0 {
+		return &pb.PriceMissingResponse{
+			MissingSections: nil,
+			TotalKopeck:     0,
+			Currency:        "RUB",
+		}, nil
+	}
+
+	var total int64
+	for _, title := range missing {
+		secID, _ := rediscourse.GetSectionIDByTitle(ctx, s.rdb, title) // может вернуть redis.Nil
+		var price int64
+		var ok bool
+		if secID != "" {
+			if p, err := s.rdb.HGet(ctx, "section:"+secID, "price_kopeck").Result(); err == nil && p != "" {
+				if v, conv := strconv.ParseInt(p, 10, 64); conv == nil {
+					price, ok = v, true
+				}
+			}
+		}
+		if !ok {
+			v, derr := s.db.GetSectionPriceKopeckByTitle(ctx, title)
+			if derr != nil {
+				return nil, status.Errorf(codes.Internal, "db price by title %q: %v", title, derr)
+			}
+			price = v
+		}
+		total += price
+	}
+
+	return &pb.PriceMissingResponse{
+		MissingSections: missing,
+		TotalKopeck:     total,
+		Currency:        "RUB",
 	}, nil
 }
 

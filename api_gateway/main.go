@@ -417,6 +417,49 @@ func main() {
 		json.NewEncoder(w).Encode(map[string]bool{"success": resp.Success})
 	})
 
+	http.HandleFunc("/sections/total", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		var req struct {
+			TgID     string   `json:"tgid"`
+			Sections []string `json:"sections"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.TgID == "" || len(req.Sections) == 0 {
+			http.Error(w, "invalid json: need tgid and sections", http.StatusBadRequest)
+			return
+		}
+
+		conn, err := grpc.Dial(addrCourse, grpc.WithInsecure())
+		if err != nil {
+			http.Error(w, "gRPC connect to course failed", http.StatusInternalServerError)
+			return
+		}
+		defer conn.Close()
+		client := pb.NewCourseServiceClient(conn)
+
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+
+		resp, err := client.PriceMissingFromList(ctx, &pb.PriceMissingRequest{
+			Tgid:     req.TgID,
+			Sections: req.Sections,
+		})
+		if err != nil {
+			log.Println("PriceMissingFromList RPC failed:", err)
+			http.Error(w, "price calculation failed", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"missing_sections": resp.MissingSections,
+			"total_kopeck":     resp.TotalKopeck,
+			"currency":         resp.Currency,
+		})
+	})
+
 	http.HandleFunc("/createpayment", func(w http.ResponseWriter, r *http.Request) {
 		type createReq struct {
 			TgID     string   `json:"tgid"`
@@ -430,41 +473,86 @@ func main() {
 			return
 		}
 
+		// собрать входной список
 		courseIDs := req.Sections
 		if len(courseIDs) == 0 && strings.TrimSpace(req.Section) != "" {
-			courseIDs = []string{req.Section}
+			courseIDs = []string{strings.TrimSpace(req.Section)}
 		}
 		if req.TgID == "" || len(courseIDs) == 0 {
 			http.Error(w, "missing tgid or sections", http.StatusBadRequest)
 			return
 		}
 
-		conn, err := grpc.Dial(addrPayment, grpc.WithInsecure())
+		// 1) CourseService: считаем стоимость некупленных из списка
+		cConn, err := grpc.Dial(addrCourse, grpc.WithInsecure())
 		if err != nil {
-			http.Error(w, "gRPC connect failed", http.StatusInternalServerError)
+			http.Error(w, "gRPC connect to course failed", http.StatusInternalServerError)
 			return
 		}
-		defer conn.Close()
+		defer cConn.Close()
+		cClient := pb.NewCourseServiceClient(cConn)
 
-		client := pb.NewPaymentServiceClient(conn)
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
+		ctxCourse, cancelCourse := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancelCourse()
 
-		resp, err := client.CreatePayment(ctx, &pb.CreatePaymentRequest{
-			Tgid:      req.TgID,
-			CourseIds: courseIDs,
+		priceResp, err := cClient.PriceMissingFromList(ctxCourse, &pb.PriceMissingRequest{
+			Tgid:     req.TgID,
+			Sections: courseIDs,
 		})
 		if err != nil {
-			log.Println("Ошибка в RPC CreatePayment:", err)
+			log.Println("PriceMissingFromList RPC failed:", err)
+			http.Error(w, "price calculation failed", http.StatusInternalServerError)
+			return
+		}
+
+		missing := priceResp.MissingSections
+		total := priceResp.TotalKopeck
+		currency := priceResp.Currency
+
+		// если нечего покупать — сразу ответ
+		if len(missing) == 0 || total <= 0 {
+			w.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"message":          "nothing to buy: all provided sections already owned",
+				"missing_sections": []string{},
+				"total_kopeck":     0,
+				"currency":         "RUB",
+			})
+			return
+		}
+
+		// 2) PaymentService: создаём платёж с этой суммой
+		pConn, err := grpc.Dial(addrPayment, grpc.WithInsecure())
+		if err != nil {
+			http.Error(w, "gRPC connect to payment failed", http.StatusInternalServerError)
+			return
+		}
+		defer pConn.Close()
+		pClient := pb.NewPaymentServiceClient(pConn)
+
+		ctxPay, cancelPay := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancelPay()
+
+		pResp, err := pClient.CreatePayment(ctxPay, &pb.CreatePaymentRequest{
+			Tgid:         req.TgID,
+			CourseIds:    missing, // оплачиваем только то, чего нет
+			AmountKopeck: total,   // сумма из course-service
+		})
+		if err != nil {
+			log.Println("CreatePayment RPC failed:", err)
 			http.Error(w, "payment create failed", http.StatusInternalServerError)
 			return
 		}
 
+		// 3) Ответ клиенту
 		w.Header().Set("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(map[string]string{
-			"Payment_id":  resp.PaymentId,
-			"Payment_url": resp.PaymentUrl,
-			"Status":      resp.Status,
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"payment_id":       pResp.PaymentId,
+			"payment_url":      pResp.PaymentUrl,
+			"status":           pResp.Status,
+			"missing_sections": missing,
+			"total_kopeck":     total,
+			"currency":         currency,
 		})
 	})
 

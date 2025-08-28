@@ -21,6 +21,118 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type PriceMissingRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Tgid          string                 `protobuf:"bytes,1,opt,name=tgid,proto3" json:"tgid,omitempty"`
+	Sections      []string               `protobuf:"bytes,2,rep,name=sections,proto3" json:"sections,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PriceMissingRequest) Reset() {
+	*x = PriceMissingRequest{}
+	mi := &file_proto_hello_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PriceMissingRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PriceMissingRequest) ProtoMessage() {}
+
+func (x *PriceMissingRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_hello_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PriceMissingRequest.ProtoReflect.Descriptor instead.
+func (*PriceMissingRequest) Descriptor() ([]byte, []int) {
+	return file_proto_hello_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *PriceMissingRequest) GetTgid() string {
+	if x != nil {
+		return x.Tgid
+	}
+	return ""
+}
+
+func (x *PriceMissingRequest) GetSections() []string {
+	if x != nil {
+		return x.Sections
+	}
+	return nil
+}
+
+type PriceMissingResponse struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	MissingSections []string               `protobuf:"bytes,1,rep,name=missing_sections,json=missingSections,proto3" json:"missing_sections,omitempty"`
+	TotalKopeck     int64                  `protobuf:"varint,2,opt,name=total_kopeck,json=totalKopeck,proto3" json:"total_kopeck,omitempty"`
+	Currency        string                 `protobuf:"bytes,3,opt,name=currency,proto3" json:"currency,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *PriceMissingResponse) Reset() {
+	*x = PriceMissingResponse{}
+	mi := &file_proto_hello_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PriceMissingResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PriceMissingResponse) ProtoMessage() {}
+
+func (x *PriceMissingResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_hello_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PriceMissingResponse.ProtoReflect.Descriptor instead.
+func (*PriceMissingResponse) Descriptor() ([]byte, []int) {
+	return file_proto_hello_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *PriceMissingResponse) GetMissingSections() []string {
+	if x != nil {
+		return x.MissingSections
+	}
+	return nil
+}
+
+func (x *PriceMissingResponse) GetTotalKopeck() int64 {
+	if x != nil {
+		return x.TotalKopeck
+	}
+	return 0
+}
+
+func (x *PriceMissingResponse) GetCurrency() string {
+	if x != nil {
+		return x.Currency
+	}
+	return ""
+}
+
 type MissingSectionsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Tgid          string                 `protobuf:"bytes,1,opt,name=tgid,proto3" json:"tgid,omitempty"`
@@ -31,7 +143,7 @@ type MissingSectionsRequest struct {
 
 func (x *MissingSectionsRequest) Reset() {
 	*x = MissingSectionsRequest{}
-	mi := &file_proto_hello_proto_msgTypes[0]
+	mi := &file_proto_hello_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -43,7 +155,7 @@ func (x *MissingSectionsRequest) String() string {
 func (*MissingSectionsRequest) ProtoMessage() {}
 
 func (x *MissingSectionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[0]
+	mi := &file_proto_hello_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -56,7 +168,7 @@ func (x *MissingSectionsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MissingSectionsRequest.ProtoReflect.Descriptor instead.
 func (*MissingSectionsRequest) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{0}
+	return file_proto_hello_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *MissingSectionsRequest) GetTgid() string {
@@ -82,7 +194,7 @@ type MissingSectionsResponse struct {
 
 func (x *MissingSectionsResponse) Reset() {
 	*x = MissingSectionsResponse{}
-	mi := &file_proto_hello_proto_msgTypes[1]
+	mi := &file_proto_hello_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -94,7 +206,7 @@ func (x *MissingSectionsResponse) String() string {
 func (*MissingSectionsResponse) ProtoMessage() {}
 
 func (x *MissingSectionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[1]
+	mi := &file_proto_hello_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -107,7 +219,7 @@ func (x *MissingSectionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MissingSectionsResponse.ProtoReflect.Descriptor instead.
 func (*MissingSectionsResponse) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{1}
+	return file_proto_hello_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *MissingSectionsResponse) GetResult() map[string]*SubjectMissing {
@@ -126,7 +238,7 @@ type SubjectMissing struct {
 
 func (x *SubjectMissing) Reset() {
 	*x = SubjectMissing{}
-	mi := &file_proto_hello_proto_msgTypes[2]
+	mi := &file_proto_hello_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -138,7 +250,7 @@ func (x *SubjectMissing) String() string {
 func (*SubjectMissing) ProtoMessage() {}
 
 func (x *SubjectMissing) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[2]
+	mi := &file_proto_hello_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -151,7 +263,7 @@ func (x *SubjectMissing) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubjectMissing.ProtoReflect.Descriptor instead.
 func (*SubjectMissing) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{2}
+	return file_proto_hello_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *SubjectMissing) GetSectionIds() []string {
@@ -171,7 +283,7 @@ type SubjectMissingTotalRequest struct {
 
 func (x *SubjectMissingTotalRequest) Reset() {
 	*x = SubjectMissingTotalRequest{}
-	mi := &file_proto_hello_proto_msgTypes[3]
+	mi := &file_proto_hello_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -183,7 +295,7 @@ func (x *SubjectMissingTotalRequest) String() string {
 func (*SubjectMissingTotalRequest) ProtoMessage() {}
 
 func (x *SubjectMissingTotalRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[3]
+	mi := &file_proto_hello_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -196,7 +308,7 @@ func (x *SubjectMissingTotalRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubjectMissingTotalRequest.ProtoReflect.Descriptor instead.
 func (*SubjectMissingTotalRequest) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{3}
+	return file_proto_hello_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *SubjectMissingTotalRequest) GetTgid() string {
@@ -224,7 +336,7 @@ type SubjectMissingTotalResponse struct {
 
 func (x *SubjectMissingTotalResponse) Reset() {
 	*x = SubjectMissingTotalResponse{}
-	mi := &file_proto_hello_proto_msgTypes[4]
+	mi := &file_proto_hello_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -236,7 +348,7 @@ func (x *SubjectMissingTotalResponse) String() string {
 func (*SubjectMissingTotalResponse) ProtoMessage() {}
 
 func (x *SubjectMissingTotalResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[4]
+	mi := &file_proto_hello_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -249,7 +361,7 @@ func (x *SubjectMissingTotalResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubjectMissingTotalResponse.ProtoReflect.Descriptor instead.
 func (*SubjectMissingTotalResponse) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{4}
+	return file_proto_hello_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *SubjectMissingTotalResponse) GetSubject() string {
@@ -282,7 +394,7 @@ type SectionTitleRequest struct {
 
 func (x *SectionTitleRequest) Reset() {
 	*x = SectionTitleRequest{}
-	mi := &file_proto_hello_proto_msgTypes[5]
+	mi := &file_proto_hello_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -294,7 +406,7 @@ func (x *SectionTitleRequest) String() string {
 func (*SectionTitleRequest) ProtoMessage() {}
 
 func (x *SectionTitleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[5]
+	mi := &file_proto_hello_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -307,7 +419,7 @@ func (x *SectionTitleRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SectionTitleRequest.ProtoReflect.Descriptor instead.
 func (*SectionTitleRequest) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{5}
+	return file_proto_hello_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *SectionTitleRequest) GetSectionTitle() string {
@@ -331,7 +443,7 @@ type TopicItem struct {
 
 func (x *TopicItem) Reset() {
 	*x = TopicItem{}
-	mi := &file_proto_hello_proto_msgTypes[6]
+	mi := &file_proto_hello_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -343,7 +455,7 @@ func (x *TopicItem) String() string {
 func (*TopicItem) ProtoMessage() {}
 
 func (x *TopicItem) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[6]
+	mi := &file_proto_hello_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -356,7 +468,7 @@ func (x *TopicItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TopicItem.ProtoReflect.Descriptor instead.
 func (*TopicItem) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{6}
+	return file_proto_hello_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *TopicItem) GetId() int64 {
@@ -410,7 +522,7 @@ type SectionTopicsResponse struct {
 
 func (x *SectionTopicsResponse) Reset() {
 	*x = SectionTopicsResponse{}
-	mi := &file_proto_hello_proto_msgTypes[7]
+	mi := &file_proto_hello_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -422,7 +534,7 @@ func (x *SectionTopicsResponse) String() string {
 func (*SectionTopicsResponse) ProtoMessage() {}
 
 func (x *SectionTopicsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[7]
+	mi := &file_proto_hello_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -435,7 +547,7 @@ func (x *SectionTopicsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SectionTopicsResponse.ProtoReflect.Descriptor instead.
 func (*SectionTopicsResponse) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{7}
+	return file_proto_hello_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *SectionTopicsResponse) GetTopics() []*TopicItem {
@@ -455,7 +567,7 @@ type SubjectSectionsRequest struct {
 
 func (x *SubjectSectionsRequest) Reset() {
 	*x = SubjectSectionsRequest{}
-	mi := &file_proto_hello_proto_msgTypes[8]
+	mi := &file_proto_hello_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -467,7 +579,7 @@ func (x *SubjectSectionsRequest) String() string {
 func (*SubjectSectionsRequest) ProtoMessage() {}
 
 func (x *SubjectSectionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[8]
+	mi := &file_proto_hello_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -480,7 +592,7 @@ func (x *SubjectSectionsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubjectSectionsRequest.ProtoReflect.Descriptor instead.
 func (*SubjectSectionsRequest) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{8}
+	return file_proto_hello_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *SubjectSectionsRequest) GetTgid() string {
@@ -507,7 +619,7 @@ type SectionItem struct {
 
 func (x *SectionItem) Reset() {
 	*x = SectionItem{}
-	mi := &file_proto_hello_proto_msgTypes[9]
+	mi := &file_proto_hello_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -519,7 +631,7 @@ func (x *SectionItem) String() string {
 func (*SectionItem) ProtoMessage() {}
 
 func (x *SectionItem) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[9]
+	mi := &file_proto_hello_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -532,7 +644,7 @@ func (x *SectionItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SectionItem.ProtoReflect.Descriptor instead.
 func (*SectionItem) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{9}
+	return file_proto_hello_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *SectionItem) GetTitle() string {
@@ -558,7 +670,7 @@ type SubjectSectionsResponse struct {
 
 func (x *SubjectSectionsResponse) Reset() {
 	*x = SubjectSectionsResponse{}
-	mi := &file_proto_hello_proto_msgTypes[10]
+	mi := &file_proto_hello_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -570,7 +682,7 @@ func (x *SubjectSectionsResponse) String() string {
 func (*SubjectSectionsResponse) ProtoMessage() {}
 
 func (x *SubjectSectionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[10]
+	mi := &file_proto_hello_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -583,7 +695,7 @@ func (x *SubjectSectionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubjectSectionsResponse.ProtoReflect.Descriptor instead.
 func (*SubjectSectionsResponse) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{10}
+	return file_proto_hello_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *SubjectSectionsResponse) GetSections() []*SectionItem {
@@ -601,7 +713,7 @@ type ListSubjectsRequest struct {
 
 func (x *ListSubjectsRequest) Reset() {
 	*x = ListSubjectsRequest{}
-	mi := &file_proto_hello_proto_msgTypes[11]
+	mi := &file_proto_hello_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -613,7 +725,7 @@ func (x *ListSubjectsRequest) String() string {
 func (*ListSubjectsRequest) ProtoMessage() {}
 
 func (x *ListSubjectsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[11]
+	mi := &file_proto_hello_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -626,7 +738,7 @@ func (x *ListSubjectsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSubjectsRequest.ProtoReflect.Descriptor instead.
 func (*ListSubjectsRequest) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{11}
+	return file_proto_hello_proto_rawDescGZIP(), []int{13}
 }
 
 type ListSubjectsResponse struct {
@@ -638,7 +750,7 @@ type ListSubjectsResponse struct {
 
 func (x *ListSubjectsResponse) Reset() {
 	*x = ListSubjectsResponse{}
-	mi := &file_proto_hello_proto_msgTypes[12]
+	mi := &file_proto_hello_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -650,7 +762,7 @@ func (x *ListSubjectsResponse) String() string {
 func (*ListSubjectsResponse) ProtoMessage() {}
 
 func (x *ListSubjectsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[12]
+	mi := &file_proto_hello_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -663,7 +775,7 @@ func (x *ListSubjectsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSubjectsResponse.ProtoReflect.Descriptor instead.
 func (*ListSubjectsResponse) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{12}
+	return file_proto_hello_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *ListSubjectsResponse) GetTitles() []string {
@@ -677,13 +789,14 @@ type CreatePaymentRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Tgid          string                 `protobuf:"bytes,1,opt,name=tgid,proto3" json:"tgid,omitempty"`
 	CourseIds     []string               `protobuf:"bytes,2,rep,name=course_ids,json=courseIds,proto3" json:"course_ids,omitempty"`
+	AmountKopeck  int64                  `protobuf:"varint,3,opt,name=amount_kopeck,json=amountKopeck,proto3" json:"amount_kopeck,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CreatePaymentRequest) Reset() {
 	*x = CreatePaymentRequest{}
-	mi := &file_proto_hello_proto_msgTypes[13]
+	mi := &file_proto_hello_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -695,7 +808,7 @@ func (x *CreatePaymentRequest) String() string {
 func (*CreatePaymentRequest) ProtoMessage() {}
 
 func (x *CreatePaymentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[13]
+	mi := &file_proto_hello_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -708,7 +821,7 @@ func (x *CreatePaymentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreatePaymentRequest.ProtoReflect.Descriptor instead.
 func (*CreatePaymentRequest) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{13}
+	return file_proto_hello_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *CreatePaymentRequest) GetTgid() string {
@@ -725,6 +838,13 @@ func (x *CreatePaymentRequest) GetCourseIds() []string {
 	return nil
 }
 
+func (x *CreatePaymentRequest) GetAmountKopeck() int64 {
+	if x != nil {
+		return x.AmountKopeck
+	}
+	return 0
+}
+
 type CreatePaymentResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PaymentId     string                 `protobuf:"bytes,1,opt,name=payment_id,json=paymentId,proto3" json:"payment_id,omitempty"`
@@ -736,7 +856,7 @@ type CreatePaymentResponse struct {
 
 func (x *CreatePaymentResponse) Reset() {
 	*x = CreatePaymentResponse{}
-	mi := &file_proto_hello_proto_msgTypes[14]
+	mi := &file_proto_hello_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -748,7 +868,7 @@ func (x *CreatePaymentResponse) String() string {
 func (*CreatePaymentResponse) ProtoMessage() {}
 
 func (x *CreatePaymentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[14]
+	mi := &file_proto_hello_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -761,7 +881,7 @@ func (x *CreatePaymentResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreatePaymentResponse.ProtoReflect.Descriptor instead.
 func (*CreatePaymentResponse) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{14}
+	return file_proto_hello_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *CreatePaymentResponse) GetPaymentId() string {
@@ -795,7 +915,7 @@ type SaveSectionRequest struct {
 
 func (x *SaveSectionRequest) Reset() {
 	*x = SaveSectionRequest{}
-	mi := &file_proto_hello_proto_msgTypes[15]
+	mi := &file_proto_hello_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -807,7 +927,7 @@ func (x *SaveSectionRequest) String() string {
 func (*SaveSectionRequest) ProtoMessage() {}
 
 func (x *SaveSectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[15]
+	mi := &file_proto_hello_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -820,7 +940,7 @@ func (x *SaveSectionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SaveSectionRequest.ProtoReflect.Descriptor instead.
 func (*SaveSectionRequest) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{15}
+	return file_proto_hello_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *SaveSectionRequest) GetTgid() string {
@@ -846,7 +966,7 @@ type SaveSectionResponse struct {
 
 func (x *SaveSectionResponse) Reset() {
 	*x = SaveSectionResponse{}
-	mi := &file_proto_hello_proto_msgTypes[16]
+	mi := &file_proto_hello_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -858,7 +978,7 @@ func (x *SaveSectionResponse) String() string {
 func (*SaveSectionResponse) ProtoMessage() {}
 
 func (x *SaveSectionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[16]
+	mi := &file_proto_hello_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -871,7 +991,7 @@ func (x *SaveSectionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SaveSectionResponse.ProtoReflect.Descriptor instead.
 func (*SaveSectionResponse) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{16}
+	return file_proto_hello_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *SaveSectionResponse) GetSuccess() bool {
@@ -890,7 +1010,7 @@ type UserRequest struct {
 
 func (x *UserRequest) Reset() {
 	*x = UserRequest{}
-	mi := &file_proto_hello_proto_msgTypes[17]
+	mi := &file_proto_hello_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -902,7 +1022,7 @@ func (x *UserRequest) String() string {
 func (*UserRequest) ProtoMessage() {}
 
 func (x *UserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[17]
+	mi := &file_proto_hello_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -915,7 +1035,7 @@ func (x *UserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserRequest.ProtoReflect.Descriptor instead.
 func (*UserRequest) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{17}
+	return file_proto_hello_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *UserRequest) GetTgid() string {
@@ -934,7 +1054,7 @@ type UserSectionsResponse struct {
 
 func (x *UserSectionsResponse) Reset() {
 	*x = UserSectionsResponse{}
-	mi := &file_proto_hello_proto_msgTypes[18]
+	mi := &file_proto_hello_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -946,7 +1066,7 @@ func (x *UserSectionsResponse) String() string {
 func (*UserSectionsResponse) ProtoMessage() {}
 
 func (x *UserSectionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[18]
+	mi := &file_proto_hello_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -959,7 +1079,7 @@ func (x *UserSectionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserSectionsResponse.ProtoReflect.Descriptor instead.
 func (*UserSectionsResponse) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{18}
+	return file_proto_hello_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *UserSectionsResponse) GetTopicTitles() []string {
@@ -979,7 +1099,7 @@ type LoginRequest struct {
 
 func (x *LoginRequest) Reset() {
 	*x = LoginRequest{}
-	mi := &file_proto_hello_proto_msgTypes[19]
+	mi := &file_proto_hello_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -991,7 +1111,7 @@ func (x *LoginRequest) String() string {
 func (*LoginRequest) ProtoMessage() {}
 
 func (x *LoginRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[19]
+	mi := &file_proto_hello_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1004,7 +1124,7 @@ func (x *LoginRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginRequest.ProtoReflect.Descriptor instead.
 func (*LoginRequest) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{19}
+	return file_proto_hello_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *LoginRequest) GetUsername() string {
@@ -1030,7 +1150,7 @@ type LoginResponse struct {
 
 func (x *LoginResponse) Reset() {
 	*x = LoginResponse{}
-	mi := &file_proto_hello_proto_msgTypes[20]
+	mi := &file_proto_hello_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1042,7 +1162,7 @@ func (x *LoginResponse) String() string {
 func (*LoginResponse) ProtoMessage() {}
 
 func (x *LoginResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[20]
+	mi := &file_proto_hello_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1055,7 +1175,7 @@ func (x *LoginResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginResponse.ProtoReflect.Descriptor instead.
 func (*LoginResponse) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{20}
+	return file_proto_hello_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *LoginResponse) GetToken() string {
@@ -1074,7 +1194,7 @@ type VerifyRequest struct {
 
 func (x *VerifyRequest) Reset() {
 	*x = VerifyRequest{}
-	mi := &file_proto_hello_proto_msgTypes[21]
+	mi := &file_proto_hello_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1086,7 +1206,7 @@ func (x *VerifyRequest) String() string {
 func (*VerifyRequest) ProtoMessage() {}
 
 func (x *VerifyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[21]
+	mi := &file_proto_hello_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1099,7 +1219,7 @@ func (x *VerifyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerifyRequest.ProtoReflect.Descriptor instead.
 func (*VerifyRequest) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{21}
+	return file_proto_hello_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *VerifyRequest) GetToken() string {
@@ -1118,7 +1238,7 @@ type VerifyResponse struct {
 
 func (x *VerifyResponse) Reset() {
 	*x = VerifyResponse{}
-	mi := &file_proto_hello_proto_msgTypes[22]
+	mi := &file_proto_hello_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1130,7 +1250,7 @@ func (x *VerifyResponse) String() string {
 func (*VerifyResponse) ProtoMessage() {}
 
 func (x *VerifyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[22]
+	mi := &file_proto_hello_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1143,7 +1263,7 @@ func (x *VerifyResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerifyResponse.ProtoReflect.Descriptor instead.
 func (*VerifyResponse) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{22}
+	return file_proto_hello_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *VerifyResponse) GetValid() bool {
@@ -1164,7 +1284,7 @@ type SaveUserRequest struct {
 
 func (x *SaveUserRequest) Reset() {
 	*x = SaveUserRequest{}
-	mi := &file_proto_hello_proto_msgTypes[23]
+	mi := &file_proto_hello_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1176,7 +1296,7 @@ func (x *SaveUserRequest) String() string {
 func (*SaveUserRequest) ProtoMessage() {}
 
 func (x *SaveUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[23]
+	mi := &file_proto_hello_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1189,7 +1309,7 @@ func (x *SaveUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SaveUserRequest.ProtoReflect.Descriptor instead.
 func (*SaveUserRequest) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{23}
+	return file_proto_hello_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *SaveUserRequest) GetName() string {
@@ -1222,7 +1342,7 @@ type CheckUserResponse struct {
 
 func (x *CheckUserResponse) Reset() {
 	*x = CheckUserResponse{}
-	mi := &file_proto_hello_proto_msgTypes[24]
+	mi := &file_proto_hello_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1234,7 +1354,7 @@ func (x *CheckUserResponse) String() string {
 func (*CheckUserResponse) ProtoMessage() {}
 
 func (x *CheckUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[24]
+	mi := &file_proto_hello_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1247,7 +1367,7 @@ func (x *CheckUserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckUserResponse.ProtoReflect.Descriptor instead.
 func (*CheckUserResponse) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{24}
+	return file_proto_hello_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *CheckUserResponse) GetExists() bool {
@@ -1267,7 +1387,7 @@ type SaveUserResponse struct {
 
 func (x *SaveUserResponse) Reset() {
 	*x = SaveUserResponse{}
-	mi := &file_proto_hello_proto_msgTypes[25]
+	mi := &file_proto_hello_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1279,7 +1399,7 @@ func (x *SaveUserResponse) String() string {
 func (*SaveUserResponse) ProtoMessage() {}
 
 func (x *SaveUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hello_proto_msgTypes[25]
+	mi := &file_proto_hello_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1292,7 +1412,7 @@ func (x *SaveUserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SaveUserResponse.ProtoReflect.Descriptor instead.
 func (*SaveUserResponse) Descriptor() ([]byte, []int) {
-	return file_proto_hello_proto_rawDescGZIP(), []int{25}
+	return file_proto_hello_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *SaveUserResponse) GetSuccess() bool {
@@ -1313,7 +1433,14 @@ var File_proto_hello_proto protoreflect.FileDescriptor
 
 const file_proto_hello_proto_rawDesc = "" +
 	"\n" +
-	"\x11proto/hello.proto\x12\x02pb\"H\n" +
+	"\x11proto/hello.proto\x12\x02pb\"E\n" +
+	"\x13PriceMissingRequest\x12\x12\n" +
+	"\x04tgid\x18\x01 \x01(\tR\x04tgid\x12\x1a\n" +
+	"\bsections\x18\x02 \x03(\tR\bsections\"\x80\x01\n" +
+	"\x14PriceMissingResponse\x12)\n" +
+	"\x10missing_sections\x18\x01 \x03(\tR\x0fmissingSections\x12!\n" +
+	"\ftotal_kopeck\x18\x02 \x01(\x03R\vtotalKopeck\x12\x1a\n" +
+	"\bcurrency\x18\x03 \x01(\tR\bcurrency\"H\n" +
 	"\x16MissingSectionsRequest\x12\x12\n" +
 	"\x04tgid\x18\x01 \x01(\tR\x04tgid\x12\x1a\n" +
 	"\bsubjects\x18\x02 \x03(\tR\bsubjects\"\xa9\x01\n" +
@@ -1357,11 +1484,12 @@ const file_proto_hello_proto_rawDesc = "" +
 	"\bsections\x18\x01 \x03(\v2\x0f.pb.SectionItemR\bsections\"\x15\n" +
 	"\x13ListSubjectsRequest\".\n" +
 	"\x14ListSubjectsResponse\x12\x16\n" +
-	"\x06titles\x18\x01 \x03(\tR\x06titles\"I\n" +
+	"\x06titles\x18\x01 \x03(\tR\x06titles\"n\n" +
 	"\x14CreatePaymentRequest\x12\x12\n" +
 	"\x04tgid\x18\x01 \x01(\tR\x04tgid\x12\x1d\n" +
 	"\n" +
-	"course_ids\x18\x02 \x03(\tR\tcourseIds\"o\n" +
+	"course_ids\x18\x02 \x03(\tR\tcourseIds\x12#\n" +
+	"\ramount_kopeck\x18\x03 \x01(\x03R\famountKopeck\"o\n" +
 	"\x15CreatePaymentResponse\x12\x1d\n" +
 	"\n" +
 	"payment_id\x18\x01 \x01(\tR\tpaymentId\x12\x1f\n" +
@@ -1399,9 +1527,10 @@ const file_proto_hello_proto_rawDesc = "" +
 	"\x05Login\x12\x10.pb.LoginRequest\x1a\x11.pb.LoginResponse\x124\n" +
 	"\vVerifyToken\x12\x11.pb.VerifyRequest\x1a\x12.pb.VerifyResponse\x125\n" +
 	"\bRegister\x12\x13.pb.SaveUserRequest\x1a\x14.pb.SaveUserResponse\x123\n" +
-	"\tCheckUser\x12\x0f.pb.UserRequest\x1a\x15.pb.CheckUserResponse2\x9e\x04\n" +
+	"\tCheckUser\x12\x0f.pb.UserRequest\x1a\x15.pb.CheckUserResponse2\xe9\x04\n" +
 	"\rCourseService\x12T\n" +
-	"\x19MissingSectionsBySubjects\x12\x1a.pb.MissingSectionsRequest\x1a\x1b.pb.MissingSectionsResponse\x12V\n" +
+	"\x19MissingSectionsBySubjects\x12\x1a.pb.MissingSectionsRequest\x1a\x1b.pb.MissingSectionsResponse\x12I\n" +
+	"\x14PriceMissingFromList\x12\x17.pb.PriceMissingRequest\x1a\x18.pb.PriceMissingResponse\x12V\n" +
 	"\x13SubjectMissingTotal\x12\x1e.pb.SubjectMissingTotalRequest\x1a\x1f.pb.SubjectMissingTotalResponse\x12<\n" +
 	"\x0fGetUserSections\x12\x0f.pb.UserRequest\x1a\x18.pb.UserSectionsResponse\x12=\n" +
 	"\n" +
@@ -1424,67 +1553,71 @@ func file_proto_hello_proto_rawDescGZIP() []byte {
 	return file_proto_hello_proto_rawDescData
 }
 
-var file_proto_hello_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
+var file_proto_hello_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
 var file_proto_hello_proto_goTypes = []any{
-	(*MissingSectionsRequest)(nil),      // 0: pb.MissingSectionsRequest
-	(*MissingSectionsResponse)(nil),     // 1: pb.MissingSectionsResponse
-	(*SubjectMissing)(nil),              // 2: pb.SubjectMissing
-	(*SubjectMissingTotalRequest)(nil),  // 3: pb.SubjectMissingTotalRequest
-	(*SubjectMissingTotalResponse)(nil), // 4: pb.SubjectMissingTotalResponse
-	(*SectionTitleRequest)(nil),         // 5: pb.SectionTitleRequest
-	(*TopicItem)(nil),                   // 6: pb.TopicItem
-	(*SectionTopicsResponse)(nil),       // 7: pb.SectionTopicsResponse
-	(*SubjectSectionsRequest)(nil),      // 8: pb.SubjectSectionsRequest
-	(*SectionItem)(nil),                 // 9: pb.SectionItem
-	(*SubjectSectionsResponse)(nil),     // 10: pb.SubjectSectionsResponse
-	(*ListSubjectsRequest)(nil),         // 11: pb.ListSubjectsRequest
-	(*ListSubjectsResponse)(nil),        // 12: pb.ListSubjectsResponse
-	(*CreatePaymentRequest)(nil),        // 13: pb.CreatePaymentRequest
-	(*CreatePaymentResponse)(nil),       // 14: pb.CreatePaymentResponse
-	(*SaveSectionRequest)(nil),          // 15: pb.SaveSectionRequest
-	(*SaveSectionResponse)(nil),         // 16: pb.SaveSectionResponse
-	(*UserRequest)(nil),                 // 17: pb.UserRequest
-	(*UserSectionsResponse)(nil),        // 18: pb.UserSectionsResponse
-	(*LoginRequest)(nil),                // 19: pb.LoginRequest
-	(*LoginResponse)(nil),               // 20: pb.LoginResponse
-	(*VerifyRequest)(nil),               // 21: pb.VerifyRequest
-	(*VerifyResponse)(nil),              // 22: pb.VerifyResponse
-	(*SaveUserRequest)(nil),             // 23: pb.SaveUserRequest
-	(*CheckUserResponse)(nil),           // 24: pb.CheckUserResponse
-	(*SaveUserResponse)(nil),            // 25: pb.SaveUserResponse
-	nil,                                 // 26: pb.MissingSectionsResponse.ResultEntry
+	(*PriceMissingRequest)(nil),         // 0: pb.PriceMissingRequest
+	(*PriceMissingResponse)(nil),        // 1: pb.PriceMissingResponse
+	(*MissingSectionsRequest)(nil),      // 2: pb.MissingSectionsRequest
+	(*MissingSectionsResponse)(nil),     // 3: pb.MissingSectionsResponse
+	(*SubjectMissing)(nil),              // 4: pb.SubjectMissing
+	(*SubjectMissingTotalRequest)(nil),  // 5: pb.SubjectMissingTotalRequest
+	(*SubjectMissingTotalResponse)(nil), // 6: pb.SubjectMissingTotalResponse
+	(*SectionTitleRequest)(nil),         // 7: pb.SectionTitleRequest
+	(*TopicItem)(nil),                   // 8: pb.TopicItem
+	(*SectionTopicsResponse)(nil),       // 9: pb.SectionTopicsResponse
+	(*SubjectSectionsRequest)(nil),      // 10: pb.SubjectSectionsRequest
+	(*SectionItem)(nil),                 // 11: pb.SectionItem
+	(*SubjectSectionsResponse)(nil),     // 12: pb.SubjectSectionsResponse
+	(*ListSubjectsRequest)(nil),         // 13: pb.ListSubjectsRequest
+	(*ListSubjectsResponse)(nil),        // 14: pb.ListSubjectsResponse
+	(*CreatePaymentRequest)(nil),        // 15: pb.CreatePaymentRequest
+	(*CreatePaymentResponse)(nil),       // 16: pb.CreatePaymentResponse
+	(*SaveSectionRequest)(nil),          // 17: pb.SaveSectionRequest
+	(*SaveSectionResponse)(nil),         // 18: pb.SaveSectionResponse
+	(*UserRequest)(nil),                 // 19: pb.UserRequest
+	(*UserSectionsResponse)(nil),        // 20: pb.UserSectionsResponse
+	(*LoginRequest)(nil),                // 21: pb.LoginRequest
+	(*LoginResponse)(nil),               // 22: pb.LoginResponse
+	(*VerifyRequest)(nil),               // 23: pb.VerifyRequest
+	(*VerifyResponse)(nil),              // 24: pb.VerifyResponse
+	(*SaveUserRequest)(nil),             // 25: pb.SaveUserRequest
+	(*CheckUserResponse)(nil),           // 26: pb.CheckUserResponse
+	(*SaveUserResponse)(nil),            // 27: pb.SaveUserResponse
+	nil,                                 // 28: pb.MissingSectionsResponse.ResultEntry
 }
 var file_proto_hello_proto_depIdxs = []int32{
-	26, // 0: pb.MissingSectionsResponse.result:type_name -> pb.MissingSectionsResponse.ResultEntry
-	6,  // 1: pb.SectionTopicsResponse.topics:type_name -> pb.TopicItem
-	9,  // 2: pb.SubjectSectionsResponse.sections:type_name -> pb.SectionItem
-	2,  // 3: pb.MissingSectionsResponse.ResultEntry.value:type_name -> pb.SubjectMissing
-	19, // 4: pb.AuthService.Login:input_type -> pb.LoginRequest
-	21, // 5: pb.AuthService.VerifyToken:input_type -> pb.VerifyRequest
-	23, // 6: pb.AuthService.Register:input_type -> pb.SaveUserRequest
-	17, // 7: pb.AuthService.CheckUser:input_type -> pb.UserRequest
-	0,  // 8: pb.CourseService.MissingSectionsBySubjects:input_type -> pb.MissingSectionsRequest
-	3,  // 9: pb.CourseService.SubjectMissingTotal:input_type -> pb.SubjectMissingTotalRequest
-	17, // 10: pb.CourseService.GetUserSections:input_type -> pb.UserRequest
-	15, // 11: pb.CourseService.AddSection:input_type -> pb.SaveSectionRequest
-	11, // 12: pb.CourseService.GetListSubjects:input_type -> pb.ListSubjectsRequest
-	8,  // 13: pb.CourseService.GetSubjectSections:input_type -> pb.SubjectSectionsRequest
-	5,  // 14: pb.CourseService.GetTopicsBySectionTitle:input_type -> pb.SectionTitleRequest
-	13, // 15: pb.PaymentService.CreatePayment:input_type -> pb.CreatePaymentRequest
-	20, // 16: pb.AuthService.Login:output_type -> pb.LoginResponse
-	22, // 17: pb.AuthService.VerifyToken:output_type -> pb.VerifyResponse
-	25, // 18: pb.AuthService.Register:output_type -> pb.SaveUserResponse
-	24, // 19: pb.AuthService.CheckUser:output_type -> pb.CheckUserResponse
-	1,  // 20: pb.CourseService.MissingSectionsBySubjects:output_type -> pb.MissingSectionsResponse
-	4,  // 21: pb.CourseService.SubjectMissingTotal:output_type -> pb.SubjectMissingTotalResponse
-	18, // 22: pb.CourseService.GetUserSections:output_type -> pb.UserSectionsResponse
-	16, // 23: pb.CourseService.AddSection:output_type -> pb.SaveSectionResponse
-	12, // 24: pb.CourseService.GetListSubjects:output_type -> pb.ListSubjectsResponse
-	10, // 25: pb.CourseService.GetSubjectSections:output_type -> pb.SubjectSectionsResponse
-	7,  // 26: pb.CourseService.GetTopicsBySectionTitle:output_type -> pb.SectionTopicsResponse
-	14, // 27: pb.PaymentService.CreatePayment:output_type -> pb.CreatePaymentResponse
-	16, // [16:28] is the sub-list for method output_type
-	4,  // [4:16] is the sub-list for method input_type
+	28, // 0: pb.MissingSectionsResponse.result:type_name -> pb.MissingSectionsResponse.ResultEntry
+	8,  // 1: pb.SectionTopicsResponse.topics:type_name -> pb.TopicItem
+	11, // 2: pb.SubjectSectionsResponse.sections:type_name -> pb.SectionItem
+	4,  // 3: pb.MissingSectionsResponse.ResultEntry.value:type_name -> pb.SubjectMissing
+	21, // 4: pb.AuthService.Login:input_type -> pb.LoginRequest
+	23, // 5: pb.AuthService.VerifyToken:input_type -> pb.VerifyRequest
+	25, // 6: pb.AuthService.Register:input_type -> pb.SaveUserRequest
+	19, // 7: pb.AuthService.CheckUser:input_type -> pb.UserRequest
+	2,  // 8: pb.CourseService.MissingSectionsBySubjects:input_type -> pb.MissingSectionsRequest
+	0,  // 9: pb.CourseService.PriceMissingFromList:input_type -> pb.PriceMissingRequest
+	5,  // 10: pb.CourseService.SubjectMissingTotal:input_type -> pb.SubjectMissingTotalRequest
+	19, // 11: pb.CourseService.GetUserSections:input_type -> pb.UserRequest
+	17, // 12: pb.CourseService.AddSection:input_type -> pb.SaveSectionRequest
+	13, // 13: pb.CourseService.GetListSubjects:input_type -> pb.ListSubjectsRequest
+	10, // 14: pb.CourseService.GetSubjectSections:input_type -> pb.SubjectSectionsRequest
+	7,  // 15: pb.CourseService.GetTopicsBySectionTitle:input_type -> pb.SectionTitleRequest
+	15, // 16: pb.PaymentService.CreatePayment:input_type -> pb.CreatePaymentRequest
+	22, // 17: pb.AuthService.Login:output_type -> pb.LoginResponse
+	24, // 18: pb.AuthService.VerifyToken:output_type -> pb.VerifyResponse
+	27, // 19: pb.AuthService.Register:output_type -> pb.SaveUserResponse
+	26, // 20: pb.AuthService.CheckUser:output_type -> pb.CheckUserResponse
+	3,  // 21: pb.CourseService.MissingSectionsBySubjects:output_type -> pb.MissingSectionsResponse
+	1,  // 22: pb.CourseService.PriceMissingFromList:output_type -> pb.PriceMissingResponse
+	6,  // 23: pb.CourseService.SubjectMissingTotal:output_type -> pb.SubjectMissingTotalResponse
+	20, // 24: pb.CourseService.GetUserSections:output_type -> pb.UserSectionsResponse
+	18, // 25: pb.CourseService.AddSection:output_type -> pb.SaveSectionResponse
+	14, // 26: pb.CourseService.GetListSubjects:output_type -> pb.ListSubjectsResponse
+	12, // 27: pb.CourseService.GetSubjectSections:output_type -> pb.SubjectSectionsResponse
+	9,  // 28: pb.CourseService.GetTopicsBySectionTitle:output_type -> pb.SectionTopicsResponse
+	16, // 29: pb.PaymentService.CreatePayment:output_type -> pb.CreatePaymentResponse
+	17, // [17:30] is the sub-list for method output_type
+	4,  // [4:17] is the sub-list for method input_type
 	4,  // [4:4] is the sub-list for extension type_name
 	4,  // [4:4] is the sub-list for extension extendee
 	0,  // [0:4] is the sub-list for field type_name
@@ -1501,7 +1634,7 @@ func file_proto_hello_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_hello_proto_rawDesc), len(file_proto_hello_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   27,
+			NumMessages:   29,
 			NumExtensions: 0,
 			NumServices:   3,
 		},

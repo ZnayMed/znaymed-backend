@@ -18,7 +18,7 @@ service AuthService {
 
 service CourseService{
   rpc MissingSectionsBySubjects (MissingSectionsRequest) returns (MissingSectionsResponse);
-
+  rpc PriceMissingFromList (PriceMissingRequest) returns (PriceMissingResponse);
   rpc SubjectMissingTotal (SubjectMissingTotalRequest) returns (SubjectMissingTotalResponse);
 
   rpc GetUserSections (UserRequest) returns (UserSectionsResponse);
@@ -31,6 +31,16 @@ service PaymentService {
   rpc CreatePayment (CreatePaymentRequest) returns (CreatePaymentResponse);
 }
 
+message PriceMissingRequest {
+  string tgid = 1;
+  repeated string sections = 2;
+}
+
+message PriceMissingResponse {
+  repeated string missing_sections = 1;
+  int64 total_kopeck = 2;
+  string currency = 3;
+}
 
 message MissingSectionsRequest {
   string tgid = 1;
@@ -98,6 +108,7 @@ message ListSubjectsResponse {
 message CreatePaymentRequest {
   string tgid = 1;
   repeated string course_ids = 2;
+  int64 amount_kopeck = 3;
 }
 
 message CreatePaymentResponse {
