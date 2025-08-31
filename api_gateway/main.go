@@ -23,7 +23,6 @@ func main() {
 			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
-
 		var req struct {
 			TgID     string   `json:"tgid"`
 			Subjects []string `json:"subjects"`
@@ -39,14 +38,13 @@ func main() {
 			return
 		}
 		defer cConn.Close()
-
 		cClient := pb.NewCourseServiceClient(cConn)
+
 		ctxCourse, cancelCourse := context.WithTimeout(context.Background(), 3*time.Second)
 		defer cancelCourse()
 
 		cResp, err := cClient.MissingSectionsBySubjects(ctxCourse, &pb.MissingSectionsRequest{
-			Tgid:     req.TgID,
-			Subjects: req.Subjects,
+			Tgid: req.TgID, Subjects: req.Subjects,
 		})
 		if err != nil {
 			http.Error(w, "MissingSectionsBySubjects failed", http.StatusInternalServerError)
@@ -54,21 +52,51 @@ func main() {
 		}
 
 		bySubject := make(map[string][]string, len(cResp.Result))
-		var sections []string
+		seen := make(map[string]struct{})
+		var missingSections []string
 		for subj, pack := range cResp.Result {
-			if pack == nil || len(pack.SectionIds) == 0 {
+			if pack == nil {
 				continue
 			}
-			bySubject[subj] = append([]string(nil), pack.SectionIds...)
-			sections = append(sections, pack.SectionIds...)
+			for _, s := range pack.SectionIds {
+				if _, ok := seen[s]; ok {
+					continue
+				}
+				seen[s] = struct{}{}
+				missingSections = append(missingSections, s)
+				bySubject[subj] = append(bySubject[subj], s)
+			}
 		}
-
-		if len(sections) == 0 {
+		if len(missingSections) == 0 {
 			w.Header().Set("Content-Type", "application/json")
 			_ = json.NewEncoder(w).Encode(map[string]any{
-				"message":    "nothing to buy: all sections already owned",
-				"sections":   []string{},
-				"by_subject": bySubject,
+				"message":      "nothing to buy: all sections already owned",
+				"sections":     []string{},
+				"by_subject":   bySubject,
+				"total_kopeck": 0,
+				"currency":     "RUB",
+			})
+			return
+		}
+
+		priceResp, err := cClient.PriceMissingFromList(ctxCourse, &pb.PriceMissingRequest{
+			Tgid: req.TgID, Sections: missingSections,
+		})
+		if err != nil {
+			http.Error(w, "PriceMissingFromList failed", http.StatusInternalServerError)
+			return
+		}
+
+		missingForPayment := priceResp.MissingSections
+		total := priceResp.TotalKopeck
+		if len(missingForPayment) == 0 || total <= 0 {
+			w.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"message":      "nothing to buy after price check",
+				"sections":     []string{},
+				"by_subject":   bySubject,
+				"total_kopeck": 0,
+				"currency":     "RUB",
 			})
 			return
 		}
@@ -79,14 +107,15 @@ func main() {
 			return
 		}
 		defer pConn.Close()
-
 		pClient := pb.NewPaymentServiceClient(pConn)
+
 		ctxPay, cancelPay := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancelPay()
 
 		pResp, err := pClient.CreatePayment(ctxPay, &pb.CreatePaymentRequest{
-			Tgid:      req.TgID,
-			CourseIds: sections,
+			Tgid:         req.TgID,
+			CourseIds:    missingForPayment,
+			AmountKopeck: total,
 		})
 		if err != nil {
 			log.Println("CreatePayment RPC failed:", err)
@@ -96,11 +125,13 @@ func main() {
 
 		w.Header().Set("Content-Type", "application/json")
 		_ = json.NewEncoder(w).Encode(map[string]any{
-			"payment_id":  pResp.PaymentId,
-			"payment_url": pResp.PaymentUrl,
-			"status":      pResp.Status,
-			"sections":    sections,
-			"by_subject":  bySubject,
+			"payment_id":   pResp.PaymentId,
+			"payment_url":  pResp.PaymentUrl,
+			"status":       pResp.Status,
+			"sections":     missingForPayment,
+			"by_subject":   bySubject,
+			"total_kopeck": total,
+			"currency":     priceResp.Currency,
 		})
 	})
 
@@ -473,7 +504,6 @@ func main() {
 			return
 		}
 
-		// собрать входной список
 		courseIDs := req.Sections
 		if len(courseIDs) == 0 && strings.TrimSpace(req.Section) != "" {
 			courseIDs = []string{strings.TrimSpace(req.Section)}
@@ -483,7 +513,6 @@ func main() {
 			return
 		}
 
-		// 1) CourseService: считаем стоимость некупленных из списка
 		cConn, err := grpc.Dial(addrCourse, grpc.WithInsecure())
 		if err != nil {
 			http.Error(w, "gRPC connect to course failed", http.StatusInternalServerError)
@@ -509,7 +538,6 @@ func main() {
 		total := priceResp.TotalKopeck
 		currency := priceResp.Currency
 
-		// если нечего покупать — сразу ответ
 		if len(missing) == 0 || total <= 0 {
 			w.Header().Set("Content-Type", "application/json")
 			_ = json.NewEncoder(w).Encode(map[string]any{
@@ -521,7 +549,6 @@ func main() {
 			return
 		}
 
-		// 2) PaymentService: создаём платёж с этой суммой
 		pConn, err := grpc.Dial(addrPayment, grpc.WithInsecure())
 		if err != nil {
 			http.Error(w, "gRPC connect to payment failed", http.StatusInternalServerError)
@@ -535,8 +562,8 @@ func main() {
 
 		pResp, err := pClient.CreatePayment(ctxPay, &pb.CreatePaymentRequest{
 			Tgid:         req.TgID,
-			CourseIds:    missing, // оплачиваем только то, чего нет
-			AmountKopeck: total,   // сумма из course-service
+			CourseIds:    missing,
+			AmountKopeck: total,
 		})
 		if err != nil {
 			log.Println("CreatePayment RPC failed:", err)
@@ -544,7 +571,6 @@ func main() {
 			return
 		}
 
-		// 3) Ответ клиенту
 		w.Header().Set("Content-Type", "application/json")
 		_ = json.NewEncoder(w).Encode(map[string]any{
 			"payment_id":       pResp.PaymentId,
