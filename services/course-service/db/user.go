@@ -5,4 +5,5 @@ type User struct {
 	Name      string
 	TgID      string `gorm:"column:tgid"`
 	Birthdate string
+	IsAdmin   bool `gorm:"default:false"`
 }
