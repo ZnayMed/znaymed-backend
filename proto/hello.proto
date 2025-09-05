@@ -7,13 +7,12 @@ option go_package = "./;pb";
 
 
 
-
-
 service AuthService {
   rpc Login      (LoginRequest)      returns (LoginResponse);
   rpc VerifyToken(VerifyRequest)     returns (VerifyResponse);
   rpc Register   (SaveUserRequest)   returns (SaveUserResponse);
   rpc CheckUser  (UserRequest)       returns (CheckUserResponse);
+  rpc IsAdmin     (UserRequest)       returns (IsAdminResponse);
 }
 
 service CourseService{
@@ -71,11 +70,11 @@ message SectionTitleRequest {
 }
 
 message TopicItem {
-  int64  id          = 1;
-  int64  section_id  = 2;
-  string title       = 3;
+  int64  id = 1;
+  int64  section_id = 2;
+  string title = 3;
   string description = 4;
-  string tg_id       = 5;
+  string tg_id = 5;
   string mindmap_url = 6;
 }
 
@@ -116,7 +115,6 @@ message CreatePaymentResponse {
   string payment_url = 2;
   string status = 3;
 }
-
 
 message SaveSectionRequest{
   string tgid = 1;
@@ -160,6 +158,10 @@ message SaveUserRequest {
 
 message CheckUserResponse {
   bool exists = 1;
+}
+
+message IsAdminResponse {
+  bool is_admin = 1;
 }
 
 message SaveUserResponse {

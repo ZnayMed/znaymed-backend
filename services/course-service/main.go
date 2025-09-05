@@ -576,7 +576,12 @@ func main() {
 	//redis
 	ctx := context.Background()
 	rdb := rediscourse.New()
-	rediscourse.FillData(ctx, rdb)
+
+	//rediscourse.FillData(ctx, rdb)
+
+	if err := rediscourse.FillRedisFromDB(ctx, database, rdb); err != nil {
+		log.Fatalf("fill redis from db failed: %v", err)
+	}
 
 	//kafka
 	StartKafkaConsumer(database, ctx, rdb)

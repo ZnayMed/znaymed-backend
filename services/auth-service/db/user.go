@@ -11,6 +11,7 @@ type User struct {
 	Name      string
 	TgID      string `gorm:"column:tgid"`
 	Birthdate string
+	IsAdmin   bool `gorm:"default:false"`
 }
 
 func (d *Database) UserExists(tgid string) (bool, error) {
@@ -39,4 +40,20 @@ func (d *Database) SaveUser(name, tgid, birthdate string) error {
 		return err
 	}
 	return nil
+}
+
+func (d *Database) IsAdminByTGIDHash(tgidHash string) (bool, error) {
+	var u User
+	if err := d.DB.
+		Select("is_admin").
+		Where("tgid = ?", tgidHash).
+		First(&u).Error; err != nil {
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// Пользователь не найден => точно не админ
+			return false, nil
+		}
+		return false, fmt.Errorf("db query error: %w", err)
+	}
+	return u.IsAdmin, nil
 }

@@ -75,6 +75,33 @@ func (s *authServer) CheckUser(ctx context.Context, req *pb.UserRequest) (*pb.Ch
 	return &pb.CheckUserResponse{Exists: true}, nil
 }
 
+func (s *authServer) IsAdmin(ctx context.Context, req *pb.UserRequest) (*pb.IsAdminResponse, error) {
+	tgid := req.Tgid
+	hashTgid := hashTGID(tgid)
+
+	// Быстро пробуем отдать из Redis (опционально — если хочешь кэшировать):
+	// key := "user:" + tgid + ":admin"
+	// if s.rdb != nil {
+	//     if val, err := s.rdb.Get(ctx, key).Result(); err == nil && (val == "1" || val == "true") {
+	//         return &pb.IsAdminResponse{IsAdmin: true}, nil
+	//     }
+	// }
+
+	isAdmin, err := s.db.IsAdminByTGIDHash(hashTgid)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "db error: %v", err)
+	}
+
+	// Кэшируем (опционально):
+	// if s.rdb != nil {
+	//     v := "0"
+	//     if isAdmin { v = "1" }
+	//     _ = s.rdb.SetEx(ctx, key, v, userTTL).Err()
+	// }
+
+	return &pb.IsAdminResponse{IsAdmin: isAdmin}, nil
+}
+
 //func (s *authServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
 //	if req.Username != "admin" || req.Password != "password" {
 //		return nil, grpc.Errorf(401, "invalid credentials")

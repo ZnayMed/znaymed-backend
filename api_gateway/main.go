@@ -271,6 +271,37 @@ func main() {
 		_ = json.NewEncoder(w).Encode(map[string]bool{"exists": resp.Exists})
 	})
 
+	http.HandleFunc("/is_admin", func(w http.ResponseWriter, r *http.Request) {
+		tgid := r.URL.Query().Get("tgid")
+		if strings.TrimSpace(tgid) == "" {
+			http.Error(w, "missing tgid", http.StatusBadRequest)
+			return
+		}
+
+		conn, err := grpc.Dial(addrAuth, grpc.WithInsecure())
+		if err != nil {
+			http.Error(w, "gRPC connect failed", http.StatusInternalServerError)
+			return
+		}
+		defer conn.Close()
+
+		client := pb.NewAuthServiceClient(conn)
+
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+
+		resp, err := client.IsAdmin(ctx, &pb.UserRequest{Tgid: tgid})
+		if err != nil {
+			http.Error(w, "IsAdmin failed", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(map[string]bool{
+			"is_admin": resp.IsAdmin,
+		})
+	})
+
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		var req struct {
 			Username string `json:"username"`
