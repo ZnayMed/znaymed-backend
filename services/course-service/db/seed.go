@@ -12,7 +12,7 @@ func seedInitialData(db *gorm.DB) error {
 				{
 					Title:       "Алгебра",
 					Description: "Основы алгебры: выражения, уравнения, функции",
-					PriceKopeck: 19900, // 199 руб
+					PriceKopeck: 100, // 199 руб
 					Topics: []Topic{
 						{Title: "Линейные уравнения", Description: "ax + b = 0", TgID: "tg_math_lin", MindmapURL: "https://mindmap.example.com/lin"},
 						{Title: "Квадратные уравнения", Description: "ax² + bx + c = 0", TgID: "tg_math_quad", MindmapURL: "https://mindmap.example.com/quad"},
@@ -21,7 +21,7 @@ func seedInitialData(db *gorm.DB) error {
 				{
 					Title:       "Геометрия",
 					Description: "Планиметрия и стереометрия",
-					PriceKopeck: 24900, // 249 руб
+					PriceKopeck: 100, // 249 руб
 					Topics: []Topic{
 						{Title: "Треугольники", Description: "Классификация и свойства", TgID: "tg_math_tri", MindmapURL: "https://mindmap.example.com/tri"},
 					},
@@ -34,7 +34,7 @@ func seedInitialData(db *gorm.DB) error {
 				{
 					Title:       "Механика",
 					Description: "Законы Ньютона, кинематика, динамика",
-					PriceKopeck: 29900,
+					PriceKopeck: 100,
 					Topics: []Topic{
 						{Title: "Третий закон Ньютона", Description: "F₁ = −F₂", TgID: "tg_phys_newton3", MindmapURL: "https://mindmap.example.com/n3"},
 					},
@@ -42,7 +42,7 @@ func seedInitialData(db *gorm.DB) error {
 				{
 					Title:       "Оптика",
 					Description: "Свет, линзы, зеркала",
-					PriceKopeck: 15900,
+					PriceKopeck: 100,
 					Topics: []Topic{
 						{Title: "Линзы", Description: "Собирательные и рассеивающие", TgID: "tg_phys_lenses", MindmapURL: "https://mindmap.example.com/lens"},
 					},
@@ -55,7 +55,7 @@ func seedInitialData(db *gorm.DB) error {
 				{
 					Title:       "Органическая химия",
 					Description: "Углеводороды, функциональные группы",
-					PriceKopeck: 18900,
+					PriceKopeck: 100,
 					Topics: []Topic{
 						{Title: "Алканы", Description: "CnH₂n+2", TgID: "tg_chem_alkanes", MindmapURL: "https://mindmap.example.com/alk"},
 					},
@@ -63,7 +63,7 @@ func seedInitialData(db *gorm.DB) error {
 				{
 					Title:       "Неорганическая химия",
 					Description: "Соли, оксиды, кислоты",
-					PriceKopeck: 17900,
+					PriceKopeck: 100,
 					Topics: []Topic{
 						{Title: "Кислоты", Description: "Сильные и слабые", TgID: "tg_chem_acids", MindmapURL: "https://mindmap.example.com/acid"},
 					},
