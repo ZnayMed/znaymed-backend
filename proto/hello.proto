@@ -153,7 +153,7 @@ message VerifyResponse{
 message SaveUserRequest {
   string name = 1;
   string tgid = 2;
-  string birthdate = 3;
+  string email = 3;
 }
 
 message CheckUserResponse {

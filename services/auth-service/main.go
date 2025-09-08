@@ -130,9 +130,9 @@ func (s *authServer) IsAdmin(ctx context.Context, req *pb.UserRequest) (*pb.IsAd
 
 func (s *authServer) Register(ctx context.Context, req *pb.SaveUserRequest) (*pb.SaveUserResponse, error) {
 	hashName := hashTGID(req.Tgid)
-	log.Printf("Пытаемся сохранить: name=%s, hashTgid=%s, birthdate=%s", req.Name, hashName, req.Birthdate)
+	log.Printf("Пытаемся сохранить: name=%s, hashTgid=%s, email=%s", req.Name, hashName, req.Email)
 
-	if err := s.db.SaveUser(req.Name, hashName, req.Birthdate); err != nil {
+	if err := s.db.SaveUser(req.Name, hashName, req.Email); err != nil {
 		log.Println("Ошибка при сохранении:", err)
 		return &pb.SaveUserResponse{Success: false, Message: err.Error()}, err
 	}

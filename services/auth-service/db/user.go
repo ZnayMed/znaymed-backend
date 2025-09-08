@@ -3,15 +3,16 @@ package db
 import (
 	"errors"
 	"fmt"
+
 	"gorm.io/gorm"
 )
 
 type User struct {
-	ID        uint `gorm:"primaryKey"`
-	Name      string
-	TgID      string `gorm:"column:tgid"`
-	Birthdate string
-	IsAdmin   bool `gorm:"default:false"`
+	ID      uint `gorm:"primaryKey"`
+	Name    string
+	TgID    string `gorm:"column:tgid"`
+	Email   string // `gorm:"uniqueIndex"` // было: Birthdate string
+	IsAdmin bool   `gorm:"default:false"`
 }
 
 func (d *Database) UserExists(tgid string) (bool, error) {
@@ -22,7 +23,8 @@ func (d *Database) UserExists(tgid string) (bool, error) {
 	return cnt > 0, nil
 }
 
-func (d *Database) SaveUser(name, tgid, birthdate string) error {
+func (d *Database) SaveUser(name, tgid, email string) error {
+	// Проверка на существование по TGID
 	var existing User
 	if err := d.DB.Where("tgid = ?", tgid).First(&existing).Error; err == nil {
 		return fmt.Errorf("пользователь уже зарегистрирован")
@@ -30,10 +32,18 @@ func (d *Database) SaveUser(name, tgid, birthdate string) error {
 		return fmt.Errorf("ошибка при проверке пользователя: %w", err)
 	}
 
+	//// (Опционально) проверка уникальности email
+	//var byEmail User
+	//if err := d.DB.Where("email = ?", email).First(&byEmail).Error; err == nil {
+	//	return fmt.Errorf("email уже занят")
+	//} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+	//	return fmt.Errorf("ошибка при проверке email: %w", err)
+	//}
+
 	user := User{
-		Name:      name,
-		TgID:      tgid,
-		Birthdate: birthdate,
+		Name:  name,
+		TgID:  tgid,
+		Email: email,
 	}
 	if err := d.DB.Create(&user).Error; err != nil {
 		fmt.Println("GORM ошибка при сохранении пользователя:", err)
@@ -50,7 +60,6 @@ func (d *Database) IsAdminByTGIDHash(tgidHash string) (bool, error) {
 		First(&u).Error; err != nil {
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			// Пользователь не найден => точно не админ
 			return false, nil
 		}
 		return false, fmt.Errorf("db query error: %w", err)

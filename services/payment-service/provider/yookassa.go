@@ -44,6 +44,27 @@ func getenv(k, def string) string {
 	return def
 }
 
+type Receipt struct {
+	Customer struct {
+		Email string `json:"email,omitempty"`
+		Phone string `json:"phone,omitempty"`
+	} `json:"customer"`
+	Items         []ReceiptItem `json:"items"`
+	TaxSystemCode *int          `json:"tax_system_code,omitempty"`
+}
+
+type ReceiptItem struct {
+	Description string `json:"description"`
+	Quantity    string `json:"quantity"` // "1.00"
+	Amount      struct {
+		Value    string `json:"value"`    // "1.00"
+		Currency string `json:"currency"` // "RUB"
+	} `json:"amount"`
+	VatCode        int    `json:"vat_code"`                  // 1=без НДС (проверь под свой магазин)
+	PaymentSubject string `json:"payment_subject,omitempty"` // "service"
+	PaymentMode    string `json:"payment_mode,omitempty"`    // "full_payment"
+}
+
 type CreatePaymentReq struct {
 	Amount struct {
 		Value    string `json:"value"`
@@ -56,6 +77,7 @@ type CreatePaymentReq struct {
 		ReturnURL string `json:"return_url"`
 	} `json:"confirmation"`
 	Metadata map[string]string `json:"metadata,omitempty"`
+	Receipt  *Receipt          `json:"receipt,omitempty"` // <— НОВОЕ
 }
 
 type CreatePaymentResp struct {

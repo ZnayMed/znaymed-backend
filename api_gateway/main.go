@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"net/mail"
 	"os"
 	"strings"
 	"time"
@@ -368,13 +369,21 @@ func main() {
 
 	http.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
 		var req struct {
-			Name      string `json:"name"`
-			TgID      string `json:"tgid"`
-			Birthdate string `json:"birthdate"`
+			Name  string `json:"name"`
+			TgID  string `json:"tgid"`
+			Email string `json:"email"`
 		}
 
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, "invalid JSON", http.StatusBadRequest)
+			return
+		}
+		if req.Name == "" || req.TgID == "" || req.Email == "" {
+			http.Error(w, "name, tgid and email are required", http.StatusBadRequest)
+			return
+		}
+		if _, err := mail.ParseAddress(req.Email); err != nil {
+			http.Error(w, "invalid email", http.StatusBadRequest)
 			return
 		}
 
@@ -391,9 +400,9 @@ func main() {
 		defer cancel()
 
 		resp, err := client.Register(ctx, &pb.SaveUserRequest{
-			Name:      req.Name,
-			Tgid:      req.TgID,
-			Birthdate: req.Birthdate,
+			Name:  req.Name,
+			Tgid:  req.TgID,
+			Email: req.Email,
 		})
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -412,7 +421,6 @@ func main() {
 			})
 			return
 		}
-
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"success": true,

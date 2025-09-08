@@ -1277,7 +1277,7 @@ type SaveUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Tgid          string                 `protobuf:"bytes,2,opt,name=tgid,proto3" json:"tgid,omitempty"`
-	Birthdate     string                 `protobuf:"bytes,3,opt,name=birthdate,proto3" json:"birthdate,omitempty"`
+	Email         string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1326,9 +1326,9 @@ func (x *SaveUserRequest) GetTgid() string {
 	return ""
 }
 
-func (x *SaveUserRequest) GetBirthdate() string {
+func (x *SaveUserRequest) GetEmail() string {
 	if x != nil {
-		return x.Birthdate
+		return x.Email
 	}
 	return ""
 }
@@ -1557,11 +1557,11 @@ const file_hello_proto_rawDesc = "" +
 	"\rVerifyRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\"&\n" +
 	"\x0eVerifyResponse\x12\x14\n" +
-	"\x05valid\x18\x01 \x01(\bR\x05valid\"W\n" +
+	"\x05valid\x18\x01 \x01(\bR\x05valid\"O\n" +
 	"\x0fSaveUserRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x12\n" +
-	"\x04tgid\x18\x02 \x01(\tR\x04tgid\x12\x1c\n" +
-	"\tbirthdate\x18\x03 \x01(\tR\tbirthdate\"+\n" +
+	"\x04tgid\x18\x02 \x01(\tR\x04tgid\x12\x14\n" +
+	"\x05email\x18\x03 \x01(\tR\x05email\"+\n" +
 	"\x11CheckUserResponse\x12\x16\n" +
 	"\x06exists\x18\x01 \x01(\bR\x06exists\",\n" +
 	"\x0fIsAdminResponse\x12\x19\n" +

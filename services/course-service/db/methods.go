@@ -149,8 +149,6 @@ func GetTopicsBySectionID(ctx context.Context, gdb *gorm.DB, sectionID uint) ([]
 	return topics, nil
 }
 
-// ===== НОВОЕ: цена раздела по НАЗВАНИЮ (в копейках)
-// Если колонки price_kopeck нет — вернёт 0 (GORM просто проскочит поле).
 func (d *Database) GetSectionPriceKopeckByTitle(ctx context.Context, sectionTitle string) (int64, error) {
 	var price int64
 	err := d.DB.WithContext(ctx).
