@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	pb "github.com/ZnayMed/znaymed-backend/pb"
 	"github.com/ZnayMed/znaymed-backend/services/auth-service/db"
 	redisauth "github.com/ZnayMed/znaymed-backend/services/auth-service/redis"
@@ -11,6 +12,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"gorm.io/gorm"
 	"log"
 	"net"
 	"time"
@@ -22,6 +24,23 @@ type authServer struct {
 	pb.UnimplementedAuthServiceServer
 	db  *db.Database
 	rdb *goredis.Client
+}
+
+func (s *authServer) GetUser(ctx context.Context, req *pb.UserRequest) (*pb.UserInfo, error) {
+	hashTgid := hashTGID(req.Tgid)
+	u, err := s.db.GetUserByTGIDHash(hashTgid)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return &pb.UserInfo{}, nil
+		}
+		return nil, status.Errorf(codes.Internal, "db error: %v", err)
+	}
+	return &pb.UserInfo{
+		Name:    u.Name,
+		Tgid:    req.Tgid, // возвращаем исходный, не хэш
+		Email:   u.Email,
+		IsAdmin: u.IsAdmin,
+	}, nil
 }
 
 func (s *authServer) CheckUser(ctx context.Context, req *pb.UserRequest) (*pb.CheckUserResponse, error) {

@@ -68,6 +68,22 @@ func basketKey(courseIDs []string) string {
 	return "MULTI:" + strings.Join(courseIDs, "|")
 }
 
+func lookupEmailByTgID(ctx context.Context, tgid string) string {
+	addrAuth := os.Getenv("AUTH_SERVICE_ADDR")
+	conn, err := grpc.DialContext(ctx, addrAuth, grpc.WithInsecure())
+	if err != nil {
+		return ""
+	}
+	defer conn.Close()
+
+	client := pb.NewAuthServiceClient(conn)
+	resp, err := client.GetUser(ctx, &pb.UserRequest{Tgid: tgid})
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(resp.Email)
+}
+
 func normalizeCourses(in []string) []string {
 	seen := make(map[string]struct{}, len(in))
 	out := make([]string, 0, len(in))

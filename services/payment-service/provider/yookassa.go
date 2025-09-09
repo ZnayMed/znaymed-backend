@@ -9,6 +9,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -17,6 +19,11 @@ type YooKassa struct {
 	shopID    string
 	secretKey string
 	client    *http.Client
+
+	vatCode        int    // напр. 1 = без НДС
+	taxSystemCode  *int   // может быть nil
+	paymentSubject string // "service"
+	paymentMode    string // "full_payment"
 }
 
 func NewYooKassa() *YooKassa {
@@ -25,11 +32,17 @@ func NewYooKassa() *YooKassa {
 		shopID:    os.Getenv("YOOKASSA_SHOP_ID"),
 		secretKey: os.Getenv("YOOKASSA_SECRET"),
 		client:    &http.Client{Timeout: 10 * time.Second},
+
+		vatCode:        getenvInt("YOOKASSA_VAT_CODE", 1),
+		taxSystemCode:  getenvIntPtr("YOOKASSA_TAX_SYSTEM_CODE"),
+		paymentSubject: getenv("YOOKASSA_PAYMENT_SUBJECT", "service"),
+		paymentMode:    getenv("YOOKASSA_PAYMENT_MODE", "full_payment"),
 	}
 	log.Printf("[YooKassa] api=%s shop=%s*** mock=%v return_url=%s",
 		y.apiURL, head(y.shopID), os.Getenv("YOOKASSA_MOCK") == "1", os.Getenv("PUBLIC_RETURN_URL"))
 	return y
 }
+
 func head(s string) string {
 	if len(s) < 3 {
 		return s
@@ -42,6 +55,31 @@ func getenv(k, def string) string {
 		return v
 	}
 	return def
+}
+
+func getenvInt(k string, def int) int {
+	if v := os.Getenv(k); v != "" {
+		if n, err := strconv.Atoi(strings.TrimSpace(v)); err == nil {
+			return n
+		}
+	}
+	return def
+}
+
+func getenvIntPtr(k string) *int {
+	if v := os.Getenv(k); v != "" {
+		if n, err := strconv.Atoi(strings.TrimSpace(v)); err == nil {
+			return &n
+		}
+	}
+	return nil
+}
+
+func truncate(s string, max int) string {
+	if len(s) <= max {
+		return s
+	}
+	return s[:max]
 }
 
 type Receipt struct {

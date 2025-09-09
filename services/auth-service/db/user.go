@@ -15,6 +15,12 @@ type User struct {
 	IsAdmin bool   `gorm:"default:false"`
 }
 
+func (d *Database) GetUserByTGIDHash(tgidHash string) (User, error) {
+	var u User
+	err := d.DB.Where("tgid = ?", tgidHash).First(&u).Error
+	return u, err
+}
+
 func (d *Database) UserExists(tgid string) (bool, error) {
 	var cnt int64
 	if err := d.DB.Model(&User{}).Where("tgid = ?", tgid).Count(&cnt).Error; err != nil {

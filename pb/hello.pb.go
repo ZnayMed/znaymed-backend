@@ -1473,6 +1473,74 @@ func (x *SaveUserResponse) GetMessage() string {
 	return ""
 }
 
+type UserInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Tgid          string                 `protobuf:"bytes,2,opt,name=tgid,proto3" json:"tgid,omitempty"`
+	Email         string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
+	IsAdmin       bool                   `protobuf:"varint,4,opt,name=is_admin,json=isAdmin,proto3" json:"is_admin,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserInfo) Reset() {
+	*x = UserInfo{}
+	mi := &file_hello_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserInfo) ProtoMessage() {}
+
+func (x *UserInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_hello_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserInfo.ProtoReflect.Descriptor instead.
+func (*UserInfo) Descriptor() ([]byte, []int) {
+	return file_hello_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *UserInfo) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UserInfo) GetTgid() string {
+	if x != nil {
+		return x.Tgid
+	}
+	return ""
+}
+
+func (x *UserInfo) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *UserInfo) GetIsAdmin() bool {
+	if x != nil {
+		return x.IsAdmin
+	}
+	return false
+}
+
 var File_hello_proto protoreflect.FileDescriptor
 
 const file_hello_proto_rawDesc = "" +
@@ -1568,13 +1636,19 @@ const file_hello_proto_rawDesc = "" +
 	"\bis_admin\x18\x01 \x01(\bR\aisAdmin\"F\n" +
 	"\x10SaveUserResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage2\x8e\x02\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"c\n" +
+	"\bUserInfo\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x12\n" +
+	"\x04tgid\x18\x02 \x01(\tR\x04tgid\x12\x14\n" +
+	"\x05email\x18\x03 \x01(\tR\x05email\x12\x19\n" +
+	"\bis_admin\x18\x04 \x01(\bR\aisAdmin2\xb8\x02\n" +
 	"\vAuthService\x12,\n" +
 	"\x05Login\x12\x10.pb.LoginRequest\x1a\x11.pb.LoginResponse\x124\n" +
 	"\vVerifyToken\x12\x11.pb.VerifyRequest\x1a\x12.pb.VerifyResponse\x125\n" +
 	"\bRegister\x12\x13.pb.SaveUserRequest\x1a\x14.pb.SaveUserResponse\x123\n" +
 	"\tCheckUser\x12\x0f.pb.UserRequest\x1a\x15.pb.CheckUserResponse\x12/\n" +
-	"\aIsAdmin\x12\x0f.pb.UserRequest\x1a\x13.pb.IsAdminResponse2\xe9\x04\n" +
+	"\aIsAdmin\x12\x0f.pb.UserRequest\x1a\x13.pb.IsAdminResponse\x12(\n" +
+	"\aGetUser\x12\x0f.pb.UserRequest\x1a\f.pb.UserInfo2\xe9\x04\n" +
 	"\rCourseService\x12T\n" +
 	"\x19MissingSectionsBySubjects\x12\x1a.pb.MissingSectionsRequest\x1a\x1b.pb.MissingSectionsResponse\x12I\n" +
 	"\x14PriceMissingFromList\x12\x17.pb.PriceMissingRequest\x1a\x18.pb.PriceMissingResponse\x12V\n" +
@@ -1600,7 +1674,7 @@ func file_hello_proto_rawDescGZIP() []byte {
 	return file_hello_proto_rawDescData
 }
 
-var file_hello_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
+var file_hello_proto_msgTypes = make([]protoimpl.MessageInfo, 31)
 var file_hello_proto_goTypes = []any{
 	(*PriceMissingRequest)(nil),         // 0: pb.PriceMissingRequest
 	(*PriceMissingResponse)(nil),        // 1: pb.PriceMissingResponse
@@ -1631,10 +1705,11 @@ var file_hello_proto_goTypes = []any{
 	(*CheckUserResponse)(nil),           // 26: pb.CheckUserResponse
 	(*IsAdminResponse)(nil),             // 27: pb.IsAdminResponse
 	(*SaveUserResponse)(nil),            // 28: pb.SaveUserResponse
-	nil,                                 // 29: pb.MissingSectionsResponse.ResultEntry
+	(*UserInfo)(nil),                    // 29: pb.UserInfo
+	nil,                                 // 30: pb.MissingSectionsResponse.ResultEntry
 }
 var file_hello_proto_depIdxs = []int32{
-	29, // 0: pb.MissingSectionsResponse.result:type_name -> pb.MissingSectionsResponse.ResultEntry
+	30, // 0: pb.MissingSectionsResponse.result:type_name -> pb.MissingSectionsResponse.ResultEntry
 	8,  // 1: pb.SectionTopicsResponse.topics:type_name -> pb.TopicItem
 	11, // 2: pb.SubjectSectionsResponse.sections:type_name -> pb.SectionItem
 	4,  // 3: pb.MissingSectionsResponse.ResultEntry.value:type_name -> pb.SubjectMissing
@@ -1643,31 +1718,33 @@ var file_hello_proto_depIdxs = []int32{
 	25, // 6: pb.AuthService.Register:input_type -> pb.SaveUserRequest
 	19, // 7: pb.AuthService.CheckUser:input_type -> pb.UserRequest
 	19, // 8: pb.AuthService.IsAdmin:input_type -> pb.UserRequest
-	2,  // 9: pb.CourseService.MissingSectionsBySubjects:input_type -> pb.MissingSectionsRequest
-	0,  // 10: pb.CourseService.PriceMissingFromList:input_type -> pb.PriceMissingRequest
-	5,  // 11: pb.CourseService.SubjectMissingTotal:input_type -> pb.SubjectMissingTotalRequest
-	19, // 12: pb.CourseService.GetUserSections:input_type -> pb.UserRequest
-	17, // 13: pb.CourseService.AddSection:input_type -> pb.SaveSectionRequest
-	13, // 14: pb.CourseService.GetListSubjects:input_type -> pb.ListSubjectsRequest
-	10, // 15: pb.CourseService.GetSubjectSections:input_type -> pb.SubjectSectionsRequest
-	7,  // 16: pb.CourseService.GetTopicsBySectionTitle:input_type -> pb.SectionTitleRequest
-	15, // 17: pb.PaymentService.CreatePayment:input_type -> pb.CreatePaymentRequest
-	22, // 18: pb.AuthService.Login:output_type -> pb.LoginResponse
-	24, // 19: pb.AuthService.VerifyToken:output_type -> pb.VerifyResponse
-	28, // 20: pb.AuthService.Register:output_type -> pb.SaveUserResponse
-	26, // 21: pb.AuthService.CheckUser:output_type -> pb.CheckUserResponse
-	27, // 22: pb.AuthService.IsAdmin:output_type -> pb.IsAdminResponse
-	3,  // 23: pb.CourseService.MissingSectionsBySubjects:output_type -> pb.MissingSectionsResponse
-	1,  // 24: pb.CourseService.PriceMissingFromList:output_type -> pb.PriceMissingResponse
-	6,  // 25: pb.CourseService.SubjectMissingTotal:output_type -> pb.SubjectMissingTotalResponse
-	20, // 26: pb.CourseService.GetUserSections:output_type -> pb.UserSectionsResponse
-	18, // 27: pb.CourseService.AddSection:output_type -> pb.SaveSectionResponse
-	14, // 28: pb.CourseService.GetListSubjects:output_type -> pb.ListSubjectsResponse
-	12, // 29: pb.CourseService.GetSubjectSections:output_type -> pb.SubjectSectionsResponse
-	9,  // 30: pb.CourseService.GetTopicsBySectionTitle:output_type -> pb.SectionTopicsResponse
-	16, // 31: pb.PaymentService.CreatePayment:output_type -> pb.CreatePaymentResponse
-	18, // [18:32] is the sub-list for method output_type
-	4,  // [4:18] is the sub-list for method input_type
+	19, // 9: pb.AuthService.GetUser:input_type -> pb.UserRequest
+	2,  // 10: pb.CourseService.MissingSectionsBySubjects:input_type -> pb.MissingSectionsRequest
+	0,  // 11: pb.CourseService.PriceMissingFromList:input_type -> pb.PriceMissingRequest
+	5,  // 12: pb.CourseService.SubjectMissingTotal:input_type -> pb.SubjectMissingTotalRequest
+	19, // 13: pb.CourseService.GetUserSections:input_type -> pb.UserRequest
+	17, // 14: pb.CourseService.AddSection:input_type -> pb.SaveSectionRequest
+	13, // 15: pb.CourseService.GetListSubjects:input_type -> pb.ListSubjectsRequest
+	10, // 16: pb.CourseService.GetSubjectSections:input_type -> pb.SubjectSectionsRequest
+	7,  // 17: pb.CourseService.GetTopicsBySectionTitle:input_type -> pb.SectionTitleRequest
+	15, // 18: pb.PaymentService.CreatePayment:input_type -> pb.CreatePaymentRequest
+	22, // 19: pb.AuthService.Login:output_type -> pb.LoginResponse
+	24, // 20: pb.AuthService.VerifyToken:output_type -> pb.VerifyResponse
+	28, // 21: pb.AuthService.Register:output_type -> pb.SaveUserResponse
+	26, // 22: pb.AuthService.CheckUser:output_type -> pb.CheckUserResponse
+	27, // 23: pb.AuthService.IsAdmin:output_type -> pb.IsAdminResponse
+	29, // 24: pb.AuthService.GetUser:output_type -> pb.UserInfo
+	3,  // 25: pb.CourseService.MissingSectionsBySubjects:output_type -> pb.MissingSectionsResponse
+	1,  // 26: pb.CourseService.PriceMissingFromList:output_type -> pb.PriceMissingResponse
+	6,  // 27: pb.CourseService.SubjectMissingTotal:output_type -> pb.SubjectMissingTotalResponse
+	20, // 28: pb.CourseService.GetUserSections:output_type -> pb.UserSectionsResponse
+	18, // 29: pb.CourseService.AddSection:output_type -> pb.SaveSectionResponse
+	14, // 30: pb.CourseService.GetListSubjects:output_type -> pb.ListSubjectsResponse
+	12, // 31: pb.CourseService.GetSubjectSections:output_type -> pb.SubjectSectionsResponse
+	9,  // 32: pb.CourseService.GetTopicsBySectionTitle:output_type -> pb.SectionTopicsResponse
+	16, // 33: pb.PaymentService.CreatePayment:output_type -> pb.CreatePaymentResponse
+	19, // [19:34] is the sub-list for method output_type
+	4,  // [4:19] is the sub-list for method input_type
 	4,  // [4:4] is the sub-list for extension type_name
 	4,  // [4:4] is the sub-list for extension extendee
 	0,  // [0:4] is the sub-list for field type_name
@@ -1684,7 +1761,7 @@ func file_hello_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_hello_proto_rawDesc), len(file_hello_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   30,
+			NumMessages:   31,
 			NumExtensions: 0,
 			NumServices:   3,
 		},

@@ -13,6 +13,7 @@ service AuthService {
   rpc Register   (SaveUserRequest)   returns (SaveUserResponse);
   rpc CheckUser  (UserRequest)       returns (CheckUserResponse);
   rpc IsAdmin     (UserRequest)       returns (IsAdminResponse);
+  rpc GetUser    (UserRequest)       returns (UserInfo);
 }
 
 service CourseService{
@@ -169,3 +170,9 @@ message SaveUserResponse {
   string message = 2;
 }
 
+message UserInfo {
+  string name = 1;
+  string tgid = 2;
+  string email = 3;
+  bool   is_admin = 4;
+}
