@@ -3,12 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/ZnayMed/znaymed-backend/pb"
-	"github.com/ZnayMed/znaymed-backend/services/payment-service/db"
-	"github.com/ZnayMed/znaymed-backend/services/payment-service/provider"
-	"github.com/google/uuid"
-	"github.com/segmentio/kafka-go"
-	"google.golang.org/grpc"
 	"log"
 	"net"
 	"os"
@@ -16,6 +10,13 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/ZnayMed/znaymed-backend/pb"
+	"github.com/ZnayMed/znaymed-backend/services/payment-service/db"
+	"github.com/ZnayMed/znaymed-backend/services/payment-service/provider"
+	"github.com/google/uuid"
+	"github.com/segmentio/kafka-go"
+	"google.golang.org/grpc"
 )
 
 type paymentServer struct {
@@ -68,22 +69,6 @@ func basketKey(courseIDs []string) string {
 	return "MULTI:" + strings.Join(courseIDs, "|")
 }
 
-func lookupEmailByTgID(ctx context.Context, tgid string) string {
-	addrAuth := os.Getenv("AUTH_SERVICE_ADDR")
-	conn, err := grpc.DialContext(ctx, addrAuth, grpc.WithInsecure())
-	if err != nil {
-		return ""
-	}
-	defer conn.Close()
-
-	client := pb.NewAuthServiceClient(conn)
-	resp, err := client.GetUser(ctx, &pb.UserRequest{Tgid: tgid})
-	if err != nil {
-		return ""
-	}
-	return strings.TrimSpace(resp.Email)
-}
-
 func normalizeCourses(in []string) []string {
 	seen := make(map[string]struct{}, len(in))
 	out := make([]string, 0, len(in))
@@ -114,7 +99,7 @@ func (s *paymentServer) CreatePayment(ctx context.Context, req *pb.CreatePayment
 	key := basketKey(courses)
 
 	if p, err := s.db.FindActivePending(req.Tgid, key); err == nil {
-		log.Println("💰 Уже есть активный платеж по корзине, возвращаю ConfirmationURL")
+		log.Println("Уже есть активный платеж по корзине, возвращаю ConfirmationURL")
 		return &pb.CreatePaymentResponse{
 			PaymentId:  p.ID,
 			PaymentUrl: p.ConfirmationURL,
@@ -124,6 +109,11 @@ func (s *paymentServer) CreatePayment(ctx context.Context, req *pb.CreatePayment
 
 	totalK := req.AmountKopeck
 	amountRubStr := fmt.Sprintf("%.2f", float64(totalK)/100.0)
+
+	email := strings.TrimSpace(req.Email)
+	if email == "" {
+		email = "random_email@mail.ru"
+	}
 
 	paymentID := uuid.NewString()
 	idemKey := uuid.NewString()
@@ -159,6 +149,7 @@ func (s *paymentServer) CreatePayment(ctx context.Context, req *pb.CreatePayment
 			"basket_key":          key,
 			"courses":             strings.Join(courses, ","),
 		},
+		email,
 	)
 	if err != nil {
 		log.Println("YooKassa CreatePayment:", err)

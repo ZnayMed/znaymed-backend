@@ -9,6 +9,7 @@ import (
 
 	"github.com/ZnayMed/znaymed-backend/api_gateway/config"
 	"github.com/ZnayMed/znaymed-backend/api_gateway/handlers/common"
+	"github.com/ZnayMed/znaymed-backend/api_gateway/utils/authutil"
 	pb "github.com/ZnayMed/znaymed-backend/pb"
 	"google.golang.org/grpc"
 )
@@ -36,7 +37,6 @@ func CreatePayment(cfg config.Config) http.HandlerFunc {
 			return
 		}
 
-		// 1) посчитать стоимость и отсеять уже купленные
 		cConn, err := grpc.Dial(cfg.CourseAddr, grpc.WithInsecure())
 		if err != nil {
 			common.Internal(w, "gRPC connect to course failed", err)
@@ -66,7 +66,8 @@ func CreatePayment(cfg config.Config) http.HandlerFunc {
 			return
 		}
 
-		// 2) создать платёж
+		email, err := authutil.GetUserEmail(cfg, req.TgID)
+
 		pConn, err := grpc.Dial(cfg.PaymentAddr, grpc.WithInsecure())
 		if err != nil {
 			common.Internal(w, "gRPC connect to payment failed", err)
@@ -82,6 +83,7 @@ func CreatePayment(cfg config.Config) http.HandlerFunc {
 			Tgid:         req.TgID,
 			CourseIds:    priceResp.MissingSections,
 			AmountKopeck: priceResp.TotalKopeck,
+			Email:        email,
 		})
 		if err != nil {
 			common.Internal(w, "payment create failed", err)

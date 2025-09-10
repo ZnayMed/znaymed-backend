@@ -93,14 +93,14 @@ type Receipt struct {
 
 type ReceiptItem struct {
 	Description string `json:"description"`
-	Quantity    string `json:"quantity"` // "1.00"
+	Quantity    string `json:"quantity"`
 	Amount      struct {
-		Value    string `json:"value"`    // "1.00"
-		Currency string `json:"currency"` // "RUB"
+		Value    string `json:"value"`
+		Currency string `json:"currency"`
 	} `json:"amount"`
-	VatCode        int    `json:"vat_code"`                  // 1=без НДС (проверь под свой магазин)
-	PaymentSubject string `json:"payment_subject,omitempty"` // "service"
-	PaymentMode    string `json:"payment_mode,omitempty"`    // "full_payment"
+	VatCode        int    `json:"vat_code"`
+	PaymentSubject string `json:"payment_subject,omitempty"`
+	PaymentMode    string `json:"payment_mode,omitempty"`
 }
 
 type CreatePaymentReq struct {
@@ -128,19 +128,13 @@ type CreatePaymentResp struct {
 	ExpiresAt *time.Time `json:"expires_at"`
 }
 
-func (y *YooKassa) CreatePayment(ctx context.Context, amountRub string, description, returnURL, idemKey string, metadata map[string]string) (providerID, confirmationURL, status string, expiresAt *time.Time, err error) {
-
-	//if os.Getenv("YOOKASSA_MOCK") == "1" {
-	//	pid := "mock_" + idemKey
-	//	url := getenv("PUBLIC_RETURN_URL", "http://localhost:8081/return")
-	//	if strings.Contains(url, "?") {
-	//		url = url + "&pid=" + pid
-	//	} else {
-	//		url = url + "?pid=" + pid
-	//	}
-	//	return pid, url, "pending", nil, nil
-	//}
-
+func (y *YooKassa) CreatePayment(
+	ctx context.Context,
+	amountRub string,
+	description, returnURL, idemKey string,
+	metadata map[string]string,
+	receiptEmail string,
+) (providerID, confirmationURL, status string, expiresAt *time.Time, err error) {
 	reqBody := CreatePaymentReq{
 		Capture:     true,
 		Description: description,
@@ -151,6 +145,25 @@ func (y *YooKassa) CreatePayment(ctx context.Context, amountRub string, descript
 	reqBody.Confirmation.Type = "redirect"
 	reqBody.Confirmation.ReturnURL = returnURL
 
+	if strings.TrimSpace(receiptEmail) != "" {
+		item := ReceiptItem{
+			Description:    truncate(description, 128),
+			Quantity:       "1.00",
+			VatCode:        y.vatCode,
+			PaymentSubject: y.paymentSubject,
+			PaymentMode:    y.paymentMode,
+		}
+		item.Amount.Value = amountRub
+		item.Amount.Currency = "RUB"
+
+		rec := &Receipt{
+			Items:         []ReceiptItem{item},
+			TaxSystemCode: y.taxSystemCode,
+		}
+		rec.Customer.Email = strings.TrimSpace(receiptEmail)
+		reqBody.Receipt = rec
+	}
+
 	b, _ := json.Marshal(reqBody)
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("%s/payments", y.apiURL), bytes.NewReader(b))
 	if err != nil {
@@ -159,7 +172,6 @@ func (y *YooKassa) CreatePayment(ctx context.Context, amountRub string, descript
 
 	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(y.shopID+":"+y.secretKey)))
 	req.Header.Set("Content-Type", "application/json")
-	// Идемпотентность
 	req.Header.Set("Idempotence-Key", idemKey)
 
 	resp, err := y.client.Do(req)

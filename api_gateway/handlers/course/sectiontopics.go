@@ -1,15 +1,15 @@
 package course
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"time"
 
 	"github.com/ZnayMed/znaymed-backend/api_gateway/config"
 	"github.com/ZnayMed/znaymed-backend/api_gateway/handlers/common"
+	"github.com/ZnayMed/znaymed-backend/api_gateway/utils/courseutil"
+	"github.com/ZnayMed/znaymed-backend/api_gateway/utils/grpcx"
 	pb "github.com/ZnayMed/znaymed-backend/pb"
-	"google.golang.org/grpc"
 )
 
 type sectionTopicsReq struct {
@@ -29,44 +29,41 @@ func SectionTopics(cfg config.Config) http.HandlerFunc {
 			return
 		}
 
-		conn, err := grpc.Dial(cfg.CourseAddr, grpc.WithInsecure())
-		if err != nil {
-			common.Internal(w, "gRPC connect failed", err)
-			return
-		}
-		defer conn.Close()
-		client := pb.NewCourseServiceClient(conn)
+		err := courseutil.WithClient(cfg, 3*time.Second, func(c pb.CourseServiceClient) error {
+			ctx, cancel := grpcx.Context(3 * time.Second)
+			defer cancel()
 
-		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-		defer cancel()
+			resp, err := c.GetTopicsBySectionTitle(ctx, &pb.SectionTitleRequest{
+				SectionTitle: req.SectionTitle,
+			})
+			if err != nil {
+				return err
+			}
 
-		resp, err := client.GetTopicsBySectionTitle(ctx, &pb.SectionTitleRequest{
-			SectionTitle: req.SectionTitle,
+			type topicJSON struct {
+				Title       string `json:"title"`
+				Description string `json:"description"`
+				TgId        string `json:"tg_id"`
+				MindmapUrl  string `json:"mindmap_url"`
+			}
+			out := make([]topicJSON, 0, len(resp.Topics))
+			for _, t := range resp.Topics {
+				out = append(out, topicJSON{
+					Title:       t.Title,
+					Description: t.Description,
+					TgId:        t.TgId,
+					MindmapUrl:  t.MindmapUrl,
+				})
+			}
+
+			common.JSON(w, http.StatusOK, map[string]any{
+				"section_title": req.SectionTitle,
+				"topics":        out,
+			})
+			return nil
 		})
 		if err != nil {
 			common.Internal(w, "GetTopicsBySectionTitle failed", err)
-			return
 		}
-
-		type topicJSON struct {
-			Title       string `json:"title"`
-			Description string `json:"description"`
-			TgId        string `json:"tg_id"`
-			MindmapUrl  string `json:"mindmap_url"`
-		}
-		out := make([]topicJSON, 0, len(resp.Topics))
-		for _, t := range resp.Topics {
-			out = append(out, topicJSON{
-				Title:       t.Title,
-				Description: t.Description,
-				TgId:        t.TgId,
-				MindmapUrl:  t.MindmapUrl,
-			})
-		}
-
-		common.JSON(w, http.StatusOK, map[string]any{
-			"section_title": req.SectionTitle,
-			"topics":        out,
-		})
 	}
 }

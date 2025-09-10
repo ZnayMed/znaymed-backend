@@ -1,15 +1,15 @@
 package course
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"time"
 
 	"github.com/ZnayMed/znaymed-backend/api_gateway/config"
 	"github.com/ZnayMed/znaymed-backend/api_gateway/handlers/common"
+	"github.com/ZnayMed/znaymed-backend/api_gateway/utils/courseutil"
+	"github.com/ZnayMed/znaymed-backend/api_gateway/utils/grpcx"
 	pb "github.com/ZnayMed/znaymed-backend/pb"
-	"google.golang.org/grpc"
 )
 
 type addSectionReq struct {
@@ -25,25 +25,23 @@ func AddSection(cfg config.Config) http.HandlerFunc {
 			return
 		}
 
-		conn, err := grpc.Dial(cfg.CourseAddr, grpc.WithInsecure())
-		if err != nil {
-			common.Internal(w, "gRPC connect failed", err)
-			return
-		}
-		defer conn.Close()
-		client := pb.NewCourseServiceClient(conn)
+		err := courseutil.WithClient(cfg, 3*time.Second, func(c pb.CourseServiceClient) error {
+			ctx, cancel := grpcx.Context(3 * time.Second)
+			defer cancel()
 
-		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-		defer cancel()
+			resp, err := c.AddSection(ctx, &pb.SaveSectionRequest{
+				Tgid:  req.TgID,
+				Title: req.Title,
+			})
+			if err != nil {
+				return err
+			}
 
-		resp, err := client.AddSection(ctx, &pb.SaveSectionRequest{
-			Tgid:  req.TgID,
-			Title: req.Title,
+			common.JSON(w, http.StatusOK, map[string]bool{"success": resp.Success})
+			return nil
 		})
 		if err != nil {
 			common.Internal(w, "AddSection failed", err)
-			return
 		}
-		common.JSON(w, http.StatusOK, map[string]bool{"success": resp.Success})
 	}
 }

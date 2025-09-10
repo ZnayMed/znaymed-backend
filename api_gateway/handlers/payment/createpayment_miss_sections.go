@@ -8,6 +8,7 @@ import (
 
 	"github.com/ZnayMed/znaymed-backend/api_gateway/config"
 	"github.com/ZnayMed/znaymed-backend/api_gateway/handlers/common"
+	"github.com/ZnayMed/znaymed-backend/api_gateway/utils/authutil"
 	pb "github.com/ZnayMed/znaymed-backend/pb"
 	"google.golang.org/grpc"
 )
@@ -29,7 +30,6 @@ func CreatePaymentMissSections(cfg config.Config) http.HandlerFunc {
 			return
 		}
 
-		// 1) найдём недостающие секции по предметам
 		cConn, err := grpc.Dial(cfg.CourseAddr, grpc.WithInsecure())
 		if err != nil {
 			common.Internal(w, "gRPC connect to course failed", err)
@@ -50,7 +50,6 @@ func CreatePaymentMissSections(cfg config.Config) http.HandlerFunc {
 			return
 		}
 
-		// Соберём уникальные секции и разложим по предметам
 		seen := make(map[string]struct{})
 		bySubject := make(map[string][]string, len(missResp.Result))
 		var missingSections []string
@@ -79,7 +78,6 @@ func CreatePaymentMissSections(cfg config.Config) http.HandlerFunc {
 			return
 		}
 
-		// 2) посчитать цену + отсеять уже купленные (на всякий случай)
 		priceResp, err := cClient.PriceMissingFromList(ctxCourse, &pb.PriceMissingRequest{
 			Tgid:     req.TgID,
 			Sections: missingSections,
@@ -88,6 +86,7 @@ func CreatePaymentMissSections(cfg config.Config) http.HandlerFunc {
 			common.Internal(w, "PriceMissingFromList failed", err)
 			return
 		}
+
 		missingForPayment := priceResp.MissingSections
 		total := priceResp.TotalKopeck
 		if len(missingForPayment) == 0 || total <= 0 {
@@ -101,7 +100,8 @@ func CreatePaymentMissSections(cfg config.Config) http.HandlerFunc {
 			return
 		}
 
-		// 3) создать платёж
+		email, err := authutil.GetUserEmail(cfg, req.TgID)
+
 		pConn, err := grpc.Dial(cfg.PaymentAddr, grpc.WithInsecure())
 		if err != nil {
 			common.Internal(w, "gRPC connect to payment failed", err)
@@ -117,6 +117,7 @@ func CreatePaymentMissSections(cfg config.Config) http.HandlerFunc {
 			Tgid:         req.TgID,
 			CourseIds:    missingForPayment,
 			AmountKopeck: total,
+			Email:        email,
 		})
 		if err != nil {
 			common.Internal(w, "payment create failed", err)

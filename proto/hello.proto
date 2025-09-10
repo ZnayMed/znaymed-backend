@@ -20,7 +20,6 @@ service CourseService{
   rpc MissingSectionsBySubjects (MissingSectionsRequest) returns (MissingSectionsResponse);
   rpc PriceMissingFromList (PriceMissingRequest) returns (PriceMissingResponse);
   rpc SubjectMissingTotal (SubjectMissingTotalRequest) returns (SubjectMissingTotalResponse);
-
   rpc GetUserSections (UserRequest) returns (UserSectionsResponse);
   rpc AddSection (SaveSectionRequest) returns (SaveSectionResponse);
   rpc GetListSubjects(ListSubjectsRequest) returns (ListSubjectsResponse);
@@ -109,6 +108,7 @@ message CreatePaymentRequest {
   string tgid = 1;
   repeated string course_ids = 2;
   int64 amount_kopeck = 3;
+  string email = 4;
 }
 
 message CreatePaymentResponse {
