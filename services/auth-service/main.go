@@ -5,6 +5,10 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	"log"
+	"net"
+	"time"
+
 	pb "github.com/ZnayMed/znaymed-backend/pb"
 	"github.com/ZnayMed/znaymed-backend/services/auth-service/db"
 	redisauth "github.com/ZnayMed/znaymed-backend/services/auth-service/redis"
@@ -13,9 +17,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
-	"log"
-	"net"
-	"time"
 )
 
 const userTTL = 3 * time.Hour
@@ -37,7 +38,7 @@ func (s *authServer) GetUser(ctx context.Context, req *pb.UserRequest) (*pb.User
 	}
 	return &pb.UserInfo{
 		Name:    u.Name,
-		Tgid:    req.Tgid, // возвращаем исходный, не хэш
+		Tgid:    req.Tgid,
 		Email:   u.Email,
 		IsAdmin: u.IsAdmin,
 	}, nil
