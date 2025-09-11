@@ -14,6 +14,7 @@ service AuthService {
   rpc CheckUser  (UserRequest)       returns (CheckUserResponse);
   rpc IsAdmin     (UserRequest)       returns (IsAdminResponse);
   rpc GetUser    (UserRequest)       returns (UserInfo);
+  rpc UpdateEmail (UpdateEmailRequest) returns (UpdateEmailResponse);
 }
 
 service CourseService{
@@ -26,6 +27,7 @@ service CourseService{
   rpc GetSubjectSections(SubjectSectionsRequest) returns (SubjectSectionsResponse);
   rpc GetTopicsBySectionTitle (SectionTitleRequest) returns (SectionTopicsResponse);
 }
+
 service PaymentService {
   rpc CreatePayment (CreatePaymentRequest) returns (CreatePaymentResponse);
 }
@@ -175,4 +177,14 @@ message UserInfo {
   string tgid = 2;
   string email = 3;
   bool   is_admin = 4;
+}
+
+message UpdateEmailRequest {
+  string tgid = 1;
+  string new_email = 2;
+}
+
+message UpdateEmailResponse {
+  bool success = 1;
+  string message = 2;
 }

@@ -16,6 +16,7 @@ func RegisterRoutes(mux *http.ServeMux, cfg config.Config) {
 	mux.HandleFunc("/check_user", auth.CheckUser(cfg))
 	mux.HandleFunc("/login", auth.Login(cfg))
 	mux.HandleFunc("/verify", auth.Verify(cfg))
+	mux.HandleFunc("/change_email", auth.ChangeEmail(cfg))
 
 	// course
 	mux.HandleFunc("/listsubjects", course.ListSubjects(cfg))

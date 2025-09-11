@@ -58,6 +58,22 @@ func (d *Database) SaveUser(name, tgid, email string) error {
 	return nil
 }
 
+func (d *Database) UpdateEmailByTGIDHash(tgidHash, newEmail string) error {
+	var u User
+	if err := d.DB.Where("tgid = ?", tgidHash).First(&u).Error; err != nil {
+		return err // пробросим gorm.ErrRecordNotFound как есть
+	}
+
+	// var exists User
+	// if err := d.DB.Where("email = ?", newEmail).First(&exists).Error; err == nil {
+	//     return fmt.Errorf("email already in use")
+	// } else if !errors.Is(err, gorm.ErrRecordNotFound) {
+	//     return fmt.Errorf("db error checking email: %w", err)
+	// }
+
+	return d.DB.Model(&u).Update("email", newEmail).Error
+}
+
 func (d *Database) IsAdminByTGIDHash(tgidHash string) (bool, error) {
 	var u User
 	if err := d.DB.

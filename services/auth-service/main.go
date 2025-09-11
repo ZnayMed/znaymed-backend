@@ -7,6 +7,7 @@ import (
 	"errors"
 	"log"
 	"net"
+	"net/mail"
 	"time"
 
 	pb "github.com/ZnayMed/znaymed-backend/pb"
@@ -167,6 +168,46 @@ func (s *authServer) Register(ctx context.Context, req *pb.SaveUserRequest) (*pb
 	}
 
 	return &pb.SaveUserResponse{Success: true, Message: "Пользователь успешно добавлен"}, nil
+}
+
+func (s *authServer) UpdateEmail(ctx context.Context, req *pb.UpdateEmailRequest) (*pb.UpdateEmailResponse, error) {
+	// Быстрая валидация
+	if req.Tgid == "" || req.NewEmail == "" {
+		return &pb.UpdateEmailResponse{
+			Success: false,
+			Message: "tgid and new_email are required",
+		}, nil
+	}
+
+	// Доп. валидация формата e-mail (на стороне сервера, чтобы быть уверенными)
+	if _, err := mail.ParseAddress(req.NewEmail); err != nil {
+		return &pb.UpdateEmailResponse{
+			Success: false,
+			Message: "invalid email",
+		}, nil
+	}
+
+	hashTgid := hashTGID(req.Tgid)
+	if err := s.db.UpdateEmailByTGIDHash(hashTgid, req.NewEmail); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// Ожидаемая ошибка — вернем success=false без внутренней ошибки
+			return &pb.UpdateEmailResponse{
+				Success: false,
+				Message: "user not found",
+			}, nil
+		}
+		// Неожиданная ошибка — как 500
+		return nil, status.Errorf(codes.Internal, "db error: %v", err)
+	}
+
+	// Кэш Redis трогать не обязательно, он тут ни на что не влияет.
+	// Но если захочешь, можешь поставить маркер существования как в Register:
+	// if s.rdb != nil { _ = redisauth.SetUserExistMarker(ctx, s.rdb, req.Tgid, userTTL) }
+
+	return &pb.UpdateEmailResponse{
+		Success: true,
+		Message: "email updated",
+	}, nil
 }
 
 func hashTGID(tgid string) string {
