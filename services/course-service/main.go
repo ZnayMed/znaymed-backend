@@ -6,6 +6,12 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"log"
+	"net"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/ZnayMed/znaymed-backend/pb"
 	"github.com/ZnayMed/znaymed-backend/services/course-service/db"
 	rediscourse "github.com/ZnayMed/znaymed-backend/services/course-service/redis"
@@ -15,11 +21,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
-	"log"
-	"net"
-	"strconv"
-	"strings"
-	"time"
 )
 
 type courseServer struct {
@@ -576,8 +577,6 @@ func main() {
 	//redis
 	ctx := context.Background()
 	rdb := rediscourse.New()
-
-	//rediscourse.FillData(ctx, rdb)
 
 	if err := rediscourse.FillRedisFromDB(ctx, database, rdb); err != nil {
 		log.Fatalf("fill redis from db failed: %v", err)

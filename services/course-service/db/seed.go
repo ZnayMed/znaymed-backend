@@ -72,6 +72,5 @@ func seedInitialData(db *gorm.DB) error {
 		},
 	}
 
-	// твой остальной код сидера
 	return db.Create(&subjects).Error
 }
