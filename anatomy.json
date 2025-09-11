@@ -1,0 +1,813 @@
+{
+  "Title": "Анатомия",
+  "Sections": [
+    {
+      "Title": "Остеология",
+      "Description": "🦴 Остеология — раздел анатомии, который изучает кости человека и их строение.\n\nВ этом разделе разберём:\n📏 общий план костей и позвонков\n🧍‍♂️ шейные, грудные, поясничные позвонки и крестец\n🫁 рёбра, грудину и кости таза\n💪 кости верхних и нижних конечностей\n🙂 кости черепа\n\n✨ Знания по остеологии — это база для дальнейшего изучения анатомии: скелет задаёт форму тела, обеспечивает движение и защищает внутренние органы.",
+      "PriceKopeck": 300000,
+      "Topics": [
+        {
+          "Title": "База по анатомии",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAIB9Gi67_iWpAbKWdhAX_dfAVSrKhB4AALFfAACuOvZSUQHKKu4ehwyNgQ",
+          "MindmapURL": ""
+        },
+        {
+          "Title": "Общий план строение позвонков",
+          "Description": "https://drive.google.com/file/d/1j_Oo24bpIi05jRLy7yf8D0nYQPDhJOyI/view",
+          "TgID": "BAACAgIAAxkBAAICGWi9S4UOYXfsG54-W3hIoklJZ9dEAAK3ggAC_93oSeNa60sxe7vHNgQ",
+          "MindmapURL": "https://xmind.ai/share/Wrvjy2k5"
+        },
+        {
+          "Title": "Шейные позвонки",
+          "Description": "https://drive.google.com/file/d/1yYOMO6jqdsv0h-F1CbExtgTqW9ndu87e/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICG2i9TD-wnMLH6d9sYUcwjw4GeQSNAALGggAC_93oSYaoYdmDDh_KNgQ",
+          "MindmapURL": "https://xmind.ai/share/Wrvjy2k5"
+        },
+        {
+          "Title": "Грудные позвонки",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICHWi9TGKWoqMOy_nzQC0nFkWSUWtYAALLggAC_93oSVguhOQcpBFYNgQ",
+          "MindmapURL": "https://xmind.ai/share/Wrvjy2k5"
+        },
+        {
+          "Title": "Поясничные позвонки",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICH2i9THnV2L0OM7Zbc-WUCGeNVVTcAALMggAC_93oSZ8xWQgqYIbGNgQ",
+          "MindmapURL": "https://xmind.ai/share/Wrvjy2k5"
+        },
+        {
+          "Title": "Крестец",
+          "Description": "https://drive.google.com/file/d/1JuX-FTaLiF8RlYYv1d1M3tuAPDLh7pbF/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICIWi9TLT8nlO-vgrvBfYv_NO-cYM3AALNggAC_93oSSmdWg4Hp-M2NgQ",
+          "MindmapURL": "https://xmind.ai/share/Wrvjy2k5"
+        },
+        {
+          "Title": "Ребра",
+          "Description": "https://drive.google.com/file/d/1sguTntw95KTGNg-h-szRSPSe3-uaEoqX/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICI2i9T6KcrETK9tZSSD7xSpJcR_tmAAL5ggAC_93oSSMTS1ZoopDFNgQ",
+          "MindmapURL": "https://xmind.ai/share/S6b8JpMN"
+        },
+        {
+          "Title": "Грудина",
+          "Description": "https://drive.google.com/file/d/1RmGtJFAu1HBsI769eLdceC4aZPmIeWql/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICJWi9T8uRMghYz5kVR4RYHICxI9LsAAL8ggAC_93oSYr34Vaka18CNgQ",
+          "MindmapURL": "https://xmind.ai/share/S6b8JpMN"
+        },
+        {
+          "Title": "Тазовая кость",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICJ2i9UDaWuORGGkaDt9gMciVtrajxAAIEgwAC_93oSdmq7O5IOHA_NgQ",
+          "MindmapURL": "https://xmind.ai/share/vwUH7lGN"
+        },
+        {
+          "Title": "Таз в целом",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICKWi9UE6OR115_BqXg4A_fYmfMOlbAAIGgwAC_93oSRW4DAHLaUDyNgQ",
+          "MindmapURL": "https://xmind.ai/share/vwUH7lGN"
+        },
+        {
+          "Title": "Лопатка",
+          "Description": "https://drive.google.com/file/d/1EGSDONtk2GOIhWP4-dW8a38IMBldJnb5/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICK2i9UIrA4eMSl9s92b4mp3z3XZ-nAAIKgwAC_93oSfEMBg5Gr8bVNgQ",
+          "MindmapURL": "https://xmind.ai/share/KuMuNIYE"
+        },
+        {
+          "Title": "Ключица",
+          "Description": "https://drive.google.com/file/d/12RBVAwrTiFlOcdUoeXVVNs4eWUiv9o_k/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICLWi9ULWAQtHAYwZjVT7U1tZXsOTrAAILgwAC_93oSThXr8A6zJcAATYE",
+          "MindmapURL": "https://xmind.ai/share/9uweSYpq"
+        },
+        {
+          "Title": "Плечевая кость",
+          "Description": "https://drive.google.com/file/d/1jgA-qRd_YT8uYDH9J1ZYxX_PiMtP2ZC8/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICL2i9UrptepnxWz0_-r3Leh7rcUKmAAIegwAC_93oST28HkzNUP9VNgQ",
+          "MindmapURL": "https://xmind.ai/share/0EIBXIay"
+        },
+        {
+          "Title": "Локтевая кость",
+          "Description": "https://drive.google.com/file/d/1KSU4zK_SX4QXTWPwVxz3ietySCJc2ecY/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICMWi9U0eE0Vapwt0zeAABmMwDqiPMEAACIoMAAv_d6EnmyG78K-LpRjYE",
+          "MindmapURL": "https://xmind.ai/share/Wie8YKhu"
+        },
+        {
+          "Title": "Лучевая кость",
+          "Description": "https://drive.google.com/file/d/1KSU4zK_SX4QXTWPwVxz3ietySCJc2ecY/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICM2i9U8Zxed6Kx0jA1vKn4zHihBZcAAImgwAC_93oSTBkgCKXxY8mNgQ",
+          "MindmapURL": "https://xmind.ai/share/Wie8YKhu"
+        },
+        {
+          "Title": "Кости запястья",
+          "Description": "https://drive.google.com/file/d/1R6hlhQVayvNkcTb1BSyCmine2Vg-_tbx/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICNWi9U-ibKgwAAcIz-vjDYXlqHHPNaAACJ4MAAv_d6EmEM3FaQbC4BjYE",
+          "MindmapURL": "https://xmind.ai/share/6DoFT7GD"
+        },
+        {
+          "Title": "Пясть и пальцы",
+          "Description": "https://drive.google.com/file/d/1R6hlhQVayvNkcTb1BSyCmine2Vg-_tbx/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICN2i9VF9pmJxcVJhVciTeED6SLhQvAAIpgwAC_93oSeO-L7SkkPnUNgQ",
+          "MindmapURL": "https://xmind.ai/share/6DoFT7GD"
+        },
+        {
+          "Title": "Бедренная кость",
+          "Description": "https://drive.google.com/file/d/1GbjmfnFnPPpU3XKf-cAbaNLGWsf0gmy4/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICOWi9VJEahcAiHD9F1GXdIYzYLYzkAAIugwAC_93oSQX9xdvkzahQNgQ",
+          "MindmapURL": "https://xmind.ai/share/wXJbUmkB"
+        },
+        {
+          "Title": "Надколенник",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICO2i9VKHVExMhaB-b-zDqruqt0_L3AAIvgwAC_93oSc1rGGA598SaNgQ",
+          "MindmapURL": "https://xmind.ai/share/p7O1WLZW"
+        },
+        {
+          "Title": "Большеберцовая кость",
+          "Description": "https://drive.google.com/file/d/1hjFiX-RNf8H5JhyAi_AbRcZewmeGhn20/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICPWi9VSxRTdXgnrPscfPlEKoc2k-tAAI7gwAC_93oSUvrqNBaPUidNgQ",
+          "MindmapURL": "https://xmind.ai/share/SJp7fk8f"
+        },
+        {
+          "Title": "Малоберцовая кость",
+          "Description": "https://drive.google.com/file/d/1bm1ohLqlGU4lry59uFpQPVnvmwYziUaA/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICP2i9VT6TXQ_GIaMvwk1dRzmIRirBAAI8gwAC_93oSTrlO7DMtweKNgQ",
+          "MindmapURL": "https://xmind.ai/share/SJp7fk8f"
+        },
+        {
+          "Title": "Предплюсна",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICQWi9VW-svjjhqP3HChconcEeyAbvAAI-gwAC_93oSZDdpaJwpedTNgQ",
+          "MindmapURL": "https://xmind.ai/share/A61Amr0q"
+        },
+        {
+          "Title": "Плюсна и пальцы",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICQ2i9VYbz8jc3x76J1yDGluOOYObZAAJBgwAC_93oSXSo2rcHbB8uNgQ",
+          "MindmapURL": "https://xmind.ai/share/A61Amr0q"
+        },
+        {
+          "Title": "Лобная кость",
+          "Description": "https://drive.google.com/file/d/1A6ZvFegBPKziJQbSaWQtOSuExeS8wz6y/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICRWi9VbIOr867GT63na4M4N_C4ClRAAJEgwAC_93oSYopuNSPjuXlNgQ",
+          "MindmapURL": "https://xmind.ai/share/18ys8nUD"
+        },
+        {
+          "Title": "Клиновидная кость",
+          "Description": "https://drive.google.com/file/d/1jRVMoj0gzOBGXvmXQXyIIqgzXYz8sySj/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICR2i9VqU_3-twkiluBlK7ZCHtr_LpAAJUgwAC_93oSUkk8WnOQGFjNgQ",
+          "MindmapURL": "https://xmind.ai/share/V1FGL5Nq"
+        },
+        {
+          "Title": "Затылочная кость",
+          "Description": "https://drive.google.com/file/d/1K1eZUr5xkJhT7bGiTH28q3JVDBaMvSgF/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICSWi9Vv5Dzbr--LvDcMisyxWqEKmPAAJagwAC_93oSSEwYSntHM5dNgQ",
+          "MindmapURL": "https://xmind.ai/share/lQTfYaq6"
+        },
+        {
+          "Title": "Теменная кость",
+          "Description": "https://drive.google.com/file/d/1OqYiM4ZTdSZLkUqOBmbHZ8iXpwBGodtT/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICS2i9Vyg83ichMGwRPFL7_pjml3pgAAJdgwAC_93oSS9cb2O69gVTNgQ",
+          "MindmapURL": "https://xmind.ai/share/v6GMuEOF"
+        },
+        {
+          "Title": "Решетчатая кость",
+          "Description": "https://drive.google.com/file/d/10bMnjvixzkTqhTaD2tHyNeW2SgNtF-ce/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICTWi9V0XqQK5pa1HkeIy14_WmosduAAJfgwAC_93oSay_6Sn6Ks41NgQ",
+          "MindmapURL": "https://xmind.ai/share/o0cHbYkJ"
+        },
+        {
+          "Title": "Височная кость 1",
+          "Description": "https://drive.google.com/file/d/1-32htLyc2C0sLOqK9hAdMS1AyzXMbxF2/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICT2i9V4kOgwUZ-bsYDgqQJxuhwX-RAAJlgwAC_93oSWMWrGMgbnoUNgQ",
+          "MindmapURL": "https://xmind.ai/share/zcamiG5h"
+        },
+        {
+          "Title": "Височная кость 2",
+          "Description": "https://drive.google.com/file/d/1l4JrBBykr1BZ6vHC2iBMEc1fYPzZB6-T/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICUWi9V_M8IfdJqGefCcpQIhaw9b99AAJvgwAC_93oSe3lXaV0937GNgQ",
+          "MindmapURL": "https://xmind.ai/share/zcamiG5h"
+        },
+        {
+          "Title": "Каналы височной кости",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICU2i9WDMNXtxPseOdFdnsCoLdiUxFAAJxgwAC_93oSY0BwHJaVC8aNgQ",
+          "MindmapURL": "https://xmind.ai/share/HLtBc8zy"
+        },
+        {
+          "Title": "Верхняя челюсть",
+          "Description": "https://drive.google.com/file/d/1LtgHfdEGjhbAinHiP4VmsjpQebwuAByk/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICVWi9WFpRX-UmXHvZenOWK41MLuo8AAJzgwAC_93oSYxXMiuhlPLKNgQ",
+          "MindmapURL": "https://xmind.ai/share/M5ue2fZO"
+        },
+        {
+          "Title": "Небная кость",
+          "Description": "https://drive.google.com/file/d/1KkZyMIbWF3TQ9FsDh00TvtChDqQM61y0/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICV2i9WHAaFL2A9rtzL3Aw782h3rd4AAJ0gwAC_93oSeP3XG6RAdRmNgQ",
+          "MindmapURL": "https://xmind.ai/share/6uzZL8H2"
+        },
+        {
+          "Title": "Нижняя челюсть",
+          "Description": "https://drive.google.com/file/d/1AHCmdJZtdW4eUWBsEmaGLDVmrP2RJMeg/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICWWi9WKGQUZYn7QjDzMrnddLyPTzLAAJ3gwAC_93oSd6Gq46PBwSiNgQ",
+          "MindmapURL": "https://xmind.ai/share/Rb0X91U8"
+        },
+        {
+          "Title": "Остальные кости лицевого черепа",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICW2i9WSjCeA2lDbyPp3lbewuhyq9aAAJ_gwAC_93oSfmIke3jnFS7NgQ",
+          "MindmapURL": "https://xmind.ai/share/rtUmiQXa"
+        },
+        {
+          "Title": "Ямки наружнего основания черепа",
+          "Description": "https://drive.google.com/file/d/1WlyE9acKrLPXZVwvET4Lwx18wXRcOStU/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICXWi9WVG2rA3Pv6dK-7qf5mAwcY4BAAKAgwAC_93oSSYO9OZoSs6eNgQ",
+          "MindmapURL": ""
+        },
+        {
+          "Title": "Отверстия наружнего основания черепа",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICX2i9WWupB-ciUfQwnr0kZuD1gaBrAAKBgwAC_93oSUtjpSpHFtv6NgQ",
+          "MindmapURL": ""
+        },
+        {
+          "Title": "Внутреннее основание черепа",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICYWi9WYuZMmX725cu8iIt_OWRE1OBAAKEgwAC_93oSd7v67AVOUDUNgQ",
+          "MindmapURL": ""
+        },
+        {
+          "Title": "Глазница",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICY2i9WZwjNVM-2DbiotLP8FW7z0X8AAKIgwAC_93oSUoQIXekiN9UNgQ",
+          "MindmapURL": ""
+        },
+        {
+          "Title": "Носовая полость",
+          "Description": "https://drive.google.com/file/d/1NLiq9qqcfrg4_i-pnuimGS3bSp30UlvO/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICZWi9WbHcraI0Cgan1qtmLPxdG08zAAKMgwAC_93oSQABrK_7_3-72zYE",
+          "MindmapURL": ""
+        }
+      ]
+    },
+    {
+      "Title": "Артрология",
+      "Description": "🤝 Артрология — раздел анатомии, который изучает соединения костей и суставы человека.\n\nВ этом разделе разберём:\n📚 базу по артрологии и соединения костей черепа\n🙂 височно-нижнечелюстной, атлантозатылочный и атлантоосевой суставы\n🧍‍♂️ соединения позвонков, суставы рёбер и грудины\n🦴 суставы таза\n💪 суставы верхней конечности (пояса, плечевой, локтевой и кисти)\n🦵 суставы нижней конечности (тазобедренный, коленный, голени и стопы)\n\n✨ Знания по артрологии помогают понять, как устроены движения человека: от наклона головы и работы челюсти до сложных движений руками и ногами.",
+      "PriceKopeck": 300000,
+      "Topics": [
+        {
+          "Title": "База по артрологии. Соединения костей черепа",
+          "Description": "https://drive.google.com/file/d/1CWIierIBfZWj8HQF4k53SzsvTbpZhsC9/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICZ2i9XEzWY7IFbV0fmSm-U_enrXZqAAKlgwAC_93oSZ_RdP9lWtXgNgQ",
+          "MindmapURL": "https://xmind.ai/share/EhHpHGRY"
+        },
+        {
+          "Title": "Височно-нижнечелюстной сустав",
+          "Description": "https://drive.google.com/file/d/1ehGnAyIpHHq8vQOQzIHsqpRY5MOdQm36/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICaWi9XIBqj65jC0Nt2rk1o17gSHrsAAKngwAC_93oSQdhaEInKZoBNgQ",
+          "MindmapURL": "https://xmind.ai/share/j7nvEnWS"
+        },
+        {
+          "Title": "Атлантозатылочный сустав",
+          "Description": "https://drive.google.com/file/d/1Jkj3ZEKPefuqabHec8n3CyI2W3QWW_gN/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICa2i9XIxPFHS29bz3uHI0jFA_BLtwAAKogwAC_93oSf4EniNs34eCNgQ",
+          "MindmapURL": "https://xmind.ai/share/Sn6muJ9R"
+        },
+        {
+          "Title": "Атлантоосевой сустав",
+          "Description": "https://drive.google.com/file/d/1Jkj3ZEKPefuqabHec8n3CyI2W3QWW_gN/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICbWi9XMuUSKQtYqN2jCrI0j1TcTj8AAKpgwAC_93oSWYYfYD1NRhFNgQ",
+          "MindmapURL": "https://xmind.ai/share/VqT7TseE"
+        },
+        {
+          "Title": "Соединения позвонков",
+          "Description": "https://drive.google.com/file/d/1R961-l-gg5DUdxyZjXCiZnYFH0et_ALA/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICb2i9XOpR3bkFP9HNGJ-Uc6wPZb9sAAKrgwAC_93oSbsAAUtKnIRxvDYE",
+          "MindmapURL": "https://xmind.ai/share/NTLPq6Y7"
+        },
+        {
+          "Title": "Суставы ребер",
+          "Description": "https://drive.google.com/file/d/1fDvyonAddcoVrl6OB9Cpi4PLxgjSY_DS/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICcWi9YBVTfzrf7ZFdaEEIzCXLotGlAALWgwAC_93oSWLU4bBO0eEvNgQ",
+          "MindmapURL": "https://xmind.ai/share/wrLKPvFV"
+        },
+        {
+          "Title": "Суставы таза",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICc2i9YH0jXgHHkXD2O5Xd7-74dztEAALkgwAC_93oSYS3S76OXX9dNgQ",
+          "MindmapURL": "https://xmind.ai/share/yyVThBKc"
+        },
+        {
+          "Title": "Суставы пояса верхней конечности",
+          "Description": "https://drive.google.com/file/d/1B9fhBTCRBrXY8AjsYmmVuv7kWFXtmmvV/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICdWi9YM2dtNK25hWWUBBQ99eQqsYlAALwgwAC_93oSYwqFU2K79xeNgQ",
+          "MindmapURL": "https://xmind.ai/share/lzV6sAtx"
+        },
+        {
+          "Title": "Плечевой сустав",
+          "Description": "https://drive.google.com/file/d/1UKs1RkP5DeAwlv4ojmD1sQ0QT4Iw1xfW/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICd2i9YPfbitLFSokekghIv3rZXHwoAAL0gwAC_93oSWJmv0gqEZv4NgQ",
+          "MindmapURL": "https://xmind.ai/share/Rkqv3Vby"
+        },
+        {
+          "Title": "Локтевой сустав",
+          "Description": "https://drive.google.com/file/d/13iUbC2myILZWghJHLUYfew-hXABwrtQ3/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICeWi9YSjLF9oiUIrV7j-RuNimSd8cAAL6gwAC_93oSdwdXhIe4NPDNgQ",
+          "MindmapURL": "https://xmind.ai/share/mPPBLYmo"
+        },
+        {
+          "Title": "Суставы кисти",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICe2i9YnHBdfyQGxXdRP9G4YFcfINpAAINhAAC_93oSdTeb414dn01NgQ",
+          "MindmapURL": "https://xmind.ai/share/jrYaLtJc"
+        },
+        {
+          "Title": "Тазобедренный сустав",
+          "Description": "https://drive.google.com/file/d/1CSHtV_uot7hLt0P8QyOPynhXL6Z-WIR1/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICfWi9YqiBcmEqBZJiMAgUoDGNVdgQAAIQhAAC_93oSXNNYNeM_ufsNgQ",
+          "MindmapURL": "https://xmind.ai/share/xOwvZA7w"
+        },
+        {
+          "Title": "Коленный сустав",
+          "Description": "https://drive.google.com/file/d/1DATYl_3z6E1OYP6JEigWmft9wkM_pAcu/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICf2i9Yz09ZT9RfjPU328MQXvja2XsAAIShAAC_93oSeQU_2QMpuX5NgQ",
+          "MindmapURL": "https://xmind.ai/share/6Q6AskzH"
+        },
+        {
+          "Title": "Суставы голени",
+          "Description": "https://drive.google.com/file/d/1DATYl_3z6E1OYP6JEigWmft9wkM_pAcu/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICh2i9Y_fTaQ6U1GQc6OFYyt9osfohAALYeAAC_93wSXf_FZSDurpENgQ",
+          "MindmapURL": "https://xmind.ai/share/mrySP2Pn"
+        },
+        {
+          "Title": "Суставы стопы 1",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICi2i9ZD1UGtQh3r4u2kRjlUrPdHzHAALceAAC_93wSfEkleuvXvCxNgQ",
+          "MindmapURL": "https://xmind.ai/share/kd1HMhHd"
+        },
+        {
+          "Title": "Суставы стопы 2",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICjWi9ZIFWtLkvV-1GcLsmxfbrjNfCAALgeAAC_93wSZbacdaEuwhBNgQ",
+          "MindmapURL": "https://xmind.ai/share/Z6lUZltV"
+        }
+      ]
+    },
+    {
+      "Title": "Спланхнология 1",
+      "Description": "🫁 Спланхнология 1 — раздел анатомии о строении и функциях внутренних органов.\n\nМы разберём:\n🔹 органы пищеварения (ротовая полость, зубы, язык, железы, желудок, кишечник)\n🔹 печень, желчный пузырь, поджелудочную железу\n🔹 брюшину и её отделы\n🔹 нос и гортань (хрящи, связки, мышцы)\n🔹 трахею, лёгкие и средостение\n\n✨ Эти знания помогут понять, как работают жизненно важные системы организма.",
+      "PriceKopeck": 300000,
+      "Topics": [
+        {
+          "Title": "Дисклеймер",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICs2i9ajWENFLIKLg5obWjxbGSjEUaAAJXeQAC_93wSS1ToL65pu9ZNgQ",
+          "MindmapURL": ""
+        },
+        {
+          "Title": "База по спланхнологии",
+          "Description": "https://drive.google.com/file/d/1_6XdFQx8jpR3xTeZeVm1MgyPkHFBBT8Y/view?usp=sharing",
+          "TgID": "BAACAgIAAxkBAAICn2i9aHWevxd9tDzCQm8tVR2xfqnzAAI7eQAC_93wSUXvmyekpBAxNgQ",
+          "MindmapURL": ""
+        },
+        {
+          "Title": "Ротовая полость",
+          "Description": "https://drive.google.com/file/d/1olgPB5uwGwDKMqh6yhx8eL1YzbZbzrpe/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIC4Wi9ciK8OcMAAQLPvrM-jh1aiMrurwAC3HkAAv_d8Els-JFbb9CCAjYE",
+          "MindmapURL": "https://xmind.ai/share/gOEY4qiu"
+        },
+        {
+          "Title": "Зубы",
+          "Description": "https://drive.google.com/file/d/1DBJGqzOCNjOHBEQayd1dlT-QKp6_AV6x/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICq2i9acJm2dRhiAAB5qS2SkXsiwHrTQACT3kAAv_d8EkiU_CKg_YX2TYE",
+          "MindmapURL": "https://xmind.ai/share/gOEY4qiu"
+        },
+        {
+          "Title": "Слюнные железы",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICuWi9apVcxQ4k1DlfOEhE0qPpJMrUAAJaeQAC_93wSZ3kbzZvTD-pNgQ",
+          "MindmapURL": "https://xmind.ai/share/gOEY4qiu"
+        },
+        {
+          "Title": "Язык",
+          "Description": "https://drive.google.com/file/d/1yI4Ciz2W-3TA7fKl-O5Nx-UIgZSMX-m8/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIDFWi9ezi0XU3L5p0mgXiK0DHE79QyAAJzegAC_93wSdpYvheO6rmUNgQ",
+          "MindmapURL": "https://xmind.ai/share/gOEY4qiu"
+        },
+        {
+          "Title": "Глотка",
+          "Description": "https://drive.google.com/file/d/1eQRcCVz4Px3I1L8ZDr9QK8StpXZnDanh/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICl2i9Z3_7u7Pl1wq8rM49ohCwunQrAAIheQAC_93wSfKajLNXoVbeNgQ",
+          "MindmapURL": "https://xmind.ai/share/4EQ84G8F"
+        },
+        {
+          "Title": "Пищевод",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICw2i9bDM849PebydhYm4uzwSyjk3IAAJweQAC_93wSbV-OK-bAwk9NgQ",
+          "MindmapURL": "https://xmind.ai/share/w2KBSl75"
+        },
+        {
+          "Title": "Желудок",
+          "Description": "https://drive.google.com/file/d/18ENUMrnXs1AOry-GrbOoNGo1uw3UWSP9/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICp2i9aYuJRzs1pIqvYgL0KGbiU2kdAAJKeQAC_93wSU2v5B09SGInNgQ",
+          "MindmapURL": "https://xmind.ai/share/ADkAVrO3"
+        },
+        {
+          "Title": "Тонкий кишечник",
+          "Description": "https://drive.google.com/file/d/1yQyHNbg-34RiHLznMH2roMZ6YEY99Mbw/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIC_Wi9d3olGFDMvnqcN8NhQK9mmRU2AAJDegAC_93wSRrZ2eYiiD-WNgQ",
+          "MindmapURL": "https://xmind.ai/share/MQXJE187"
+        },
+        {
+          "Title": "Толстый кишечник",
+          "Description": "https://drive.google.com/file/d/1BW8ryvIIkI1zaaxMdGFpCuXQdrWFf5BD/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIDB2i9eG8sSFRuv43PZFSWaeFlVe0-AAJXegAC_93wSX3xrIhm7YbINgQ",
+          "MindmapURL": "https://xmind.ai/share/fEcSsbdv"
+        },
+        {
+          "Title": "Печень",
+          "Description": "https://drive.google.com/file/d/1kWVaNJ842XXY1dFiPo1-73K48N8yHkLt/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIC0Wi9bddYMkf3j1U4YZB3kyhTwyxxAAKdeQAC_93wSeBWBozUrE43NgQ",
+          "MindmapURL": "https://xmind.ai/share/qgXPKwl4"
+        },
+        {
+          "Title": "Желчный пузырь",
+          "Description": "https://drive.google.com/file/d/12JwZpL7dTm1gcHVY1K-HzmM7kQInOT0E/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICr2i9aggDfk84ZcqSa9UeVfgzPV9wAAJTeQAC_93wSeuC1ECBaES6NgQ",
+          "MindmapURL": "https://xmind.ai/share/gneRWgzT"
+        },
+        {
+          "Title": "Поджелудочная железа",
+          "Description": "https://drive.google.com/file/d/1ULA5VYxyPyz0qd2-aUZx2XHq8eIr6YmF/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIC2Wi9cR8eYgG5i7X9JOq3j_F2jadVAALLeQAC_93wSevNOCHfJr4xNgQ",
+          "MindmapURL": "https://xmind.ai/share/aii25EoV"
+        },
+        {
+          "Title": "Ход брюшины",
+          "Description": "https://drive.google.com/file/d/1Tqbzc61TVxdXSoo9HzUIqeu3c-fgjEKO/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIC42i9dAKlXrFlfNPLqhs4BLq4JEzeAAICegAC_93wSdKgVyc-uBefNgQ",
+          "MindmapURL": ""
+        },
+        {
+          "Title": "Верхний этаж брюшины",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICm2i9Z-7hvop0S1QRU8JdaeQvaWQ4AAIveQAC_93wSTwQJ-BbAAGJFDYE",
+          "MindmapURL": ""
+        },
+        {
+          "Title": "Нижний этаж брюшины",
+          "Description": "https://drive.google.com/file/d/1vjFQdk9CAEdSR5z55WxbgkBWcfaXKniE/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICwWi9a-jdSGzXNJwSVaVHCZ56lg9GAAJoeQAC_93wSS937XM45Wg4NgQ",
+          "MindmapURL": ""
+        },
+        {
+          "Title": "Углубления брюшины",
+          "Description": "https://drive.google.com/file/d/1_a1oL4TEsqZUqbtxJmZiINy_CbSy_XjB/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIDC2i9eib8ucEbzujmFBZbQiD7l4BHAAJvegAC_93wSajv-xQnkD1RNgQ",
+          "MindmapURL": ""
+        },
+        {
+          "Title": "Нос",
+          "Description": "https://drive.google.com/file/d/18KaBWc_xELUTMMTunTMpNo4quPgXHq9E/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICzWi9bVHV3XSUdvyfiNTrakEBdKa-AAKOeQAC_93wSQhFtCOH9chKNgQ",
+          "MindmapURL": "https://xmind.ai/share/1hjChVs2"
+        },
+        {
+          "Title": "База по гортани",
+          "Description": "https://drive.google.com/file/d/1uIl4B9PEQ7M0x53gMIwEhpHmi_rIyuXC/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICk2i9ZpQ9mnj3EvzgrcTuG9Q4u9gqAAL-eAAC_93wSaDhohbtOQkeNgQ",
+          "MindmapURL": "https://xmind.ai/share/BKOShe7B"
+        },
+        {
+          "Title": "Хрящи гортани",
+          "Description": "https://drive.google.com/file/d/1ug2EhX5Xo5fUq_C7KYZDuPeY5QecIpl7/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIDDWi9epjVeehBOIw7nS6GMiZTb0mKAAJxegAC_93wSdcxaiSxJ4g7NgQ",
+          "MindmapURL": "https://xmind.ai/share/BKOShe7B"
+        },
+        {
+          "Title": "Суставы и связки гортани",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAIC62i9dU5Yc7kywznxdFsCrrSBCqYZAAISegAC_93wSRGKaNfX3FYgNgQ",
+          "MindmapURL": "https://xmind.ai/share/BKOShe7B"
+        },
+        {
+          "Title": "Мышцы гортани",
+          "Description": "https://drive.google.com/file/d/11VE_mf-DTXtBIoIg0icPflfY85FQtpam/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICyWi9bLssYN99VsAeCIGd6m8fErSEAAJ8eQAC_93wSQvD8bk3qeS8NgQ",
+          "MindmapURL": "https://xmind.ai/share/BKOShe7B"
+        },
+        {
+          "Title": "Трахея",
+          "Description": "https://drive.google.com/file/d/1VBjOmhz2QS7uCXzDLwIXOxst_66gPgqo/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIC72i9dfGBiRvjn1grUck3VH3jsBb3AAIbegAC_93wST7mXfwEs18AATYE",
+          "MindmapURL": "https://xmind.ai/share/z5dSU4Bq"
+        },
+        {
+          "Title": "База по легким",
+          "Description": "https://drive.google.com/file/d/1dNuuRU-RYdm1ZZiVo8_ibEbCbTRuzGbn/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIClWi9Zv3vbY32fiDbCLKfoswTUHFHAAIKeQAC_93wSb0bsaHEqTO2NgQ",
+          "MindmapURL": "https://xmind.ai/share/BWwAaqF9"
+        },
+        {
+          "Title": "Сегменты легких",
+          "Description": "https://drive.google.com/file/d/1dNuuRU-RYdm1ZZiVo8_ibEbCbTRuzGbn/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIC52i9dIpF41zCsZTZ7GwD3PqaiUBRAAILegAC_93wSRwfT0YCCTWsNgQ",
+          "MindmapURL": "https://xmind.ai/share/BWwAaqF9"
+        },
+        {
+          "Title": "Плевра",
+          "Description": "https://drive.google.com/file/d/1q-n8SLkKpxuna-0-cy5xlEoq8a_O8L4O/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIC3Wi9cXq_yfUNkK7mdZnDH5uskUNvAALTeQAC_93wSXOWiKEqU24xNgQ",
+          "MindmapURL": "https://xmind.ai/share/lRCMSqsx"
+        },
+        {
+          "Title": "Средостенье",
+          "Description": "https://drive.google.com/file/d/1xQnyoAWoChQq4jgkJTfNqqRROlP_8oLo/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIC-Gi9dubRcMQHYC2e0emeDdH9UCyHAAIyegAC_93wSZM466F5_ggmNgQ",
+          "MindmapURL": "https://xmind.ai/share/Bl1Y90c9"
+        }
+      ]
+    },
+    {
+      "Title": "Ангиология",
+      "Description": "🩸 Ангиология — раздел анатомии, посвящённый сердечно-сосудистой и лимфатической системам.\n\nМы разберём:\n🔹 сердце и круги кровообращения\n🔹 аорту и её основные ветви (грудная, брюшная, подвздошные, подключичная, сонные и др.)\n🔹 кровоснабжение конечностей, головы и мозга (включая Виллизиев круг)\n🔹 венозную систему (полые вены, воротная вена, синусы твёрдой мозговой оболочки)\n🔹 особенности кровоснабжения плода\n🔹 лимфатическую систему и её сосуды и узлы\n\n✨ Знания из ангиологии помогают понять, как кровь и лимфа обеспечивают питание, дыхание и защиту всего организма.",
+      "PriceKopeck": 300000,
+      "Topics": [
+        {
+          "Title": "База по ССС",
+          "Description": "https://drive.google.com/file/d/119CVW51OS1vwyM-B2qTanXsjNmJF7W5W/view?usp=sharing",
+          "TgID": "BAACAgIAAxkBAAICrWi9agLDHfom9WsFiiH9YWS75EQBAAJpcwACHezpSdAXPSxiTC7oNgQ",
+          "MindmapURL": ""
+        },
+        {
+          "Title": "Сердце",
+          "Description": "https://drive.google.com/file/d/1SX6eYolTCuz5_JjpN1XdPW7Hr_HHhC_2/view?usp=sharing",
+          "TgID": "BAACAgIAAxkBAAIDD2i9eptTbTFSJCTs6DKLkgABN_o8pwACgXQAAh3s6Ulf9yhm48-5AjYE",
+          "MindmapURL": "https://xmind.ai/share/WzOC1bgF"
+        },
+        {
+          "Title": "Малый круг кровообращения",
+          "Description": "https://drive.google.com/file/d/1kqqZAMICvbtntcn-IHNYODCp_623qMPt/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIC8Wi9dgrLx3X6pZHMMuMYSHbfoEY8AAJKdAACHezpSbh55HMO3xYJNgQ",
+          "MindmapURL": "https://xmind.ai/share/egQmD3DM"
+        },
+        {
+          "Title": "Аорта. Начало",
+          "Description": "https://drive.google.com/file/d/12tNukkMG6I_1DhZ2ZZK95VZNz2QtmtaV/view?usp=sharing",
+          "TgID": "BAACAgIAAxkBAAIChWi9Y9bt8nODnWBlXH8_2iwwUe2TAAILcwACHezpSTBqp_4ahN6FNgQ",
+          "MindmapURL": "https://xmind.ai/share/tWHeGTaj"
+        },
+        {
+          "Title": "База по аорте",
+          "Description": "https://drive.google.com/file/d/12tNukkMG6I_1DhZ2ZZK95VZNz2QtmtaV/view?usp=sharing",
+          "TgID": "BAACAgIAAxkBAAICg2i9Y5UabSJZCK63vnxmtKUe1YkBAAIHcwACHezpSWtz5TdVagLbNgQ",
+          "MindmapURL": "https://xmind.ai/share/tWHeGTaj"
+        },
+        {
+          "Title": "Восход, дуга, грудная аорта",
+          "Description": "https://drive.google.com/file/d/12tNukkMG6I_1DhZ2ZZK95VZNz2QtmtaV/view?usp=sharing",
+          "TgID": "BAACAgIAAxkBAAIC1Wi9biLXsEP9F4ut1z0rAAHdiex-IgAC0nMAAh3s6Uk6ASwGDHy0TzYE",
+          "MindmapURL": "https://xmind.ai/share/tWHeGTaj"
+        },
+        {
+          "Title": "Брюшная аорта (верхняя брызжеечная а)",
+          "Description": "https://drive.google.com/file/d/12tNukkMG6I_1DhZ2ZZK95VZNz2QtmtaV/view?usp=sharing",
+          "TgID": "BAACAgIAAxkBAAICz2i9bXBNyV0w7ei6fQoLO2154o2IAALJcwACHezpSXHagvaWWyR_NgQ",
+          "MindmapURL": "https://xmind.ai/share/tWHeGTaj"
+        },
+        {
+          "Title": "Нижняя брызжеечная а",
+          "Description": "https://drive.google.com/file/d/12tNukkMG6I_1DhZ2ZZK95VZNz2QtmtaV/view?usp=sharing",
+          "TgID": "BAACAgIAAxkBAAIC92i9duYgmEby4_rn9VKz8cMO6y-kAAJYdAACHezpSQceJSgVnRQuNgQ",
+          "MindmapURL": "https://xmind.ai/share/tWHeGTaj"
+        },
+        {
+          "Title": "Чревный ствол",
+          "Description": "https://drive.google.com/file/d/12tNukkMG6I_1DhZ2ZZK95VZNz2QtmtaV/view?usp=sharing",
+          "TgID": "BAACAgIAAxkBAAIDE2i9eyMNFU_rPdDBGr_TZDjcHfWSAAKJdAACHezpSXBlUdAyYq9pNgQ",
+          "MindmapURL": "https://xmind.ai/share/tWHeGTaj"
+        },
+        {
+          "Title": "Парные ветви брюшной аорты",
+          "Description": "https://drive.google.com/file/d/1hFe-7ca7hJlTtH0jhmEBzsAlmI9IHfQi/view?usp=sharing",
+          "TgID": "BAACAgIAAxkBAAICoGi9aHUSLXD7qFlfAT0VNEKG-iQ9AAJRcwACHezpSYRIWA_8rNv_NgQ",
+          "MindmapURL": "https://xmind.ai/share/tWHeGTaj"
+        },
+        {
+          "Title": "Внутренняя подвздошная а",
+          "Description": "https://drive.google.com/file/d/1jcN0Ov4-IlPk6HJtHbptuFwp8sPKle7U/view?usp=sharing",
+          "TgID": "BAACAgIAAxkBAAICj2i9ZPCjmBkd8zCKiPaCWJBSB3FlAAIecwACHezpSVJXKYkgVaOpNgQ",
+          "MindmapURL": "https://xmind.ai/share/WXWRwzd0"
+        },
+        {
+          "Title": "Наружная подвздошная а",
+          "Description": "https://drive.google.com/file/d/1jcN0Ov4-IlPk6HJtHbptuFwp8sPKle7U/view?usp=sharing",
+          "TgID": "BAACAgIAAxkBAAIC82i9dlFU7gJUm8Caa-ZAB5nEphhQAAJRdAACHezpSWBF3oqYHT00NgQ",
+          "MindmapURL": "https://xmind.ai/share/WXWRwzd0"
+        },
+        {
+          "Title": "Бедренная а",
+          "Description": "https://drive.google.com/file/d/147OZZPtTMDKBgW-JpXgaHOmLwyHQ4ctS/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICv2i9a-bMNrACmSzVcP6pnTcm-aPpAAKecwACHezpSXbI6CHhTvP7NgQ",
+          "MindmapURL": "https://xmind.ai/share/kQIpUZX0"
+        },
+        {
+          "Title": "Подколенная а",
+          "Description": "https://drive.google.com/file/d/1Ag_C__uLHBPhzpspiizndk_NJibluEK9/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICt2i9aorM4OFTjwn9LMzdw-caQ9fNAAJ7cwACHezpSf5ndLUKBZjnNgQ",
+          "MindmapURL": "https://xmind.ai/share/I6eMO6wm"
+        },
+        {
+          "Title": "Передняя и задняя ББ аа",
+          "Description": "https://drive.google.com/file/d/1Ag_C__uLHBPhzpspiizndk_NJibluEK9/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIC_2i9d408uN9Ad5XPTFbV3EBqhcEiAAJidAACHezpSdsiEQVvkj4dNgQ",
+          "MindmapURL": "https://xmind.ai/share/tqH2Et3Y"
+        },
+        {
+          "Title": "Кровоснабжение стопы",
+          "Description": "https://drive.google.com/file/d/1zmBlHJwGbxVqXUGdgwYKk1ZvpiYXm1Ti/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICnWi9aAOp572f9RzqaKtDYDHWdXD9AAJKcwACHezpSQzwnaeM68HJNgQ",
+          "MindmapURL": "https://xmind.ai/share/tqH2Et3Y"
+        },
+        {
+          "Title": "Подключичная а (внутренняя грудная а)",
+          "Description": "https://drive.google.com/file/d/1yZnDnbJ_TF_ybeaBmiBT64OmSYBLCMb4/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIDA2i9eAKrGxQ8n3eVKGsEAvmPWxMuAAJqdAACHezpSRWFnnlQ_ChKNgQ",
+          "MindmapURL": "https://xmind.ai/share/tqH2Et3Y"
+        },
+        {
+          "Title": "Позвоночная а",
+          "Description": "https://drive.google.com/file/d/1yZnDnbJ_TF_ybeaBmiBT64OmSYBLCMb4/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICo2i9aJ59vrXy18YUMPQQqEFwPtJwAAJVcwACHezpSapQhDowMYChNgQ",
+          "MindmapURL": "https://xmind.ai/share/tqH2Et3Y"
+        },
+        {
+          "Title": "Щитошейный ствол",
+          "Description": "https://drive.google.com/file/d/1yZnDnbJ_TF_ybeaBmiBT64OmSYBLCMb4/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIDF2i9e1B7murxr_FCiuscHt6srkYJAAKNdAACHezpSWCFSmD_wQ9gNgQ",
+          "MindmapURL": "https://xmind.ai/share/tqH2Et3Y"
+        },
+        {
+          "Title": "Реберно-шейный ствол",
+          "Description": "https://drive.google.com/file/d/1yZnDnbJ_TF_ybeaBmiBT64OmSYBLCMb4/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICpWi9aO-BHGE9GYYDGtGfIuXwyw3VAAJZcwACHezpSZkCwEF_q61xNgQ",
+          "MindmapURL": "https://xmind.ai/share/tqH2Et3Y"
+        },
+        {
+          "Title": "Подмышечная а",
+          "Description": "https://drive.google.com/file/d/1cLBwM9AYj0QFcaDkodahYJ9rmJFrGCcQ/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIDCWi9eI9Hpv17PWHjVYNu7UNq_6u4AAJydAACHezpSZVJO6lTRlSVNgQ",
+          "MindmapURL": "https://xmind.ai/share/QHh0Dm6H"
+        },
+        {
+          "Title": "Плечевая а",
+          "Description": "https://drive.google.com/file/d/1cLBwM9AYj0QFcaDkodahYJ9rmJFrGCcQ/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICtWi9alfmjMrkn5OoBqawVzrcfCEcAAJ1cwACHezpSU-p5iS5i8llNgQ",
+          "MindmapURL": "https://xmind.ai/share/xjkgTWDL"
+        },
+        {
+          "Title": "Артериальная сеть локтя",
+          "Description": "https://drive.google.com/file/d/1MisXBYsLiLnuTDTrp-FDGiPUyzwYzyc8/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICu2i9auWASLNV7rqd8AbBLCSHhSDJAAKCcwACHezpSZLrvln87-qpNgQ",
+          "MindmapURL": "https://xmind.ai/share/wPI5ePA0"
+        },
+        {
+          "Title": "Кровоснабжение кисти (локтевая и лучевая аа)",
+          "Description": "https://drive.google.com/file/d/17kfTjiB3pP6PdJhKtzr01nvTh7-ll-P3/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIC5Wi9dCOjg7nOQgPPmVsTC3ZD-CBeAAImdAACHezpSR-OGW-3srTwNgQ",
+          "MindmapURL": "https://xmind.ai/share/wPI5ePA0"
+        },
+        {
+          "Title": "Верхняя щитовидная а",
+          "Description": "https://drive.google.com/file/d/16EFm46U330t0NeR8bjCt2Wc9YfO4lyLL/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICsWi9ai8Po-1G1jbYzt_2IuRzPlWpAAJwcwACHezpSShfF8iqCuC0NgQ",
+          "MindmapURL": "https://xmind.ai/share/foBkfp9U"
+        },
+        {
+          "Title": "Наружняя сонная а (язычная а)",
+          "Description": "https://drive.google.com/file/d/16EFm46U330t0NeR8bjCt2Wc9YfO4lyLL/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIDGWi9e3Kwr2CkRst6ibwxVcsnMPMBAAKPdAACHezpSYu5uYsZwzMRNgQ",
+          "MindmapURL": "https://xmind.ai/share/foBkfp9U"
+        },
+        {
+          "Title": "Лицевая а",
+          "Description": "https://drive.google.com/file/d/1tr9aEWKnsmkaLkLBL8xLeYjgOiOkfgZ3/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIC7Wi9dVUJ7v9Lg_EgqvyGD7ypDA4TAAI6dAACHezpSS8w9ejC0igMNgQ",
+          "MindmapURL": "https://xmind.ai/share/foBkfp9U"
+        },
+        {
+          "Title": "Затылочная а",
+          "Description": "https://drive.google.com/file/d/1bseUIHVJwKLGlzepZzVNMYWwHj_od9K4/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIC32i9cZVQ67VFXa7VC_KcYLeT18D9AAIGdAACHezpSfNp_SRNdEKZNgQ",
+          "MindmapURL": "https://xmind.ai/share/foBkfp9U"
+        },
+        {
+          "Title": "Задняя ушная а",
+          "Description": "https://drive.google.com/file/d/1g008fKkBt9nTiAKKq4Y6Otg1eRzMKhti/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIC22i9cVZr_Szs3Nzy733vNuaOBCBtAAICdAACHezpSfKKYRj5_FBMNgQ",
+          "MindmapURL": "https://xmind.ai/share/foBkfp9U"
+        },
+        {
+          "Title": "Восходящая глоточная а",
+          "Description": "https://drive.google.com/file/d/1UUkglnY7NB-84ZDH53MRWS3lizqJQNGA/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIC12i9cRVDzZd0qSk1KVX4oFTm3cyjAAL8cwACHezpScPSAyQIzQa7NgQ",
+          "MindmapURL": "https://xmind.ai/share/foBkfp9U"
+        },
+        {
+          "Title": "Поверхностная височная а",
+          "Description": "https://drive.google.com/file/d/1qe2nfC2rHmAbDT8Y3_ZFKHyoXYf6AP1i/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIDAWi9d9J4e1iq8kDw_459LfGJhHD7AAJldAACHezpSXdkbrTARd_ONgQ",
+          "MindmapURL": "https://xmind.ai/share/foBkfp9U"
+        },
+        {
+          "Title": "Верхнечелюстная а",
+          "Description": "https://drive.google.com/file/d/1fVaGz8O4o0K18FZxGop8LJYnzn1RDD1A/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICy2i9bT3KzsKcpcSL7PRTZaX1XJiWAALEcwACHezpSf6H_WmSg5TONgQ",
+          "MindmapURL": "https://xmind.ai/share/foBkfp9U"
+        },
+        {
+          "Title": "Внутренняя сонная а",
+          "Description": "https://drive.google.com/file/d/1nIA40gG2SbVBkxesP1d1CfoIDpNdoqW4/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICkWi9Zdvus_OUzWMdOcCgbG7aneQYAAItcwACHezpSR7i4txcP5MFNgQ",
+          "MindmapURL": "https://xmind.ai/share/foBkfp9U"
+        },
+        {
+          "Title": "Кровоснабжение головного мозга (Виллизиев круг)",
+          "Description": "https://drive.google.com/file/d/1GJs-K3P9fRrfvPFi_34ftpc5TFNmPDIB/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIDG2i9fBCuu5c_JVLgHGKD8nC60TuPAAKbdAACHezpSSL_TFTWXRN2NgQ",
+          "MindmapURL": "https://xmind.ai/share/foBkfp9U"
+        },
+        {
+          "Title": "База по венам",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICvWi9a52o7zUJGa8b3o8pPna25MSLAAKUcwACHezpSXwOkI5ze-IrNgQ",
+          "MindmapURL": ""
+        },
+        {
+          "Title": "Верхняя полая в (непарная и полунепарная вв)",
+          "Description": "https://drive.google.com/file/d/1fEXKjKm7wKyafBEZFbWjolyZTGlGBZPp/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIC9Wi9draSfkBD6TmjPHfKmNBw9tZ_AAJXdAACHezpSamRS-mnmTG5NgQ",
+          "MindmapURL": "https://xmind.ai/share/yG6gEG13"
+        },
+        {
+          "Title": "Подключичная в",
+          "Description": "https://drive.google.com/file/d/171TKTZJ-oKYhdzdRpdn1EXBuAcBTaxn-/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIDBWi9eGctmSo9C18o5Wl3OsxyzPZAAAJvdAACHezpSdHapE9ajdOSNgQ",
+          "MindmapURL": "https://xmind.ai/share/yG6gEG13"
+        },
+        {
+          "Title": "Вены головы и шеи",
+          "Description": "https://drive.google.com/file/d/184FGnNcNpQoC4dedVJrtuDeuIXZANYce/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICxWi9bDrW1cGH7TLjDbvYAyVFt2HsAAKncwACHezpSQUbLle1N45KNgQ",
+          "MindmapURL": "https://xmind.ai/share/Ptuu1aGT"
+        },
+        {
+          "Title": "Синусы твердой мозговой оболочки",
+          "Description": "https://drive.google.com/file/d/16KajQg4JFOgs4sm7qM15nNwrXoTjbdxk/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIDEWi9euycEnzABPGsGxD2purZMzAbAAKEdAACHezpSaE4Fsv2O2N3NgQ",
+          "MindmapURL": "https://xmind.ai/share/CGfaALwp"
+        },
+        {
+          "Title": "Вены верхней конечности",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICiWi9ZB10PkBOsxx1srjqJOE1SQPnAAIXcwACHezpSVuXxicJzf2CNgQ",
+          "MindmapURL": "https://xmind.ai/share/TIGHHXJc"
+        },
+        {
+          "Title": "Нижняя полая в",
+          "Description": "https://drive.google.com/file/d/1qKl38ZPuG26o7dwPVBKXSUy6EMNjGxte/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIC-2i9d1wgiQgSqgZpiFBhxZ6jZLLzAAJgdAACHezpSRuNzpjBsVvNNgQ",
+          "MindmapURL": "https://xmind.ai/share/KRXFCvOw"
+        },
+        {
+          "Title": "Воротная в",
+          "Description": "https://drive.google.com/file/d/1jinvskjGvyC8du-5goGMg1v22IA8RsR4/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIC02i9bd4IMzhIbUngNS4gxpRNxrbaAALNcwACHezpSaQuzA_D9OeqNgQ",
+          "MindmapURL": "https://xmind.ai/share/mrZ3vyGR"
+        },
+        {
+          "Title": "Вены таза и нижней конечности.",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICx2i9bJbInPjk5jWFZXp45TsOAAF8oAACrnMAAh3s6Ul19Csxa7AKRjYE",
+          "MindmapURL": "https://xmind.ai/share/cvLN4pk9"
+        },
+        {
+          "Title": "Анастомозы вен",
+          "Description": "",
+          "TgID": "BAACAgIAAxkBAAICqWi9abMoeVEi4vIVLz0HJiM3UlM5AAJlcwACHezpSdXLziYQGfsTNgQ",
+          "MindmapURL": ""
+        },
+        {
+          "Title": "Кровоснабжение плода",
+          "Description": "https://drive.google.com/file/d/1aHSFP2GqcbCIVtgAKLCEKV-L84BVFgOa/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAICmWi9Z55ngItFAtFH_ZEdgw36oYDsAAJGcwACHezpSfU912Jlp1iENgQ",
+          "MindmapURL": ""
+        },
+        {
+          "Title": "Лимфатическая система",
+          "Description": "https://drive.google.com/file/d/1-jiN_9o9tD0XC60awfwiG3goK9op-K3P/view?usp=drive_link",
+          "TgID": "BAACAgIAAxkBAAIC6Wi9dMOs79xKTLf-g7CffE9zf31QAAIwdAACHezpSW13fgqzmmDYNgQ",
+          "MindmapURL": ""
+        }
+      ]
+    }
+  ]
+}

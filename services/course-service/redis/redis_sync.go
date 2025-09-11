@@ -8,11 +8,7 @@ import (
 	redislib "github.com/redis/go-redis/v9"
 )
 
-// FillRedisFromDB выгружает все данные из БД в Redis,
-// строго соблюдая схему ключей из FillData (никаких новых/других ключей).
-// Синхронизацию user:<tgid>:sections НЕ выполняет.
 func FillRedisFromDB(ctx context.Context, database *coursedb.Database, rdb *redislib.Client) error {
-	// 1) Загружаем Subjects -> Sections -> Topics одной пачкой
 	var subjects []coursedb.Subject
 	if err := database.DB.WithContext(ctx).
 		Preload("Sections.Topics").
@@ -40,20 +36,16 @@ func FillRedisFromDB(ctx context.Context, database *coursedb.Database, rdb *redi
 		}
 	}
 
-	// 2) Subjects + mappings + subject:<id>:sections
 	for _, s := range subjects {
-		// subject:<id>
 		pipe.HSet(ctx, fmt.Sprintf("subject:%d", s.ID),
 			"id", s.ID,
 			"title", s.Title,
 		)
 		queue()
 
-		// subject:title:<Title> -> <id>
 		pipe.Set(ctx, "subject:title:"+s.Title, fmt.Sprintf("%d", s.ID), 0)
 		queue()
 
-		// subject:<id>:sections (пересобираем)
 		secKey := fmt.Sprintf("subject:%d:sections", s.ID)
 		pipe.Del(ctx, secKey)
 		queue()
@@ -66,23 +58,19 @@ func FillRedisFromDB(ctx context.Context, database *coursedb.Database, rdb *redi
 			queue()
 		}
 
-		// 3) Sections + mappings + section:<id>:topics
 		for _, sec := range s.Sections {
-			// section:<id>
 			pipe.HSet(ctx, fmt.Sprintf("section:%d", sec.ID),
 				"id", sec.ID,
 				"subject_id", s.ID,
 				"title", sec.Title,
 				"description", sec.Description,
-				"price_kopeck", sec.PriceKopeck, // строго как в FillData
+				"price_kopeck", sec.PriceKopeck,
 			)
 			queue()
 
-			// section:title:<Title> -> <id>
 			pipe.Set(ctx, "section:title:"+sec.Title, fmt.Sprintf("%d", sec.ID), 0)
 			queue()
 
-			// section:<id>:topics (пересобираем)
 			topKey := fmt.Sprintf("section:%d:topics", sec.ID)
 			pipe.Del(ctx, topKey)
 			queue()
@@ -95,7 +83,6 @@ func FillRedisFromDB(ctx context.Context, database *coursedb.Database, rdb *redi
 				queue()
 			}
 
-			// 4) Topics
 			for _, t := range sec.Topics {
 				pipe.HSet(ctx, fmt.Sprintf("topic:%d", t.ID),
 					"id", t.ID,
@@ -110,7 +97,6 @@ func FillRedisFromDB(ctx context.Context, database *coursedb.Database, rdb *redi
 		}
 	}
 
-	// финальный flush
 	if err := flush(); err != nil {
 		return fmt.Errorf("redis pipeline exec: %w", err)
 	}

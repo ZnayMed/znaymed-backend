@@ -2,12 +2,13 @@ package db
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"log"
 	"os"
 	"time"
+
+	"github.com/joho/godotenv"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 type Database struct {
@@ -28,11 +29,11 @@ func NewDatabase() (*Database, error) {
 		os.Getenv("DB_NAME"),
 	)
 
-	var db *gorm.DB
+	var gdb *gorm.DB
 	var err error
 
 	for i := 0; i < 10; i++ {
-		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+		gdb, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		if err == nil {
 			break
 		}
@@ -43,20 +44,26 @@ func NewDatabase() (*Database, error) {
 		return nil, fmt.Errorf("ошибка подключения к БД: %w", err)
 	}
 
-	if err := db.AutoMigrate(
+	if err := gdb.AutoMigrate(
 		&User{}, &Subject{}, &Section{}, &Topic{}, &UserSection{},
 	); err != nil {
 		return nil, err
 	}
 
 	var cnt int64
-	db.Model(&Subject{}).Count(&cnt)
+	gdb.Model(&Subject{}).Count(&cnt)
 	if cnt == 0 {
-		if err := seedInitialData(db); err != nil {
-			return nil, err
+		path := os.Getenv("IMPORT_JSON")
+		if path == "" {
+			return nil, fmt.Errorf("empty DB and IMPORT_JSON not set — aborting to avoid loading test seed")
 		}
-		log.Println("База заполнена начальными предметами/темами")
+
+		log.Printf("Empty DB: importing subjects from JSON: %s ...", path)
+		if err := ImportSubjectsFromFile(gdb, path); err != nil {
+			return nil, fmt.Errorf("import failed from %s: %w", path, err)
+		}
+		log.Println("Import finished successfully")
 	}
 
-	return &Database{DB: db}, nil
+	return &Database{DB: gdb}, nil
 }
