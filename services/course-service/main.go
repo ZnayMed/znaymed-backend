@@ -232,7 +232,7 @@ func (s *courseServer) GetListSubjects(ctx context.Context, _ *pb.ListSubjectsRe
 }
 
 func (s *courseServer) GetSubjectSections(ctx context.Context, req *pb.SubjectSectionsRequest) (*pb.SubjectSectionsResponse, error) {
-	const userTTL = 3 * time.Hour
+	const userTTL = 2 * time.Minute
 	start := time.Now()
 
 	if req == nil || strings.TrimSpace(req.Tgid) == "" || strings.TrimSpace(req.Subject) == "" {
