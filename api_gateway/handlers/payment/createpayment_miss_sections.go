@@ -141,7 +141,7 @@ func CreatePaymentMissSections(cfg config.Config) http.HandlerFunc {
 func applyDiscountByCount(total int64, count int32) (int64, string) {
 	switch {
 	case count == 2:
-		return total * 9682 / 10000, "3.18% for 2 sections"
+		return total * 9682 / 10000, "3.18%"
 	case count == 3:
 		return total * 9464 / 10000, "5.35%"
 	case count == 4:
