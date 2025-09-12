@@ -53,14 +53,27 @@ func NewDatabase() (*Database, error) {
 	var cnt int64
 	gdb.Model(&Subject{}).Count(&cnt)
 	if cnt == 0 {
-		path := os.Getenv("IMPORT_JSON")
-		if path == "" {
-			return nil, fmt.Errorf("empty DB and IMPORT_JSON not set — aborting to avoid loading test seed")
+		paths := []string{
+			os.Getenv("ANATOMY_JSON"),
+			os.Getenv("HISTOLOGY_JSON"),
 		}
 
-		log.Printf("Empty DB: importing subjects from JSON: %s ...", path)
-		if err := ImportSubjectsFromFile(gdb, path); err != nil {
-			return nil, fmt.Errorf("import failed from %s: %w", path, err)
+		var importPaths []string
+		for _, p := range paths {
+			if p != "" {
+				importPaths = append(importPaths, p)
+			}
+		}
+
+		if len(importPaths) == 0 {
+			return nil, fmt.Errorf("empty DB and neither ANATOMY_JSON nor HISTOLOGY_JSON is set — aborting to avoid loading test seed")
+		}
+
+		for _, path := range importPaths {
+			log.Printf("Empty DB: importing subjects from JSON: %s ...", path)
+			if err := ImportSubjectsFromFile(gdb, path); err != nil {
+				return nil, fmt.Errorf("import failed from %s: %w", path, err)
+			}
 		}
 		log.Println("Import finished successfully")
 	}
