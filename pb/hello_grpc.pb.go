@@ -352,6 +352,7 @@ const (
 	CourseService_MissingSectionsBySubjects_FullMethodName = "/pb.CourseService/MissingSectionsBySubjects"
 	CourseService_PriceMissingFromList_FullMethodName      = "/pb.CourseService/PriceMissingFromList"
 	CourseService_SubjectMissingTotal_FullMethodName       = "/pb.CourseService/SubjectMissingTotal"
+	CourseService_AllSubjectsPricing_FullMethodName        = "/pb.CourseService/AllSubjectsPricing"
 	CourseService_GetUserSections_FullMethodName           = "/pb.CourseService/GetUserSections"
 	CourseService_AddSection_FullMethodName                = "/pb.CourseService/AddSection"
 	CourseService_GetListSubjects_FullMethodName           = "/pb.CourseService/GetListSubjects"
@@ -366,7 +367,8 @@ const (
 type CourseServiceClient interface {
 	MissingSectionsBySubjects(ctx context.Context, in *MissingSectionsRequest, opts ...grpc.CallOption) (*MissingSectionsResponse, error)
 	PriceMissingFromList(ctx context.Context, in *PriceMissingRequest, opts ...grpc.CallOption) (*PriceMissingResponse, error)
-	SubjectMissingTotal(ctx context.Context, in *SubjectMissingTotalRequest, opts ...grpc.CallOption) (*SubjectMissingTotalResponse, error)
+	SubjectMissingTotal(ctx context.Context, in *SubjectMissingTotalRequest, opts ...grpc.CallOption) (*SubjectsMissingTotalResponse, error)
+	AllSubjectsPricing(ctx context.Context, in *AllSubjectsPricingRequest, opts ...grpc.CallOption) (*AllSubjectsPricingResponse, error)
 	GetUserSections(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserSectionsResponse, error)
 	AddSection(ctx context.Context, in *SaveSectionRequest, opts ...grpc.CallOption) (*SaveSectionResponse, error)
 	GetListSubjects(ctx context.Context, in *ListSubjectsRequest, opts ...grpc.CallOption) (*ListSubjectsResponse, error)
@@ -403,10 +405,20 @@ func (c *courseServiceClient) PriceMissingFromList(ctx context.Context, in *Pric
 	return out, nil
 }
 
-func (c *courseServiceClient) SubjectMissingTotal(ctx context.Context, in *SubjectMissingTotalRequest, opts ...grpc.CallOption) (*SubjectMissingTotalResponse, error) {
+func (c *courseServiceClient) SubjectMissingTotal(ctx context.Context, in *SubjectMissingTotalRequest, opts ...grpc.CallOption) (*SubjectsMissingTotalResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SubjectMissingTotalResponse)
+	out := new(SubjectsMissingTotalResponse)
 	err := c.cc.Invoke(ctx, CourseService_SubjectMissingTotal_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *courseServiceClient) AllSubjectsPricing(ctx context.Context, in *AllSubjectsPricingRequest, opts ...grpc.CallOption) (*AllSubjectsPricingResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AllSubjectsPricingResponse)
+	err := c.cc.Invoke(ctx, CourseService_AllSubjectsPricing_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -479,7 +491,8 @@ func (c *courseServiceClient) GrantFreeSection(ctx context.Context, in *GrantFre
 type CourseServiceServer interface {
 	MissingSectionsBySubjects(context.Context, *MissingSectionsRequest) (*MissingSectionsResponse, error)
 	PriceMissingFromList(context.Context, *PriceMissingRequest) (*PriceMissingResponse, error)
-	SubjectMissingTotal(context.Context, *SubjectMissingTotalRequest) (*SubjectMissingTotalResponse, error)
+	SubjectMissingTotal(context.Context, *SubjectMissingTotalRequest) (*SubjectsMissingTotalResponse, error)
+	AllSubjectsPricing(context.Context, *AllSubjectsPricingRequest) (*AllSubjectsPricingResponse, error)
 	GetUserSections(context.Context, *UserRequest) (*UserSectionsResponse, error)
 	AddSection(context.Context, *SaveSectionRequest) (*SaveSectionResponse, error)
 	GetListSubjects(context.Context, *ListSubjectsRequest) (*ListSubjectsResponse, error)
@@ -502,8 +515,11 @@ func (UnimplementedCourseServiceServer) MissingSectionsBySubjects(context.Contex
 func (UnimplementedCourseServiceServer) PriceMissingFromList(context.Context, *PriceMissingRequest) (*PriceMissingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PriceMissingFromList not implemented")
 }
-func (UnimplementedCourseServiceServer) SubjectMissingTotal(context.Context, *SubjectMissingTotalRequest) (*SubjectMissingTotalResponse, error) {
+func (UnimplementedCourseServiceServer) SubjectMissingTotal(context.Context, *SubjectMissingTotalRequest) (*SubjectsMissingTotalResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SubjectMissingTotal not implemented")
+}
+func (UnimplementedCourseServiceServer) AllSubjectsPricing(context.Context, *AllSubjectsPricingRequest) (*AllSubjectsPricingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AllSubjectsPricing not implemented")
 }
 func (UnimplementedCourseServiceServer) GetUserSections(context.Context, *UserRequest) (*UserSectionsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserSections not implemented")
@@ -594,6 +610,24 @@ func _CourseService_SubjectMissingTotal_Handler(srv interface{}, ctx context.Con
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CourseServiceServer).SubjectMissingTotal(ctx, req.(*SubjectMissingTotalRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CourseService_AllSubjectsPricing_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AllSubjectsPricingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CourseServiceServer).AllSubjectsPricing(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CourseService_AllSubjectsPricing_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CourseServiceServer).AllSubjectsPricing(ctx, req.(*AllSubjectsPricingRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -724,6 +758,10 @@ var CourseService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SubjectMissingTotal",
 			Handler:    _CourseService_SubjectMissingTotal_Handler,
+		},
+		{
+			MethodName: "AllSubjectsPricing",
+			Handler:    _CourseService_AllSubjectsPricing_Handler,
 		},
 		{
 			MethodName: "GetUserSections",

@@ -22,7 +22,7 @@ func RegisterRoutes(mux *http.ServeMux, cfg config.Config) {
 	mux.HandleFunc("/listsubjects", course.ListSubjects(cfg))
 	mux.HandleFunc("/addsection", course.AddSection(cfg))
 	mux.HandleFunc("/sections/total", course.SectionsTotal(cfg))
-	mux.HandleFunc("/subject_total", course.SubjectTotal(cfg))
+	mux.HandleFunc("/subject_total", course.AllSubjectsPricing(cfg))
 	mux.HandleFunc("/sectiontopics", course.SectionTopics(cfg))
 	mux.HandleFunc("/subjectsections", course.SubjectSections(cfg))
 

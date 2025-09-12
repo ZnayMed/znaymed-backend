@@ -11,7 +11,7 @@ type User struct {
 	ID      uint `gorm:"primaryKey"`
 	Name    string
 	TgID    string `gorm:"column:tgid"`
-	Email   string // `gorm:"uniqueIndex"` // было: Birthdate string
+	Email   string // `gorm:"uniqueIndex"`
 	IsAdmin bool   `gorm:"default:false"`
 }
 
@@ -38,14 +38,6 @@ func (d *Database) SaveUser(name, tgid, email string) error {
 		return fmt.Errorf("ошибка при проверке пользователя: %w", err)
 	}
 
-	//// (Опционально) проверка уникальности email
-	//var byEmail User
-	//if err := d.DB.Where("email = ?", email).First(&byEmail).Error; err == nil {
-	//	return fmt.Errorf("email уже занят")
-	//} else if !errors.Is(err, gorm.ErrRecordNotFound) {
-	//	return fmt.Errorf("ошибка при проверке email: %w", err)
-	//}
-
 	user := User{
 		Name:  name,
 		TgID:  tgid,
@@ -63,13 +55,6 @@ func (d *Database) UpdateEmailByTGIDHash(tgidHash, newEmail string) error {
 	if err := d.DB.Where("tgid = ?", tgidHash).First(&u).Error; err != nil {
 		return err // пробросим gorm.ErrRecordNotFound как есть
 	}
-
-	// var exists User
-	// if err := d.DB.Where("email = ?", newEmail).First(&exists).Error; err == nil {
-	//     return fmt.Errorf("email already in use")
-	// } else if !errors.Is(err, gorm.ErrRecordNotFound) {
-	//     return fmt.Errorf("db error checking email: %w", err)
-	// }
 
 	return d.DB.Model(&u).Update("email", newEmail).Error
 }
