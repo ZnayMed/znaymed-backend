@@ -468,58 +468,6 @@ func (s *courseServer) MissingSectionsBySubjects(ctx context.Context, in *pb.Mis
 	return out, nil
 }
 
-func (s *courseServer) SubjectMissingTotal(ctx context.Context, in *pb.SubjectMissingTotalRequest) (*pb.SubjectMissingTotalResponse, error) {
-	if in == nil || in.Tgid == "" || in.Subject == "" {
-		return nil, status.Error(codes.InvalidArgument, "tgid and subject are required")
-	}
-
-	var allTitles []string
-	if subjectID, _ := rediscourse.GetSubjectIDByTitle(ctx, s.rdb, in.Subject); subjectID != "" {
-		if secIDs, _ := rediscourse.GetSubjectSectionIDs(ctx, s.rdb, subjectID); len(secIDs) > 0 {
-			if id2title, miss, err := rediscourse.GetSectionTitlesByIDs(ctx, s.rdb, secIDs); err == nil && miss == 0 {
-				allTitles = make([]string, 0, len(secIDs))
-				for _, id := range secIDs {
-					allTitles = append(allTitles, id2title[id])
-				}
-			}
-		}
-	}
-	if len(allTitles) == 0 {
-		titles, err := s.db.GetSectionTitlesBySubjectTitle(in.Subject)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "db sections by subject: %v", err)
-		}
-		allTitles = titles
-	}
-
-	ownedTitles, err := s.db.GetAccessibleSectionTitlesByTGIDAndSubject(hashTGID(in.Tgid), in.Subject)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "db user owned by subject: %v", err)
-	}
-
-	missing := setDiffStr(allTitles, ownedTitles)
-
-	var total int64
-	for _, title := range missing {
-		if v, ok := rediscourse.GetSectionPrice(ctx, s.rdb, in.Subject, title); ok {
-			total += v
-			continue
-		}
-		priceK, derr := s.db.GetSectionPriceKopeckByTitle(ctx, title)
-		if derr != nil {
-			return nil, status.Errorf(codes.Internal, "db price by title: %v", derr)
-		}
-		total += priceK
-		rediscourse.SetSectionPrice(ctx, s.rdb, in.Subject, title, priceK)
-	}
-
-	return &pb.SubjectMissingTotalResponse{
-		Subject:     in.Subject,
-		TotalKopeck: total,
-		Currency:    "RUB",
-	}, nil
-}
-
 func setOf(ss []string) map[string]struct{} {
 	m := make(map[string]struct{}, len(ss))
 	for _, s := range ss {
@@ -580,6 +528,123 @@ func (s *courseServer) PriceMissingFromList(ctx context.Context, in *pb.PriceMis
 		TotalKopeck:     total,
 		Currency:        "RUB",
 	}, nil
+}
+
+func (s *courseServer) AllSubjectsPricing(ctx context.Context, in *pb.AllSubjectsPricingRequest) (*pb.AllSubjectsPricingResponse, error) {
+	if in == nil || strings.TrimSpace(in.Tgid) == "" {
+		return nil, status.Error(codes.InvalidArgument, "tgid is required")
+	}
+
+	list, err := s.GetListSubjects(ctx, &pb.ListSubjectsRequest{})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "list subjects: %v", err)
+	}
+	subjects := list.GetTitles()
+
+	resp := &pb.AllSubjectsPricingResponse{
+		Subjects: make([]*pb.SubjectPrice, 0, len(subjects)),
+		Currency: "RUB",
+	}
+
+	var totalMissing int32
+	var totalSubtotal int64
+
+	for _, subj := range subjects {
+		allTitles, err := s.getAllSectionTitlesForSubject(ctx, subj)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "sections of subject %q: %v", subj, err)
+		}
+
+		ownedTitles, err := s.db.GetAccessibleSectionTitlesByTGIDAndSubject(hashTGID(in.Tgid), subj)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "owned sections for %q: %v", subj, err)
+		}
+
+		missing := setDiffStr(allTitles, ownedTitles)
+		missingCount := int32(len(missing))
+
+		var subtotal int64
+		for _, title := range missing {
+			if v, ok := rediscourse.GetSectionPrice(ctx, s.rdb, subj, title); ok {
+				subtotal += v
+				continue
+			}
+			priceK, derr := s.db.GetSectionPriceKopeckByTitle(ctx, title)
+			if derr != nil {
+				return nil, status.Errorf(codes.Internal, "price for %q: %v", title, derr)
+			}
+			subtotal += priceK
+			rediscourse.SetSectionPrice(ctx, s.rdb, subj, title, priceK)
+		}
+
+		discForSubject, ruleSubj := applyDiscountByCount(subtotal, missingCount)
+
+		resp.Subjects = append(resp.Subjects, &pb.SubjectPrice{
+			Subject:          subj,
+			MissingCount:     missingCount,
+			SubtotalKopeck:   subtotal,
+			DiscountedKopeck: discForSubject,
+			AppliedRule:      ruleSubj,
+		})
+
+		totalMissing += missingCount
+		totalSubtotal += subtotal
+	}
+
+	totalDiscounted, ruleTotal := applyDiscountByCount(totalSubtotal, totalMissing)
+
+	resp.TotalMissingCount = totalMissing
+	resp.TotalSubtotalKopeck = totalSubtotal
+	resp.TotalDiscountedKopeck = totalDiscounted
+	resp.TotalAppliedRule = ruleTotal
+
+	return resp, nil
+}
+
+func (s *courseServer) getAllSectionTitlesForSubject(ctx context.Context, subject string) ([]string, error) {
+	if subjectID, _ := rediscourse.GetSubjectIDByTitle(ctx, s.rdb, subject); subjectID != "" {
+		if secIDs, _ := rediscourse.GetSubjectSectionIDs(ctx, s.rdb, subjectID); len(secIDs) > 0 {
+			if id2title, miss, err := rediscourse.GetSectionTitlesByIDs(ctx, s.rdb, secIDs); err == nil && miss == 0 {
+				out := make([]string, 0, len(secIDs))
+				for _, id := range secIDs {
+					out = append(out, id2title[id])
+				}
+				return out, nil
+			}
+		}
+	}
+	return s.db.GetSectionTitlesBySubjectTitle(subject)
+}
+
+func applyDiscountByCount(total int64, count int32) (int64, string) {
+	switch {
+	case count == 2:
+		return total * 9682 / 10000, "3.18% for 2 sections"
+	case count == 3:
+		return total * 9464 / 10000, "5.35%"
+	case count == 4:
+		return total * 9189 / 10000, "8.11%"
+	case count == 5:
+		return total * 9023 / 10000, "9.77%"
+	case count == 6:
+		return total * 8634 / 10000, "13.66%"
+	case count == 7:
+		return total * 8482 / 10000, "15%"
+	case count == 8:
+		return total * 8283 / 10000, "15.18%"
+	case count == 9:
+		return total * 8258 / 10000, "17.17%"
+	case count == 10:
+		return total * 8024 / 10000, "17.42%"
+	case count == 11:
+		return total * 8024 / 10000, "19.76%"
+	case count == 12:
+		return total * 7718 / 10000, "19.76%"
+	case count == 13:
+		return total * 9682 / 10000, "22.82%"
+	default:
+		return total, "no discount"
+	}
 }
 
 func main() {

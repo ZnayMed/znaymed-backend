@@ -100,6 +100,8 @@ func CreatePaymentMissSections(cfg config.Config) http.HandlerFunc {
 			return
 		}
 
+		discountedTotal, _ := applyDiscountByCount(total, int32(len(missingForPayment)))
+
 		email, err := authutil.GetUserEmail(cfg, req.TgID)
 
 		pConn, err := grpc.Dial(cfg.PaymentAddr, grpc.WithInsecure())
@@ -116,7 +118,7 @@ func CreatePaymentMissSections(cfg config.Config) http.HandlerFunc {
 		pResp, err := pClient.CreatePayment(ctxPay, &pb.CreatePaymentRequest{
 			Tgid:         req.TgID,
 			CourseIds:    missingForPayment,
-			AmountKopeck: total,
+			AmountKopeck: discountedTotal,
 			Email:        email,
 		})
 		if err != nil {
@@ -130,8 +132,39 @@ func CreatePaymentMissSections(cfg config.Config) http.HandlerFunc {
 			"status":       pResp.Status,
 			"sections":     missingForPayment,
 			"by_subject":   bySubject,
-			"total_kopeck": total,
+			"total_kopeck": discountedTotal,
 			"currency":     priceResp.Currency,
 		})
+	}
+}
+
+func applyDiscountByCount(total int64, count int32) (int64, string) {
+	switch {
+	case count == 2:
+		return total * 9682 / 10000, "3.18% for 2 sections"
+	case count == 3:
+		return total * 9464 / 10000, "5.35%"
+	case count == 4:
+		return total * 9189 / 10000, "8.11%"
+	case count == 5:
+		return total * 9023 / 10000, "9.77%"
+	case count == 6:
+		return total * 8634 / 10000, "13.66%"
+	case count == 7:
+		return total * 8482 / 10000, "15%"
+	case count == 8:
+		return total * 8283 / 10000, "15.18%"
+	case count == 9:
+		return total * 8258 / 10000, "17.17%"
+	case count == 10:
+		return total * 8024 / 10000, "17.42%"
+	case count == 11:
+		return total * 8024 / 10000, "19.76%"
+	case count == 12:
+		return total * 7718 / 10000, "19.76%"
+	case count == 13:
+		return total * 9682 / 10000, "22.82%"
+	default:
+		return total, "no discount"
 	}
 }
