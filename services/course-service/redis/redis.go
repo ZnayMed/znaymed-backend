@@ -414,3 +414,46 @@ func GetSectionDescriptionsByIDs(ctx context.Context, rdb *redis.Client, ids []s
 	}
 	return m, miss, nil
 }
+
+type SubjectInfoRedis struct {
+	Title       string
+	Description string
+}
+
+func GetSubjectInfos(ctx context.Context, rdb *redis.Client) ([]SubjectInfoRedis, error) {
+	ids, err := rdb.SMembers(ctx, "subjects:set").Result()
+	if err != nil {
+		return nil, fmt.Errorf("redis SMEMBERS subjects:set: %w", err)
+	}
+	if len(ids) == 0 {
+		return []SubjectInfoRedis{}, nil
+	}
+
+	pipe := rdb.Pipeline()
+	titleCmds := make([]*redis.StringCmd, 0, len(ids))
+	descCmds := make([]*redis.StringCmd, 0, len(ids))
+	for _, id := range ids {
+		titleCmds = append(titleCmds, pipe.HGet(ctx, "subject:"+id, "title"))
+		descCmds = append(descCmds, pipe.HGet(ctx, "subject:"+id, "description"))
+	}
+	if _, err := pipe.Exec(ctx); err != nil && err != redis.Nil {
+		return nil, fmt.Errorf("pipeline HGET subject fields: %w", err)
+	}
+
+	out := make([]SubjectInfoRedis, 0, len(ids))
+	for i, id := range ids {
+		title, _ := titleCmds[i].Result()
+		desc, _ := descCmds[i].Result()
+		if title == "" {
+			continue
+		}
+		if ttl, e := rdb.TTL(ctx, "subject:"+id).Result(); e == nil && ttl > 0 {
+			_ = rdb.Persist(ctx, "subject:"+id).Err()
+		}
+		out = append(out, SubjectInfoRedis{
+			Title:       title,
+			Description: desc,
+		})
+	}
+	return out, nil
+}

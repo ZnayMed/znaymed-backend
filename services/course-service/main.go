@@ -189,24 +189,46 @@ func AddSection(ctx context.Context, database *db.Database, rdb *goredis.Client,
 	return nil
 }
 
-func (s *courseServer) GetListSubjects(ctx context.Context, req *pb.ListSubjectsRequest) (*pb.ListSubjectsResponse, error) {
+func (s *courseServer) GetListSubjects(ctx context.Context, _ *pb.ListSubjectsRequest) (*pb.ListSubjectsResponse, error) {
 	if s.rdb != nil {
 		if titles, err := rediscourse.GetSubjectTitles(ctx, s.rdb); err == nil && len(titles) > 0 {
-			return &pb.ListSubjectsResponse{Titles: titles}, nil
-		} else if err != nil {
-			log.Printf("ListSubjects: Redis error: %v — fallback to DB", err)
+			rows, _ := s.db.ListSubjectsWithDescription(ctx)
+			descByTitle := make(map[string]string, len(rows))
+			for _, r := range rows {
+				descByTitle[r.Title] = r.Description
+			}
+
+			resp := &pb.ListSubjectsResponse{
+				Titles:   make([]string, 0, len(titles)),
+				Subjects: make([]*pb.SubjectInfo, 0, len(titles)),
+			}
+			for _, t := range titles {
+				resp.Titles = append(resp.Titles, t)
+				resp.Subjects = append(resp.Subjects, &pb.SubjectInfo{
+					Title:       t,
+					Description: descByTitle[t],
+				})
+			}
+			return resp, nil
 		}
 	}
 
-	subjects, err := s.db.ListSubjects(ctx)
+	rows, err := s.db.ListSubjectsWithDescription(ctx)
 	if err != nil {
 		return nil, err
 	}
-	titles := make([]string, 0, len(subjects))
-	for _, sbj := range subjects {
-		titles = append(titles, sbj.Title)
+	resp := &pb.ListSubjectsResponse{
+		Titles:   make([]string, 0, len(rows)),
+		Subjects: make([]*pb.SubjectInfo, 0, len(rows)),
 	}
-	return &pb.ListSubjectsResponse{Titles: titles}, nil
+	for _, r := range rows {
+		resp.Titles = append(resp.Titles, r.Title)
+		resp.Subjects = append(resp.Subjects, &pb.SubjectInfo{
+			Title:       r.Title,
+			Description: r.Description,
+		})
+	}
+	return resp, nil
 }
 
 func (s *courseServer) GetSubjectSections(ctx context.Context, req *pb.SubjectSectionsRequest) (*pb.SubjectSectionsResponse, error) {
@@ -491,7 +513,7 @@ func (s *courseServer) PriceMissingFromList(ctx context.Context, in *pb.PriceMis
 
 	var total int64
 	for _, title := range missing {
-		secID, _ := rediscourse.GetSectionIDByTitle(ctx, s.rdb, title) // может вернуть redis.Nil
+		secID, _ := rediscourse.GetSectionIDByTitle(ctx, s.rdb, title)
 		var price int64
 		var ok bool
 		if secID != "" {

@@ -182,3 +182,18 @@ func (d *Database) GetSectionDescriptionsBySubjectTitle(subject string) (map[str
 	}
 	return out, nil
 }
+
+type SubjectRow struct {
+	Title       string
+	Description string
+}
+
+func (d *Database) ListSubjectsWithDescription(ctx context.Context) ([]SubjectRow, error) {
+	var rows []SubjectRow
+	err := d.DB.WithContext(ctx).
+		Table("subjects AS s").
+		Select("s.title, COALESCE(s.description, s.description, '') AS description").
+		Order("s.id").
+		Scan(&rows).Error
+	return rows, err
+}
