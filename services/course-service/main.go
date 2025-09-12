@@ -147,7 +147,7 @@ func (s *courseServer) GrantFreeSection(ctx context.Context, in *pb.GrantFreeSec
 }
 
 func AddSection(ctx context.Context, database *db.Database, rdb *goredis.Client, tgid string, title string) error {
-	const userTTL = 3 * time.Hour
+	const userTTL = 2 * time.Minute
 	hashName := hashTGID(tgid)
 	log.Printf("📥 AddSectionFromKafka: hash=%s title=%s", tgid, title)
 
