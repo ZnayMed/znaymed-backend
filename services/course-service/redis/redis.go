@@ -3,10 +3,11 @@ package redis
 import (
 	"context"
 	"fmt"
-	"github.com/redis/go-redis/v9"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/redis/go-redis/v9"
 )
 
 func New() *redis.Client {
@@ -189,7 +190,6 @@ func GetSubjectIDByTitle(ctx context.Context, rdb *redis.Client, title string) (
 	if err != nil {
 		return "", fmt.Errorf("GET %s: %w", key, err)
 	}
-	// Индекс — персистентный
 	if ttl, e := rdb.TTL(ctx, key).Result(); e == nil && ttl > 0 {
 		_ = rdb.Persist(ctx, key).Err()
 	}
@@ -205,7 +205,6 @@ func GetUserSectionIDs(ctx context.Context, rdb *redis.Client, tgid string) ([]s
 	if err != nil {
 		return nil, fmt.Errorf("SMEMBERS %s: %w", key, err)
 	}
-	// Пользовательский ключ — кеш с TTL
 	_ = rdb.Expire(ctx, key, 3*time.Hour).Err()
 	return ids, nil
 }
@@ -362,7 +361,6 @@ func GetTopicsByIDsPipeline(ctx context.Context, rdb *redis.Client, topicIDs []s
 	return out, nil
 }
 
-// ===== НОВОЕ: кэш цены раздела (по subject+sectionTitle)
 func keySectionPrice(subject, sectionTitle string) string {
 	return "section_price:" + subject + ":" + sectionTitle
 }
@@ -381,4 +379,38 @@ func GetSectionPrice(ctx context.Context, rdb *redis.Client, subject, sectionTit
 
 func SetSectionPrice(ctx context.Context, rdb *redis.Client, subject, sectionTitle string, priceK int64) {
 	_ = rdb.Set(ctx, keySectionPrice(subject, sectionTitle), strconv.FormatInt(priceK, 10), 10*time.Minute).Err()
+}
+
+func GetSectionDescriptionsByIDs(ctx context.Context, rdb *redis.Client, ids []string) (map[string]string, int, error) {
+	m := make(map[string]string, len(ids))
+	if len(ids) == 0 {
+		return m, 0, nil
+	}
+	pipe := rdb.Pipeline()
+	cmds := make([]*redis.StringCmd, len(ids))
+	for i, id := range ids {
+		cmds[i] = pipe.HGet(ctx, "section:"+id, "description")
+	}
+	_, err := pipe.Exec(ctx)
+	if err != nil && err != redis.Nil {
+		return nil, 0, fmt.Errorf("pipeline HGET description: %w", err)
+	}
+
+	miss := 0
+	for i, id := range ids {
+		val, e := cmds[i].Result()
+		if e == redis.Nil || val == "" {
+			miss++
+			continue
+		}
+		if e != nil {
+			miss++
+			continue
+		}
+		if ttl, e2 := rdb.TTL(ctx, "section:"+id).Result(); e2 == nil && ttl > 0 {
+			_ = rdb.Persist(ctx, "section:"+id).Err()
+		}
+		m[id] = val
+	}
+	return m, miss, nil
 }

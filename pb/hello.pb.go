@@ -989,6 +989,7 @@ type SectionItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Title         string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
 	Accessible    bool                   `protobuf:"varint,2,opt,name=accessible,proto3" json:"accessible,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1035,6 +1036,13 @@ func (x *SectionItem) GetAccessible() bool {
 		return x.Accessible
 	}
 	return false
+}
+
+func (x *SectionItem) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
 }
 
 type SubjectSectionsResponse struct {
@@ -2100,12 +2108,13 @@ const file_hello_proto_rawDesc = "" +
 	"\x06topics\x18\x01 \x03(\v2\r.pb.TopicItemR\x06topics\"F\n" +
 	"\x16SubjectSectionsRequest\x12\x12\n" +
 	"\x04tgid\x18\x01 \x01(\tR\x04tgid\x12\x18\n" +
-	"\asubject\x18\x02 \x01(\tR\asubject\"C\n" +
+	"\asubject\x18\x02 \x01(\tR\asubject\"e\n" +
 	"\vSectionItem\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12\x1e\n" +
 	"\n" +
 	"accessible\x18\x02 \x01(\bR\n" +
-	"accessible\"F\n" +
+	"accessible\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\"F\n" +
 	"\x17SubjectSectionsResponse\x12+\n" +
 	"\bsections\x18\x01 \x03(\v2\x0f.pb.SectionItemR\bsections\"\x15\n" +
 	"\x13ListSubjectsRequest\".\n" +

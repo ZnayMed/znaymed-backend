@@ -213,58 +213,63 @@ func (s *courseServer) GetSubjectSections(ctx context.Context, req *pb.SubjectSe
 	const userTTL = 3 * time.Hour
 	start := time.Now()
 
+	if req == nil || strings.TrimSpace(req.Tgid) == "" || strings.TrimSpace(req.Subject) == "" {
+		return nil, status.Error(codes.InvalidArgument, "tgid and subject are required")
+	}
 	log.Printf("GetSubjectSections: subject='%s', tgid=%s", req.Subject, req.Tgid)
 
 	subjectID, err := rediscourse.GetSubjectIDByTitle(ctx, s.rdb, req.Subject)
 	if err != nil {
 		log.Printf("Redis GetSubjectIDByTitle('%s') error: %v", req.Subject, err)
 	}
-	if subjectID == "" {
-		log.Printf("Redis: subject id for '%s' not found", req.Subject)
-	}
-
-	subIDs, err := rediscourse.GetSubjectSectionIDs(ctx, s.rdb, subjectID)
-	if err != nil {
-		log.Printf("Redis GetSubjectSectionIDs(subjectID=%s) error: %v", subjectID, err)
-	}
-	if len(subIDs) == 0 {
-		log.Printf("Redis: no section IDs for subjectID=%s", subjectID)
-	}
-
-	id2title, miss, err := rediscourse.GetSectionTitlesByIDs(ctx, s.rdb, subIDs)
-	if err != nil {
-		log.Printf("Redis GetSectionTitlesByIDs error: %v", err)
-	}
-	if miss > 0 {
-		log.Printf("Redis: missing %d section titles (subjectID=%s)", miss, subjectID)
-	}
-
-	hasFullSubjectInRedis := subjectID != "" && len(subIDs) > 0 && miss == 0
-	if hasFullSubjectInRedis {
-		userIDs, err := rediscourse.GetUserSectionIDs(ctx, s.rdb, req.Tgid)
+	if subjectID != "" {
+		subIDs, err := rediscourse.GetSubjectSectionIDs(ctx, s.rdb, subjectID)
 		if err != nil {
-			log.Printf(" Redis GetUserSectionIDs(tgid=%s) error: %v", req.Tgid, err)
+			log.Printf("Redis GetSubjectSectionIDs('%s') error: %v", subjectID, err)
 		}
-
-		if len(userIDs) == 0 {
-			log.Printf("Redis: no user sections for tgid=%s — fallback DB", req.Tgid)
-
-			accTitles, dberr := s.db.GetAccessibleSectionTitlesByTGIDAndSubject(hashTGID(req.Tgid), req.Subject)
-			if dberr != nil {
-				log.Printf("DB GetAccessibleSectionTitlesByTGIDAndSubject error: %v", dberr)
-				accTitles = nil
+		if len(subIDs) > 0 {
+			id2title, missT, err := rediscourse.GetSectionTitlesByIDs(ctx, s.rdb, subIDs)
+			if err != nil {
+				log.Printf("Redis GetSectionTitlesByIDs error: %v", err)
+			}
+			descByID, missD, err := rediscourse.GetSectionDescriptionsByIDs(ctx, s.rdb, subIDs)
+			if err != nil {
+				log.Printf("Redis GetSectionDescriptionsByIDs error: %v", err)
 			}
 
+			if userIDs, err := rediscourse.GetUserSectionIDs(ctx, s.rdb, req.Tgid); err == nil && len(userIDs) > 0 {
+				accIDs := make(map[string]struct{}, len(userIDs))
+				for _, id := range userIDs {
+					accIDs[id] = struct{}{}
+				}
+
+				resp := &pb.SubjectSectionsResponse{Sections: make([]*pb.SectionItem, 0, len(subIDs))}
+				for _, id := range subIDs {
+					_, ok := accIDs[id]
+					resp.Sections = append(resp.Sections, &pb.SectionItem{
+						Title:       id2title[id],
+						Accessible:  ok,
+						Description: descByID[id],
+					})
+				}
+
+				log.Printf("GetSubjectSections[Redis→Redis]: subjectID=%s, titles.miss=%d, desc.miss=%d; took=%s",
+					subjectID, missT, missD, time.Since(start))
+				return resp, nil
+			}
+
+			accTitles, err := s.db.GetAccessibleSectionTitlesByTGIDAndSubject(hashTGID(req.Tgid), req.Subject)
+			if err != nil {
+				log.Printf("DB GetAccessibleSectionTitlesByTGIDAndSubject error: %v", err)
+				accTitles = nil
+			}
 			if len(accTitles) > 0 {
 				if err := rediscourse.SaveUserSectionsByTitles(ctx, s.rdb, req.Tgid, accTitles, userTTL); err != nil {
 					log.Printf("Redis SaveUserSectionsByTitles error: %v", err)
 				} else {
 					log.Printf("Redis warmed user:%s:sections with %d titles (TTL=%s)", req.Tgid, len(accTitles), userTTL)
 				}
-			} else {
-				log.Printf("DB: no accessible titles for tgid=%s, subject='%s'", req.Tgid, req.Subject)
 			}
-
 			accTitleSet := make(map[string]struct{}, len(accTitles))
 			for _, t := range accTitles {
 				accTitleSet[t] = struct{}{}
@@ -275,50 +280,31 @@ func (s *courseServer) GetSubjectSections(ctx context.Context, req *pb.SubjectSe
 				title := id2title[id]
 				_, ok := accTitleSet[title]
 				resp.Sections = append(resp.Sections, &pb.SectionItem{
-					Title:      title,
-					Accessible: ok,
+					Title:       title,
+					Accessible:  ok,
+					Description: descByID[id],
 				})
 			}
-			log.Printf("GetSubjectSections OK (redis subject + db user) in %s", time.Since(start))
+
+			log.Printf("GetSubjectSections[Redis→DB(user)]: subjectID=%s, titles.miss=%d, desc.miss=%d; took=%s",
+				subjectID, missT, missD, time.Since(start))
 			return resp, nil
 		}
-
-		accIDs := make(map[string]struct{}, len(userIDs))
-		for _, id := range userIDs {
-			accIDs[id] = struct{}{}
-		}
-
-		resp := &pb.SubjectSectionsResponse{Sections: make([]*pb.SectionItem, 0, len(subIDs))}
-		for _, id := range subIDs {
-			_, ok := accIDs[id]
-			resp.Sections = append(resp.Sections, &pb.SectionItem{
-				Title:      id2title[id],
-				Accessible: ok,
-			})
-		}
-		log.Printf("GetSubjectSections OK (redis only) in %s", time.Since(start))
-		return resp, nil
 	}
-
-	log.Printf("Fallback to DB for subject='%s'", req.Subject)
 
 	allTitles, err := s.db.GetSectionTitlesBySubjectTitle(req.Subject)
 	if err != nil {
-		log.Printf(" DB GetSectionTitlesBySubjectTitle error: %v", err)
-		return nil, status.Errorf(codes.Internal, "db: sections by subject: %v", err)
+		return nil, status.Errorf(codes.Internal, "db sections by subject: %v", err)
 	}
 	accTitles, err := s.db.GetAccessibleSectionTitlesByTGIDAndSubject(hashTGID(req.Tgid), req.Subject)
 	if err != nil {
 		log.Printf("DB GetAccessibleSectionTitlesByTGIDAndSubject error: %v", err)
 		accTitles = nil
 	}
-
-	if len(accTitles) > 0 {
-		if err := rediscourse.SaveUserSectionsByTitles(ctx, s.rdb, req.Tgid, accTitles, userTTL); err != nil {
-			log.Printf("Redis SaveUserSectionsByTitles error: %v", err)
-		} else {
-			log.Printf("Redis warmed user:%s:sections with %d titles (TTL=%s)", req.Tgid, len(accTitles), userTTL)
-		}
+	descs, err := s.db.GetSectionDescriptionsBySubjectTitle(req.Subject)
+	if err != nil {
+		log.Printf("DB GetSectionDescriptionsBySubjectTitle error: %v", err)
+		descs = map[string]string{}
 	}
 
 	accSet := make(map[string]struct{}, len(accTitles))
@@ -330,11 +316,13 @@ func (s *courseServer) GetSubjectSections(ctx context.Context, req *pb.SubjectSe
 	for _, title := range allTitles {
 		_, ok := accSet[title]
 		resp.Sections = append(resp.Sections, &pb.SectionItem{
-			Title:      title,
-			Accessible: ok,
+			Title:       title,
+			Accessible:  ok,
+			Description: descs[title],
 		})
 	}
-	log.Printf("GetSubjectSections OK (db fallback) in %s", time.Since(start))
+
+	log.Printf("GetSubjectSections[DB→DB]: subject='%s', n=%d; took=%s", req.Subject, len(resp.Sections), time.Since(start))
 	return resp, nil
 }
 

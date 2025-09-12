@@ -134,6 +134,7 @@ message SubjectSectionsRequest {
 message SectionItem {
   string title = 1;
   bool accessible = 2;
+  string description = 3;
 }
 message SubjectSectionsResponse {
   repeated SectionItem sections = 1;
