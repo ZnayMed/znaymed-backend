@@ -132,6 +132,20 @@ func (s *courseServer) GetTopicsBySectionTitle(ctx context.Context, req *pb.Sect
 	return resp, nil
 }
 
+func (s *courseServer) GrantFreeSection(ctx context.Context, in *pb.GrantFreeSectionRequest) (*pb.GrantFreeSectionResponse, error) {
+	if in == nil || strings.TrimSpace(in.Tgid) == "" || strings.TrimSpace(in.SectionTitle) == "" {
+		return nil, status.Error(codes.InvalidArgument, "tgid and section_title are required")
+	}
+
+	if err := AddSection(ctx, s.db, s.rdb, in.Tgid, in.SectionTitle); err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to grant section: %v", err)
+	}
+	return &pb.GrantFreeSectionResponse{
+		Success: true,
+		Message: "section granted (or already owned)",
+	}, nil
+}
+
 func AddSection(ctx context.Context, database *db.Database, rdb *goredis.Client, tgid string, title string) error {
 	const userTTL = 3 * time.Hour
 	hashName := hashTGID(tgid)
