@@ -134,6 +134,7 @@ message SubjectSectionsRequest {
 message SectionItem {
   string title = 1;
   bool accessible = 2;
+  string description = 3;
 }
 message SubjectSectionsResponse {
   repeated SectionItem sections = 1;
@@ -146,8 +147,13 @@ message ListSubjectsRequest{
 }
 message ListSubjectsResponse {
   repeated string titles = 1;
+  repeated SubjectInfo subjects = 2;
 }
 
+message SubjectInfo {
+  string title = 1;
+  string description = 2;
+}
 message CreatePaymentRequest {
   string tgid = 1;
   repeated string course_ids = 2;

@@ -12,8 +12,9 @@ import (
 )
 
 type seedSubject struct {
-	Title    string        `json:"Title"`
-	Sections []seedSection `json:"Sections"`
+	Title       string        `json:"Title"`
+	Description string        `json:"Description"`
+	Sections    []seedSection `json:"Sections"`
 }
 type seedSection struct {
 	Title       string      `json:"Title"`
@@ -50,17 +51,28 @@ func importOneSubject(db *gorm.DB, s seedSubject) error {
 	if title == "" {
 		return errors.New("subject.Title is empty")
 	}
+	subjDesc := strings.TrimSpace(s.Description)
 
 	return db.Transaction(func(tx *gorm.DB) error {
 		var subj Subject
 		if err := tx.Where("title = ?", title).First(&subj).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
-				subj = Subject{Title: title}
+				subj = Subject{
+					Title:       title,
+					Description: subjDesc,
+				}
 				if err := tx.Create(&subj).Error; err != nil {
 					return fmt.Errorf("create subject %q: %w", title, err)
 				}
 			} else {
 				return fmt.Errorf("find subject %q: %w", title, err)
+			}
+		} else {
+			if strings.TrimSpace(subj.Description) != subjDesc {
+				subj.Description = subjDesc
+				if err := tx.Save(&subj).Error; err != nil {
+					return fmt.Errorf("update subject %q: %w", title, err)
+				}
 			}
 		}
 

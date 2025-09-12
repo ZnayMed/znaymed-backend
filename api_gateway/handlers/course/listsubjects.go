@@ -21,7 +21,22 @@ func ListSubjects(cfg config.Config) http.HandlerFunc {
 			if err != nil {
 				return err
 			}
-			common.JSON(w, http.StatusOK, map[string]any{"subjects": resp.Titles})
+
+			type subj struct {
+				Title       string `json:"title"`
+				Description string `json:"description"`
+			}
+			outSubjects := make([]subj, 0, len(resp.GetSubjects()))
+			for _, s := range resp.GetSubjects() {
+				outSubjects = append(outSubjects, subj{
+					Title:       s.GetTitle(),
+					Description: s.GetDescription(),
+				})
+			}
+			common.JSON(w, http.StatusOK, map[string]any{
+				"subjects": outSubjects,
+				"titles":   resp.GetTitles(),
+			})
 			return nil
 		})
 		if err != nil {

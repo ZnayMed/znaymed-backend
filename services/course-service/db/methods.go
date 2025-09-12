@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"errors"
+
 	"gorm.io/gorm"
 )
 
@@ -157,4 +158,42 @@ func (d *Database) GetSectionPriceKopeckByTitle(ctx context.Context, sectionTitl
 		Select("price_kopeck").
 		Scan(&price).Error
 	return price, err
+}
+
+func (d *Database) GetSectionDescriptionsBySubjectTitle(subject string) (map[string]string, error) {
+	type row struct {
+		Title       string
+		Description string
+	}
+	var rows []row
+	err := d.DB.
+		Table("sections AS s").
+		Select("s.title, s.description").
+		Joins("JOIN subjects subj ON subj.id = s.subject_id").
+		Where("subj.title = ?", subject).
+		Order("s.id").
+		Scan(&rows).Error
+	if err != nil {
+		return nil, err
+	}
+	out := make(map[string]string, len(rows))
+	for _, r := range rows {
+		out[r.Title] = r.Description
+	}
+	return out, nil
+}
+
+type SubjectRow struct {
+	Title       string
+	Description string
+}
+
+func (d *Database) ListSubjectsWithDescription(ctx context.Context) ([]SubjectRow, error) {
+	var rows []SubjectRow
+	err := d.DB.WithContext(ctx).
+		Table("subjects AS s").
+		Select("s.title, COALESCE(s.description, s.description, '') AS description").
+		Order("s.id").
+		Scan(&rows).Error
+	return rows, err
 }

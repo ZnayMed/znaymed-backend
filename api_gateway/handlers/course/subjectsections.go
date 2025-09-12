@@ -43,8 +43,9 @@ func SubjectSections(cfg config.Config) http.HandlerFunc {
 			}
 
 			type sectionJSON struct {
-				Title      string `json:"title"`
-				Accessible bool   `json:"accessible"`
+				Title       string `json:"title"`
+				Accessible  bool   `json:"accessible"`
+				Description string `json:"description"`
 			}
 			out := struct {
 				Sections []sectionJSON `json:"sections"`
@@ -52,8 +53,9 @@ func SubjectSections(cfg config.Config) http.HandlerFunc {
 
 			for _, s := range resp.Sections {
 				out.Sections = append(out.Sections, sectionJSON{
-					Title:      s.Title,
-					Accessible: s.Accessible,
+					Title:       s.Title,
+					Accessible:  s.Accessible,
+					Description: s.Description,
 				})
 			}
 
