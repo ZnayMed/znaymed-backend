@@ -26,8 +26,18 @@ service CourseService{
   rpc GetListSubjects(ListSubjectsRequest) returns (ListSubjectsResponse);
   rpc GetSubjectSections(SubjectSectionsRequest) returns (SubjectSectionsResponse);
   rpc GetTopicsBySectionTitle (SectionTitleRequest) returns (SectionTopicsResponse);
+  rpc GrantFreeSection (GrantFreeSectionRequest) returns (GrantFreeSectionResponse);
 }
 
+message GrantFreeSectionRequest {
+  string tgid = 1;
+  string section_title = 2;
+}
+
+message GrantFreeSectionResponse {
+  bool success = 1;
+  string message = 2;
+}
 service PaymentService {
   rpc CreatePayment (CreatePaymentRequest) returns (CreatePaymentResponse);
 }
