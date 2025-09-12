@@ -205,7 +205,7 @@ func GetUserSectionIDs(ctx context.Context, rdb *redis.Client, tgid string) ([]s
 	if err != nil {
 		return nil, fmt.Errorf("SMEMBERS %s: %w", key, err)
 	}
-	_ = rdb.Expire(ctx, key, 3*time.Hour).Err()
+	_ = rdb.Expire(ctx, key, 2*time.Minute).Err()
 	return ids, nil
 }
 
