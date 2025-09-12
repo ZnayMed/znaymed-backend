@@ -20,7 +20,7 @@ import (
 	"gorm.io/gorm"
 )
 
-const userTTL = 3 * time.Hour
+const userTTL = 2 * time.Minute
 
 type authServer struct {
 	pb.UnimplementedAuthServiceServer
