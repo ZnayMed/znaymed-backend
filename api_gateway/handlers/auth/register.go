@@ -69,29 +69,42 @@ func Register(cfg config.Config) http.HandlerFunc {
 			return
 		}
 
+		const primaryFreeSectionTitle = "Остеология"
+		const extraFreeSectionTitle = "Цитология + ткани"
+
 		var grantOK bool
 		var grantMsg string
-
-		const freeSectionTitle = "Остеология"
 
 		courseConn, err := grpc.Dial(cfg.CourseAddr, grpc.WithInsecure())
 		if err == nil {
 			defer courseConn.Close()
 			courseClient := pb.NewCourseServiceClient(courseConn)
 
-			cctx, ccancel := context.WithTimeout(context.Background(), 3*time.Second)
-			defer ccancel()
+			{
+				cctx, ccancel := context.WithTimeout(context.Background(), 3*time.Second)
+				defer ccancel()
 
-			grantResp, gerr := courseClient.GrantFreeSection(cctx, &pb.GrantFreeSectionRequest{
-				Tgid:         req.TgID,
-				SectionTitle: freeSectionTitle,
-			})
-			if gerr == nil {
-				grantOK = grantResp.GetSuccess()
-				grantMsg = grantResp.GetMessage()
-			} else {
-				grantOK = false
-				grantMsg = "failed to grant free section"
+				grantResp, gerr := courseClient.GrantFreeSection(cctx, &pb.GrantFreeSectionRequest{
+					Tgid:         req.TgID,
+					SectionTitle: primaryFreeSectionTitle,
+				})
+				if gerr == nil {
+					grantOK = grantResp.GetSuccess()
+					grantMsg = grantResp.GetMessage()
+				} else {
+					grantOK = false
+					grantMsg = "failed to grant free section"
+				}
+			}
+
+			{
+				cctx2, ccancel2 := context.WithTimeout(context.Background(), 3*time.Second)
+				defer ccancel2()
+
+				_, _ = courseClient.GrantFreeSection(cctx2, &pb.GrantFreeSectionRequest{
+					Tgid:         req.TgID,
+					SectionTitle: extraFreeSectionTitle,
+				})
 			}
 		} else {
 			grantOK = false
@@ -101,10 +114,9 @@ func Register(cfg config.Config) http.HandlerFunc {
 		common.JSON(w, http.StatusOK, map[string]any{
 			"success":         true,
 			"message":         authResp.Message,
-			"granted_section": freeSectionTitle,
+			"granted_section": primaryFreeSectionTitle,
 			"grant_success":   grantOK,
 			"grant_message":   grantMsg,
 		})
-
 	}
 }

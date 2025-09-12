@@ -118,9 +118,11 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
       KAFKA_BROKERS: kafka:9092
-      IMPORT_JSON: /znaymed-backend/anatomy.json
+      ANATOMY_JSON: /znaymed-backend/anatomy.json
+      HISTOLOGY_JSON: /znaymed-backend/histology.json
     volumes:
       - ./anatomy.json:/znaymed-backend/anatomy.json:ro
+      - ./histology.json:/znaymed-backend/histology.json:ro
     ports: ["50053:50053"]
     networks: [znaymed-net]
 
