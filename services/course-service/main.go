@@ -147,9 +147,11 @@ func (s *courseServer) GrantFreeSection(ctx context.Context, in *pb.GrantFreeSec
 }
 
 func AddSection(ctx context.Context, database *db.Database, rdb *goredis.Client, tgid string, title string) error {
-	const userTTL = 2 * time.Minute
+	_ = ctx
+	_ = rdb
+
 	hashName := hashTGID(tgid)
-	log.Printf("📥 AddSectionFromKafka: hash=%s title=%s", tgid, title)
+	log.Printf("📥 AddSection: tgid=%s hash=%s title=%q", tgid, hashName, title)
 
 	success, err := database.GiveSectionToUser(hashName, title)
 	if err != nil {
@@ -157,33 +159,8 @@ func AddSection(ctx context.Context, database *db.Database, rdb *goredis.Client,
 		return err
 	}
 	if !success {
-		log.Printf("DB: nothing changed for hash=%s title=%s", hashName, title)
+		log.Printf("DB: nothing changed for hash=%s title=%q", hashName, title)
 		return nil
-	}
-
-	exists, err := rediscourse.UserSectionsExists(ctx, rdb, tgid)
-	if err != nil {
-		log.Printf("Redis EXISTS user:%s:sections error: %v (skip warmup)", tgid, err)
-		return nil
-	}
-
-	if exists {
-		if err := rediscourse.AddUserSectionByTitle(ctx, rdb, tgid, title, userTTL); err != nil {
-			log.Printf("Redis SADD user:%s:sections by title=%q failed: %v", tgid, title, err)
-		} else {
-			log.Printf("Redis updated: user:%s:sections += %q", tgid, title)
-		}
-	} else {
-		titles, derr := database.GetAccessibleSectionTitlesByTGIDHash(hashName)
-		if derr != nil {
-			log.Printf("DB GetAccessibleSectionTitlesByTGIDHash error: %v (skip warmup)", derr)
-			return nil
-		}
-		if err := rediscourse.SaveUserSectionsByTitles(ctx, rdb, tgid, titles, userTTL); err != nil {
-			log.Printf("Redis warmup user:%s:sections failed: %v", hashName, err)
-		} else {
-			log.Printf("Redis warmed user:%s:sections with %d titles (TTL=%s)", hashName, len(titles), userTTL)
-		}
 	}
 
 	return nil
@@ -232,7 +209,6 @@ func (s *courseServer) GetListSubjects(ctx context.Context, _ *pb.ListSubjectsRe
 }
 
 func (s *courseServer) GetSubjectSections(ctx context.Context, req *pb.SubjectSectionsRequest) (*pb.SubjectSectionsResponse, error) {
-	const userTTL = 2 * time.Minute
 	start := time.Now()
 
 	if req == nil || strings.TrimSpace(req.Tgid) == "" || strings.TrimSpace(req.Subject) == "" {
@@ -259,38 +235,10 @@ func (s *courseServer) GetSubjectSections(ctx context.Context, req *pb.SubjectSe
 				log.Printf("Redis GetSectionDescriptionsByIDs error: %v", err)
 			}
 
-			if userIDs, err := rediscourse.GetUserSectionIDs(ctx, s.rdb, req.Tgid); err == nil && len(userIDs) > 0 {
-				accIDs := make(map[string]struct{}, len(userIDs))
-				for _, id := range userIDs {
-					accIDs[id] = struct{}{}
-				}
-
-				resp := &pb.SubjectSectionsResponse{Sections: make([]*pb.SectionItem, 0, len(subIDs))}
-				for _, id := range subIDs {
-					_, ok := accIDs[id]
-					resp.Sections = append(resp.Sections, &pb.SectionItem{
-						Title:       id2title[id],
-						Accessible:  ok,
-						Description: descByID[id],
-					})
-				}
-
-				log.Printf("GetSubjectSections[Redis→Redis]: subjectID=%s, titles.miss=%d, desc.miss=%d; took=%s",
-					subjectID, missT, missD, time.Since(start))
-				return resp, nil
-			}
-
 			accTitles, err := s.db.GetAccessibleSectionTitlesByTGIDAndSubject(hashTGID(req.Tgid), req.Subject)
 			if err != nil {
 				log.Printf("DB GetAccessibleSectionTitlesByTGIDAndSubject error: %v", err)
 				accTitles = nil
-			}
-			if len(accTitles) > 0 {
-				if err := rediscourse.SaveUserSectionsByTitles(ctx, s.rdb, req.Tgid, accTitles, userTTL); err != nil {
-					log.Printf("Redis SaveUserSectionsByTitles error: %v", err)
-				} else {
-					log.Printf("Redis warmed user:%s:sections with %d titles (TTL=%s)", req.Tgid, len(accTitles), userTTL)
-				}
 			}
 			accTitleSet := make(map[string]struct{}, len(accTitles))
 			for _, t := range accTitles {
@@ -308,7 +256,7 @@ func (s *courseServer) GetSubjectSections(ctx context.Context, req *pb.SubjectSe
 				})
 			}
 
-			log.Printf("GetSubjectSections[Redis→DB(user)]: subjectID=%s, titles.miss=%d, desc.miss=%d; took=%s",
+			log.Printf("GetSubjectSections[Redis(struct)→DB(user)]: subjectID=%s, titles.miss=%d, desc.miss=%d; took=%s",
 				subjectID, missT, missD, time.Since(start))
 			return resp, nil
 		}
@@ -575,16 +523,11 @@ func (s *courseServer) AllSubjectsPricing(ctx context.Context, in *pb.AllSubject
 
 		var subtotal int64
 		for _, title := range missing {
-			if v, ok := rediscourse.GetSectionPrice(ctx, s.rdb, subj, title); ok {
-				subtotal += v
-				continue
-			}
 			priceK, derr := s.db.GetSectionPriceKopeckByTitle(ctx, title)
 			if derr != nil {
 				return nil, status.Errorf(codes.Internal, "price for %q: %v", title, derr)
 			}
 			subtotal += priceK
-			rediscourse.SetSectionPrice(ctx, s.rdb, subj, title, priceK)
 		}
 
 		discForSubject, ruleSubj := applyDiscountByCount(subtotal, missingCount)
